@@ -1,0 +1,44 @@
+table {
+    width: 100%;
+    table-layout: auto;
+  }
+  mat-card {
+    padding: 10px;
+    margin-bottom: 20px;
+  }
+  mat-card-title {
+    font-weight: bold;
+    background-color: #00a0c6;
+    color: white;
+    padding: 10px;
+  }
+  .m-t-20 {
+    margin-top: 20px;
+  }
+  
+  .m-l-10 {
+    margin-left: 10px;
+  }
+  
+  .text-end {
+    text-align: end;
+  }
+  
+  tr{
+    min-height: 1%;
+    height: 1%;
+  }
+
+  .table td {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    height: 20px !important;
+    padding : 2px 6px !important;
+  }
+
+  .checkbox-size {
+    height: 18px;
+    width: 18px;
+    accent-color: blue;
+  }

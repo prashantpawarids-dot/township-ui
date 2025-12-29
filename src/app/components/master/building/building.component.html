@@ -1,0 +1,55 @@
+<div class="container">
+    <div class="row" [formGroup]="buildingForm">
+        <!-- <div class="col-md-4">
+          <mat-form-field class="full-width">
+            <mat-label>Company Name</mat-label>
+           <input type="text" placeholder="Select City" aria-label="Riverview City" matInput name="name"
+           formControlName="parentID" [matAutocomplete]="autoCity">
+           <mat-autocomplete #autoCity="matAutocomplete" [displayWith]="displayCityTypes">
+            @for (option of cityTypes; track option){
+                <mat-option [value]="option.siteId">{{option.name}}</mat-option>
+            }
+           </mat-autocomplete>
+          </mat-form-field>
+        </div> -->
+          <ng-container *ngIf="neighbourhoodOptions.length">
+            <div class="col-md-4">
+              <mat-form-field class="full-width">
+                <mat-label>Neighbourhood</mat-label>
+                <input type="text" placeholder="Select Neighbourhood"
+                    aria-label="Neighbourhood" matInput
+                    formControlName="parentID" (click)="neighbourTrigger.openPanel()"
+                    readonly
+                    [matAutocomplete]="autoNeighbour"
+                    #neighbourTrigger="matAutocompleteTrigger">
+                <mat-autocomplete #autoNeighbour="matAutocomplete" [displayWith]="displayNeighbourhood">
+                    @for (option of neighbourhoodOptions; track option) {
+                    <mat-option [value]="option.id">{{option.name}}</mat-option>
+                    }
+                </mat-autocomplete>
+              </mat-form-field>
+            </div>
+            </ng-container>
+            <div class="col-md-4 ">
+                <mat-form-field class="full-width">
+                    <mat-label>Short Name</mat-label>
+                    <input matInput name="code" formControlName="code" />
+                  </mat-form-field>
+                  
+            </div>
+            <div class="col-md-4 ">
+                <mat-form-field class="full-width">
+                    <mat-label>Description</mat-label>
+                    <input matInput name="description" formControlName="name" />
+                  </mat-form-field>
+            </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12">
+              <div class="button-row m-b-10">
+                  <button *ngIf="!viewMode" mat-stroked-button (click)="editMode ? onUpdate() : onSave()">{{editMode ? "Update" : "Save"}}</button>
+                  <button class="m-l-10" mat-flat-button (click)="onCancel()">Cancel</button>
+              </div>
+          </div>
+      </div>
+    </div>

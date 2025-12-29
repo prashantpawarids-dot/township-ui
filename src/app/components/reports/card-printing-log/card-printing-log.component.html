@@ -1,0 +1,160 @@
+<form [formGroup]="reportForm" class="container-fluid">
+
+  <!-- Filters -->
+  <div class="row mt-3 g-2">
+
+    
+
+    <!-- From Date -->
+    <div class="col-10 col-md-4">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>From Date</mat-label>
+        <input matInput [matDatepicker]="fromPicker" formControlName="fromDate">
+        <mat-datepicker-toggle matSuffix [for]="fromPicker"></mat-datepicker-toggle>
+        <mat-datepicker #fromPicker></mat-datepicker>
+      </mat-form-field>
+    </div>
+
+    <!-- To Date -->
+    <div class="col-10 col-md-4">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>To Date</mat-label>
+        <input matInput [matDatepicker]="toPicker" formControlName="toDate">
+        <mat-datepicker-toggle matSuffix [for]="toPicker"></mat-datepicker-toggle>
+        <mat-datepicker #toPicker></mat-datepicker>
+      </mat-form-field>
+    </div>
+
+    <!-- Card Type -->
+    <div class="col-10 col-md-4">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>Card Type</mat-label>
+        <mat-select formControlName="cardType" multiple (selectionChange)="onCardTypeChange($event)">
+          <mat-option [value]="'all'">All</mat-option>
+          <mat-option *ngFor="let ct of cardTypes" [value]="ct.value">{{ ct.label }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <!-- Search By -->
+    <div class="col-10 col-md-2">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>Search By</mat-label>
+        <mat-select formControlName="searchBy">
+          <mat-option value="shortname">Short Name</mat-option>
+          <mat-option value="idNumber">ID Number</mat-option>
+          <mat-option value="csn">CSN</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <!-- Search Input -->
+    <div class="col-10 col-md-2">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>Search</mat-label>
+        <input matInput formControlName="searchValue" placeholder="Enter value">
+      </mat-form-field>
+    </div>
+
+    <!-- Buttons -->
+   <div class="col-auto d-flex flex-nowrap gap-2 align-items-center">
+      <button type="button" class="btn" (click)="applyFilters()">Search</button>
+      <button type="button" class="btn" (click)="showAll()">Clear</button>
+      <button type="button" class="btn" *ngIf="displayedData.length>0" (click)="exportReports()">PDF</button>
+      <button type="button" class="btn" *ngIf="displayedData.length>0" (click)="exportToExcel()">Excel</button>
+    </div>
+
+  </div>
+
+  <!-- Table & paginator remain the same -->
+
+
+
+
+
+
+  <!-- Table -->
+<div class="table-responsive mt-3">
+  <table class="table table-bordered table-hover table-striped">
+    <thead class="table-light">
+      <tr>
+        <th>Sr No</th>
+
+        <th (click)="sortColumn('idNumber')">
+          ID Number
+          <span *ngIf="getSortColumn() === 'idNumber'">
+            {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+          </span>
+        </th>
+
+        <th (click)="sortColumn('shortname')">
+          Short Name
+          <span *ngIf="getSortColumn() === 'shortname'">
+            {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+          </span>
+        </th>
+
+        <th (click)="sortColumn('csn')">
+          CSN
+          <span *ngIf="getSortColumn() === 'csn'">
+            {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+          </span>
+        </th>
+
+        <th (click)="sortColumn('flatNumber')">
+          Card Type
+          <span *ngIf="getSortColumn() === 'flatNumber'">
+            {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+          </span>
+        </th>
+<th (click)="sortColumn('cardType')">
+          Flat No
+          <span *ngIf="getSortColumn() === 'cardType'">
+            {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+          </span>
+        </th>
+        <th (click)="sortColumn('cardIssueDate')">
+          Card Printing Date
+          <span *ngIf="getSortColumn() === 'cardIssueDate'">
+            {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+          </span>
+        </th>
+
+        
+
+        <th (click)="sortColumn('status')">
+          Status
+          <span *ngIf="getSortColumn() === 'status'">
+            {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+          </span>
+        </th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr *ngFor="let e of displayedData; let i = index">
+        <td>{{ paginator.pageIndex * paginator.pageSize + i + 1 }}</td>
+        <td>{{ e.idNumber }}</td>
+        <td>{{ e.shortname }}</td>
+        <td>{{ e.csn }}</td>
+        <td>{{ e.cardType }}</td>
+        <td>{{e.flatNumber}}</td>
+        <td>{{ e.cardPrintingDate | date:'dd-MM-yyyy HH:mm:ss' }}</td>
+        
+        <td>{{ e.status }}</td>
+      </tr>
+
+      <tr *ngIf="displayedData.length === 0">
+        <td colspan="8" class="text-center">No Data Found</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+
+  
+  <!-- Paginator -->
+  <mat-paginator [pageSizeOptions]="pageSizes" [pageSize]="10" showFirstLastButtons
+                 (page)="onPageChange($event)">
+  </mat-paginator>
+</form>

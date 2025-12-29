@@ -1,0 +1,155 @@
+<form [formGroup]="reportForm" class="container-fluid">
+
+  <div class="row mt-3 g-2">
+
+   <!-- FROM DATE & TIME -->
+<div class="col-10 col-md-2">
+  <mat-form-field appearance="outline" class="w-100">
+    <mat-label>From Date</mat-label>
+    <input matInput [matDatepicker]="fromPicker" formControlName="fromDate">
+    <mat-datepicker-toggle matSuffix [for]="fromPicker"></mat-datepicker-toggle>
+    <mat-datepicker #fromPicker></mat-datepicker>
+  </mat-form-field>
+</div>
+<div class="col-2 col-md-1">
+  <input type="time" class="form-control" formControlName="fromTime">
+</div>
+
+<!-- TO DATE & TIME -->
+<div class="col-10 col-md-2">
+  <mat-form-field appearance="outline" class="w-100">
+    <mat-label>To Date</mat-label>
+    <input matInput [matDatepicker]="toPicker" formControlName="toDate">
+    <mat-datepicker-toggle matSuffix [for]="toPicker"></mat-datepicker-toggle>
+    <mat-datepicker #toPicker></mat-datepicker>
+  </mat-form-field>
+</div>
+<div class="col-2 col-md-1">
+  <input type="time" class="form-control" formControlName="toTime">
+</div>
+
+
+    <!-- Building Multi-select -->
+<div class="col-10 col-md-2">
+  <mat-form-field appearance="outline" class="w-100">
+    <mat-label>Building</mat-label>
+    <mat-select formControlName="buildings" multiple (selectionChange)="onBuildingChange()">
+
+      <mat-option *ngFor="let b of buildings" [value]="b">{{ b }}</mat-option>
+    </mat-select>
+  </mat-form-field>
+</div>
+
+
+
+    <!-- Search By -->
+    <div class="col-10 col-md-2">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>Search By</mat-label>
+        <mat-select formControlName="searchType">
+          <mat-option *ngFor="let s of searchType" [value]="s.value">{{ s.label }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <!-- Search Value -->
+    <div class="col-10 col-md-2">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>Search Value</mat-label>
+        <input matInput formControlName="searchValue">
+      </mat-form-field>
+    </div>
+
+    <!-- Buttons -->
+    <div class="col-auto d-flex gap-2">
+      <button type="button" class="btn" (click)="showReports()">Search</button>
+      <button type="button" class="btn" (click)="clear()">Clear</button>
+      <button type="button" class="btn" *ngIf="displayedData.data.length > 0" (click)="exportReports()">PDF</button>
+      <button type="button" class="btn" *ngIf="displayedData.data.length > 0" (click)="exportExcel()">Excel</button>
+    </div>
+  </div>
+
+  <!-- Table -->
+<div class="table-responsive mt-3">
+  <table class="table table-bordered table-hover table-striped">
+    <thead class="table-light">
+      <tr>
+        <th >
+          Sr No
+         
+        </th>
+        <th (click)="sortColumn('vehicleNumber')">
+          Vehicle
+          <span *ngIf="getSortColumn() === 'vehicleNumber'">
+            {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+          </span>
+        </th>
+        <th (click)="sortColumn('ownerName')">
+          Owner
+          <span *ngIf="getSortColumn() === 'ownerName'">
+            {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+          </span>
+        </th>
+        <th (click)="sortColumn('building')">
+          Building
+          <span *ngIf="getSortColumn() === 'building'">
+            {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+          </span>
+        </th>
+        <th (click)="sortColumn('flatNumber')">
+          Flat
+          <span *ngIf="getSortColumn() === 'flatNumber'">
+            {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+          </span>
+        </th>
+        <th (click)="sortColumn('inTime')">
+          In Time
+          <span *ngIf="getSortColumn() === 'inTime'">
+            {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+          </span>
+        </th>
+        <th>In Image</th>
+        <th (click)="sortColumn('outTime')">
+          Out Time
+          <span *ngIf="getSortColumn() === 'outTime'">
+            {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+          </span>
+        </th>
+        <th>Out Image</th>
+      </tr>
+    </thead>
+
+    <tbody *ngIf="displayedData.data.length > 0">
+      <tr *ngFor="let e of paginatedData; let i = index">
+        <td>{{ paginator.pageIndex * paginator.pageSize + i + 1 }}</td>
+        <td>{{ e.vehicleNumber }}</td>
+        <td>{{ e.ownerName }}</td>
+        <td>{{ e.building }}</td>
+        <td>{{ e.flatNumber }}</td>
+        <td>{{ e.inTime | date:'dd-MM-yyyy HH:mm' }}</td>
+        <td>
+          <img *ngIf="e.inCameraImage" [src]="e.inCameraImage" width="70" height="50" class="rounded border">
+        </td>
+        <td>{{ e.outTime | date:'dd-MM-yyyy HH:mm' }}</td>
+        <td>
+          <img *ngIf="e.outCameraImage" [src]="e.outCameraImage" width="70" height="50" class="rounded border">
+        </td>
+      </tr>
+    </tbody>
+
+    <tbody *ngIf="displayedData.data.length === 0">
+      <tr>
+        <td colspan="9" class="text-center"><strong>No Data Found</strong></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+
+
+
+  
+
+  <!-- Paginator -->
+  <mat-paginator [pageSizeOptions]="pageSizes" [pageSize]="10" showFirstLastButtons></mat-paginator>
+</form>

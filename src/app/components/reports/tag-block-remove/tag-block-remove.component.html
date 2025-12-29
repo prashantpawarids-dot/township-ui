@@ -1,0 +1,109 @@
+<form [formGroup]="reportForm" class="container-fluid">
+
+  <!-- Action Type Radio Buttons -->
+  <div class="row mb-3">
+    <div class="col-12">
+      <mat-radio-group formControlName="actionType">
+        <mat-radio-button value="block" class="me-4">Block</mat-radio-button>
+        <mat-radio-button value="remove" class="me-4">Remove</mat-radio-button>
+        <mat-radio-button value="both">Both</mat-radio-button>
+      </mat-radio-group>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="row mt-3 g-2">
+
+    <!-- From Date -->
+    <div class="col-10 col-md-2">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>From Date</mat-label>
+        <input matInput [matDatepicker]="fromPicker" formControlName="fromDate">
+        <mat-datepicker-toggle matSuffix [for]="fromPicker"></mat-datepicker-toggle>
+        <mat-datepicker #fromPicker></mat-datepicker>
+      </mat-form-field>
+    </div>
+
+    <!-- To Date -->
+    <div class="col-10 col-md-2">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>To Date</mat-label>
+        <input matInput [matDatepicker]="toPicker" formControlName="toDate">
+        <mat-datepicker-toggle matSuffix [for]="toPicker"></mat-datepicker-toggle>
+        <mat-datepicker #toPicker></mat-datepicker>
+      </mat-form-field>
+    </div>
+
+    <!-- Search By -->
+    <div class="col-10 col-md-2">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>Search By</mat-label>
+        <mat-select formControlName="searchBy">
+          <!-- <mat-option value="id">ID</mat-option> -->
+          <mat-option value="rfidTag">RFID Tag</mat-option>
+          <mat-option value="personName">Person Name</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <!-- Search Value -->
+    <div class="col-10 col-md-2">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>Search Value</mat-label>
+        <input matInput formControlName="searchText" placeholder="Search...">
+      </mat-form-field>
+    </div>
+
+    <!-- Buttons -->
+    <div class="col-10 col-md-4 d-flex flex-wrap gap-1 align-items-center">
+      <button type="button" class="btn"
+              (click)="filterData()" [disabled]="displayedData.data.length===0">Show</button>
+      <button type="button" class="btn"
+              (click)="showAll()" [disabled]="displayedData.data.length===0">Show All</button>
+      <button type="button" class="btn"
+              *ngIf="displayedData.data.length > 0" (click)="exportPDF()">PDF</button>
+      <button type="button" class="btn"
+              *ngIf="displayedData.data.length > 0" (click)="exportExcel()">Excel</button>
+    </div>
+
+  </div>
+
+  <!-- Responsive Table -->
+  <div class="table-responsive mt-3" *ngIf="displayedData.data.length > 0">
+    <table class="table table-bordered table-hover table-striped w-100">
+      <thead class="table-light">
+        <tr>
+          <th>Sr No</th>
+          <th>ID</th>
+          <th>RFID Tag</th>
+          <th>Person Name</th>
+          <th>Person ID</th>
+          <th>Status</th>
+          <th>Action By</th>
+          <th>Action DateTime</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let e of displayedData.data; let i = index">
+          <td>{{ paginator.pageIndex * paginator.pageSize + i + 1 }}</td>
+          <td>{{ e.id }}</td>
+          <td>{{ e.rfidTag }}</td>
+          <td>{{ e.personName }}</td>
+          <td>{{ e.personId }}</td>
+          <td>{{ e.status }}</td>
+          <td>{{ e.actionBy }}</td>
+          <td>{{ e.actionDateTime | date:'dd-MM-yyyy HH:mm:ss' }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- No Data -->
+  <div *ngIf="displayedData.data.length === 0" class="text-center mt-3 text-danger fw-bold fs-5">
+    Data Not Available
+  </div>
+
+  <!-- Paginator -->
+  <mat-paginator [pageSizeOptions]="[10,25,50]" [pageSize]="10" showFirstLastButtons></mat-paginator>
+
+</form>

@@ -1,0 +1,34 @@
+.days-list {
+    width: 150px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.days-column {
+    cursor: pointer;
+}
+
+.text-capitalize {
+    text-transform: capitalize;
+}
+
+.days-of-week {
+    display: flex;
+    .sun {
+        order: 1;
+    }.mon {
+        order: 2;
+    }.tue {
+        order: 3;
+    }.wed {
+        order: 4;
+    }.thu {
+        order: 5;
+    }.fri {
+        order: 6;
+    }.sat {
+        order: 7;
+    }
+
+}

@@ -1,0 +1,297 @@
+<form [formGroup]="reportresidentForm" class="container-fluid">
+
+  <div class="row mt-3 g-2">
+
+    <div class="col-10 col-md-3">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>From Date</mat-label>
+        <input matInput [matDatepicker]="fromPicker" formControlName="fromDate" />
+        <mat-datepicker-toggle matSuffix [for]="fromPicker"></mat-datepicker-toggle>
+        <mat-datepicker #fromPicker></mat-datepicker>
+      </mat-form-field>
+    </div>
+
+    <div class="col-10 col-md-3">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>To Date</mat-label>
+        <input matInput [matDatepicker]="toPicker" formControlName="toDate" />
+        <mat-datepicker-toggle matSuffix [for]="toPicker"></mat-datepicker-toggle>
+        <mat-datepicker #toPicker></mat-datepicker>
+      </mat-form-field>
+    </div>
+
+    <div class="col-10 col-md-3">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>Neighbourhood</mat-label>
+        <mat-select multiple formControlName="project" (selectionChange)="onProjectChange()">
+          <mat-option value="All">All</mat-option>
+          <mat-option *ngFor="let p of uniqueProjects" [value]="p">{{ p }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <div class="col-10 col-md-3">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>Building</mat-label>
+        <mat-select multiple formControlName="building" (selectionChange)="onBuildingChange()">
+          <mat-option value="All">All</mat-option>
+          <mat-option *ngFor="let b of filteredBuildings" [value]="b">{{ b }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+  </div>
+
+  <div class="row mt-2 g-2">
+
+    <div class="col-10 col-md-3">
+     <mat-form-field appearance="outline" class="w-100">
+  <mat-label>Search</mat-label>
+  <mat-select formControlName="searchType">
+    <mat-option value="">Select Search By</mat-option>
+    <mat-option *ngFor="let s of searchType" [value]="s.value">
+      {{ s.label }}
+    </mat-option>
+  </mat-select>
+</mat-form-field>
+
+
+    </div>
+
+    <div class="col-10 col-md-3">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>Search</mat-label>
+        <input matInput formControlName="searchText" placeholder="Start typing..." />
+      </mat-form-field>
+    </div>
+
+    <div class="col-10 col-md-4 d-flex flex-wrap gap-2 align-items-center">
+      <button class="btn" type="button" (click)="onSearch()">Search</button>
+      <button class="btn" type="button" (click)="showall()">Clear</button>
+      <button class="btn" type="button" *ngIf="displayedData.data.length > 0" (click)="exportPDF()">PDF</button>
+      <button class="btn" type="button" *ngIf="displayedData.data.length > 0" (click)="exportExcel()">Excel</button>
+    </div>
+
+  </div>
+
+  <div class="table-responsive mt-3">
+  <table class="table table-bordered table-hover table-striped w-100">
+
+    <thead class="table-light">
+      <tr>
+        <th>SrNo</th>
+
+        <th (click)="sortColumn('idNumber')">
+          IDNo
+          <span *ngIf="getSortColumn() === 'idNumber'">
+            {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+          </span>
+        </th>
+
+        <th (click)="sortColumn('icEno')">
+          ICENo
+          <span *ngIf="getSortColumn() === 'icEno'">
+            {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+          </span>
+        </th>
+
+        <th (click)="sortColumn('firstName')">
+          FirstName
+          <span *ngIf="getSortColumn() === 'firstName'">
+            {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+          </span>
+        </th>
+
+        <th (click)="sortColumn('middleName')">
+          MiddleName
+          <span *ngIf="getSortColumn() === 'middleName'">
+            {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+          </span>
+        </th>
+
+        <th (click)="sortColumn('lastName')">
+          LastName
+          <span *ngIf="getSortColumn() === 'lastName'">
+            {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+          </span>
+        </th>
+
+        <th (click)="sortColumn('shortName')">
+          ShortName
+          <span *ngIf="getSortColumn() === 'shortName'">
+            {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+          </span>
+        </th>
+
+        <th (click)="sortColumn('gender')">
+          Gender
+          <span *ngIf="getSortColumn() === 'gender'">
+            {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+          </span>
+        </th>
+
+        <th (click)="sortColumn('bloodGroup')">
+          BloodGrp
+          <span *ngIf="getSortColumn() === 'bloodGroup'">
+            {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+          </span>
+        </th>
+
+        <th (click)="sortColumn('dob')">
+          DOB
+          <span *ngIf="getSortColumn() === 'dob'">
+            {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+          </span>
+        </th>
+
+        <th (click)="sortColumn('emailID')">
+          EmailID
+          <span *ngIf="getSortColumn() === 'emailID'">
+            {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+          </span>
+        </th>
+
+        <th (click)="sortColumn('mobileNo')">
+          MobileNo
+          <span *ngIf="getSortColumn() === 'mobileNo'">
+            {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+          </span>
+        </th>
+
+        <th (click)="sortColumn('landLine')">
+          Landline
+          <span *ngIf="getSortColumn() === 'landLine'">
+            {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+          </span>
+        </th>
+
+        <th (click)="sortColumn('aadharCardId')">
+          AadharID
+          <span *ngIf="getSortColumn() === 'aadharCardId'">
+            {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+          </span>
+        </th>
+
+        <th (click)="sortColumn('voterID')">
+          VoterID
+          <span *ngIf="getSortColumn() === 'voterID'">
+            {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+          </span>
+        </th>
+
+        <th (click)="sortColumn('flatNumber')">
+          FlatNo
+          <span *ngIf="getSortColumn() === 'flatNumber'">
+            {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+          </span>
+        </th>
+
+        <th (click)="sortColumn('tagNumber')">
+          TagNo
+          <span *ngIf="getSortColumn() === 'tagNumber'">
+            {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+          </span>
+        </th>
+
+        <th (click)="sortColumn('paNnumber')">
+          PANNo
+          <span *ngIf="getSortColumn() === 'paNnumber'">
+            {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+          </span>
+        </th>
+
+        <th (click)="sortColumn('passportNo')">
+          PassportNo
+          <span *ngIf="getSortColumn() === 'passportNo'">
+            {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+          </span>
+        </th>
+
+        <th (click)="sortColumn('licenseNo')">
+          LicenseNo
+          <span *ngIf="getSortColumn() === 'licenseNo'">
+            {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+          </span>
+        </th>
+
+        <th (click)="sortColumn('cardIssueDate')">
+          CardIssueDate
+          <span *ngIf="getSortColumn() === 'cardIssueDate'">
+            {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+          </span>
+        </th>
+
+        <th (click)="sortColumn('cardPrintingDate')">
+          CardPrintDate
+          <span *ngIf="getSortColumn() === 'cardPrintingDate'">
+            {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+          </span>
+        </th>
+
+        <th (click)="sortColumn('registrationIssueDate')">
+          RegIssueDate
+          <span *ngIf="getSortColumn() === 'registrationIssueDate'">
+            {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+          </span>
+        </th>
+
+        <th (click)="sortColumn('nrdName')">
+          Neighbourhood
+          <span *ngIf="getSortColumn() === 'nrdName'">
+            {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+          </span>
+        </th>
+
+        <th (click)="sortColumn('buildingName')">
+          BuildingName
+          <span *ngIf="getSortColumn() === 'buildingName'">
+            {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+          </span>
+        </th>
+      </tr>
+    </thead>
+
+    <tbody *ngIf="displayedData.data.length > 0; else noData">
+      <tr *ngFor="let d of displayedData.data; let i = index">
+        <td>{{ i + 1 }}</td>
+        <td>{{ d.idNumber }}</td>
+        <td>{{ d.icEno }}</td>
+        <td>{{ d.firstName }}</td>
+        <td>{{ d.middleName }}</td>
+        <td>{{ d.lastName }}</td>
+        <td>{{ d.shortName }}</td>
+        <td>{{ d.gender }}</td>
+        <td>{{ d.bloodGroup }}</td>
+        <td>{{ d.dob | date:'dd-MM-yyyy' }}</td>
+        <td>{{ d.emailID }}</td>
+        <td>{{ d.mobileNo }}</td>
+        <td>{{ d.landLine }}</td>
+        <td>{{ d.aadharCardId }}</td>
+        <td>{{ d.voterID }}</td>
+        <td>{{ d.flatNumber }}</td>
+        <td>{{ d.tagNumber }}</td>
+        <td>{{ d.paNnumber }}</td>
+        <td>{{ d.passportNo }}</td>
+        <td>{{ d.licenseNo }}</td>
+        <td>{{ d.cardIssueDate | date:'dd-MM-yyyy' }}</td>
+        <td>{{ d.cardPrintingDate | date:'dd-MM-yyyy' }}</td>
+        <td>{{ d.registrationIssueDate | date:'dd-MM-yyyy' }}</td>
+        <td>{{ d.nrdName }}</td>
+        <td>{{ d.buildingName }}</td>
+      </tr>
+    </tbody>
+
+    <ng-template #noData>
+      <tr>
+        <td colspan="25" class="text-center">No Data Found</td>
+      </tr>
+    </ng-template>
+
+  </table>
+</div>
+
+
+  <mat-paginator #paginator [pageSizeOptions]="[10,25,50,100]" [pageSize]="10"
+                 showFirstLastButtons></mat-paginator>
+
+</form>

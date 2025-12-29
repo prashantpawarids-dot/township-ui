@@ -1,0 +1,50 @@
+<h1 *ngIf="!outlet.isActivated">Welcome!</h1>
+<!-- 
+Dashboard Code -->
+
+ 
+
+  <router-outlet #outlet="outlet"></router-outlet>
+  
+
+
+
+<div *ngIf="!outlet?.isActivated && projectList.length > 0" class="container-fluid py-3">
+  <div class="row align-items-center">
+    <div class="col">
+      <h2 class="mb-0">Welcome!</h2>
+      <h1>Dashboard</h1>
+    </div>
+    <div class="col-auto">
+      <div class="input-group">
+        <label
+          class="input-group-text"
+          for="projectSelect"
+          style="background-color: #f0f0f0; color: #333; font-weight: 500;"
+        >
+          Projects
+        </label>
+        <select
+          class="form-select"
+          id="projectSelect"
+          [(ngModel)]="selectedProject"
+          aria-label="Select Project"
+          style="background-color: white; color: #b8a4a4; border: 1px solid #ccc;"
+        >
+          <option value="" disabled selected>Select Project</option>
+          <option *ngFor="let project of projectList" [value]="project.id">
+            {{ project.name }}
+          </option>
+        </select>
+      </div>
+    </div> 
+  </div>
+</div>
+
+
+<!-- <router-outlet #outlet="outlet"></router-outlet> -->
+
+
+
+
+

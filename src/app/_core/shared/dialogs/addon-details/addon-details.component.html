@@ -1,0 +1,166 @@
+<div class="container m-t-30 m-b-30">
+    <div class="row">
+        <div class="col-md-4 ">
+            <mat-form-field class="full-width">
+                <mat-label>ID</mat-label>
+                <input disabled="true" readonly [(ngModel)]="addonData.idNumber" name="addonid" #addonid="ngModel"
+                    matInput />
+            </mat-form-field>
+        </div>
+        <div class="col-md-4 ">
+             <div>
+                <img *ngIf="photoPreviewAddOn" [src]="photoPreviewAddOn" alt="photoPreviewAddOn"
+                    width="150" height="100"
+                    style="border: 1px solid #ccc; background-color: gray;" />
+            </div>
+            <button mat-raised-button (click)="onClick($event)" [disabled]="isView">
+                <mat-icon>add</mat-icon>
+                Upload Photo</button>
+            <!-- <input [disabled]="isView" #addonphoto type="file" class="input_fileupload--hidden"  
+                [(ngModel)]="addonData.photo" name="addonphotoname" #addonphotoname="ngModel"> -->
+            <input accept="image/*" [disabled]="isView"  name="photo" #fileUpload type="file"
+                class="input_fileupload--hidden" (change)="onFileSelected($event)" />
+            <!-- <span>{{addonData.photo}}</span> -->
+
+        </div>
+        <div class="col-md-4 ">
+            <mat-form-field class="full-width">
+                <mat-label>First Name</mat-label>
+                <input [disabled]="isView" [(ngModel)]="addonData.firstName" name="addonfname" #addonfname="ngModel"
+                    matInput />
+            </mat-form-field>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4 ">
+            <mat-form-field class="full-width">
+                <mat-label>Middle Name</mat-label>
+                <input [disabled]="isView" [(ngModel)]="addonData.middleName" name="addonmname" #addonmname="ngModel"
+                    matInput />
+            </mat-form-field>
+        </div>
+        <div class="col-md-4 ">
+            <mat-form-field class="full-width">
+                <mat-label>Last Name</mat-label>
+                <input [disabled]="isView" [(ngModel)]="addonData.lastName" name="addonlname" #addonlname="ngModel"
+                    matInput />
+            </mat-form-field>
+        </div>
+        <div class="col-md-4 ">
+            <label id="gender-label" class="gender-label">Gender</label>
+            <mat-radio-group [disabled]="isView" [(ngModel)]="addonData.gender" name="addongender"
+                #addongender="ngModel" aria-label="Gender">
+                <mat-radio-button value="Male">Male</mat-radio-button>
+                <mat-radio-button value="Female">Female</mat-radio-button>
+            </mat-radio-group>
+        </div>
+    </div>
+    <div class="row">
+
+        <div class="col-md-4 ">
+            <mat-form-field class="full-width">
+                <mat-label>Blood Group</mat-label>
+                <input [disabled]="isView" [(ngModel)]="addonData.bloodGroup" name="addonblood" #addonblood="ngModel"
+                    matInput />
+            </mat-form-field>
+        </div>
+        <div class="col-md-4 ">
+            <mat-form-field class="full-width">
+                <mat-label>Date of Birth</mat-label>
+                <input [disabled]="isView" [(ngModel)]="addonData.dob" name="addondob" #addondob="ngModel" matInput
+                    [matDatepicker]="addonpicker">
+                <mat-hint>DD/MM/YYYY</mat-hint>
+                <mat-datepicker-toggle matIconSuffix [for]="addonpicker"></mat-datepicker-toggle>
+                <mat-datepicker #addonpicker></mat-datepicker>
+            </mat-form-field>
+        </div>
+        <div class="col-md-4 ">
+            <mat-form-field class="full-width">
+                <mat-label>Mobile No</mat-label>
+                <input [disabled]="isView" [(ngModel)]="addonData.mobileNo" name="addonmobile" #addonmobile="ngModel"
+                    matInput type="number" />
+            </mat-form-field>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4 ">
+            <mat-form-field class="full-width">
+                <mat-label>PAN No</mat-label>
+                <input [disabled]="isView" [(ngModel)]="addonData.paNnumber" name="addonpan" #addonpan="ngModel"
+                    matInput />
+            </mat-form-field>
+        </div>
+        <div class="col-md-4 ">
+            <mat-form-field class="full-width">
+                <mat-label>License No</mat-label>
+                <input [disabled]="isView" [(ngModel)]="addonData.licenseNo" name="addonlicence" #addonlicence="ngModel"
+                    matInput />
+            </mat-form-field>
+        </div>
+        <div class="col-md-4 ">
+            <mat-form-field class="full-width">
+                <mat-label>Passport No</mat-label>
+                <input [disabled]="isView" [(ngModel)]="addonData.passportNo" name="addonpassport"
+                    #addonpassport="ngModel" matInput />
+            </mat-form-field>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4 ">
+            <mat-form-field class="full-width">
+                <mat-label>Aadhar Card</mat-label>
+                <input [disabled]="isView" [(ngModel)]="addonData.aadharCardId" name="addonaadhar"
+                    #addonaadhar="ngModel" matInput />
+            </mat-form-field>
+        </div>
+        <div class="col-md-4 ">
+            <mat-form-field class="full-width">
+                <mat-label>Voter ID</mat-label>
+                <input [disabled]="isView" [(ngModel)]="addonData.voterID" name="addonvoter" #addonvoter="ngModel"
+                    matInput />
+            </mat-form-field>
+        </div>
+        <ng-container *ngIf="tenantType == 0">
+            <div class="col-md-4">
+                <mat-form-field class="full-width">
+                    <mat-label>Agreement From</mat-label>
+                    <input [(ngModel)]="addonData.aggreement_From" name="aggreement_From" #aggreement_From="ngModel"  
+                    matInput [matDatepicker]="pickerAgreeFrom">
+                    <mat-hint>DD/mm/YYYY</mat-hint>
+                    <mat-datepicker-toggle matIconSuffix [for]="pickerAgreeFrom"></mat-datepicker-toggle>
+                    <mat-datepicker #pickerAgreeFrom></mat-datepicker>
+                </mat-form-field>
+            </div>
+            <div class="col-md-4">
+                <mat-form-field class="full-width">
+                    <mat-label>Agreement To</mat-label>
+                    <input [(ngModel)]="addonData.aggreement_To" name="aggreement_To"   #aggreement_To="ngModel"  
+                    matInput [matDatepicker]="pickerAgreeTo">
+                    <mat-hint>DD/mm/YYYY</mat-hint>
+                    <mat-datepicker-toggle matIconSuffix [for]="pickerAgreeTo"></mat-datepicker-toggle>
+                    <mat-datepicker #pickerAgreeTo></mat-datepicker>
+                </mat-form-field>
+            </div>
+            <div class="col-md-4">
+                <mat-form-field class="full-width">
+                    <mat-label>Registration Issue Date</mat-label>
+                    <input [(ngModel)]="addonData.registrationIssueDate" name="registrationIssueDate" #dob="ngModel" matInput
+                        [matDatepicker]="picker">
+                    <mat-hint>DD/mm/YYYY</mat-hint>
+                    <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                    <mat-datepicker #picker></mat-datepicker>
+                </mat-form-field>
+            </div>
+        </ng-container>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="button-row m-t-10 m-b-10">
+                <button *ngIf="!isView" mat-stroked-button (click)="updateLandOwner()">Update</button>
+                <button class="m-l-10" (click)="cancel()" mat-flat-button>Cancel</button>
+            </div>
+        </div>
+    </div>
+
+</div>

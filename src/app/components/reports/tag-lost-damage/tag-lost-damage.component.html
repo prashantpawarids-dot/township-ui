@@ -1,0 +1,108 @@
+<form [formGroup]="reportForm" class="container-fluid">
+
+  <!-- Liable Type Radio Buttons -->
+  <div class="row mb-3">
+    <div class="col-12">
+      <mat-radio-group formControlName="liableType">
+        <mat-radio-button value="lost" class="me-4">Lost</mat-radio-button>
+        <mat-radio-button value="damage" class="me-4">Damage</mat-radio-button>
+        <mat-radio-button value="both">Both</mat-radio-button>
+      </mat-radio-group>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="row mt-3 g-2">
+
+    <!-- From Date -->
+    <div class="col-10 col-md-2">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>From Date</mat-label>
+        <input matInput [matDatepicker]="fromPicker" formControlName="fromDate">
+        <mat-datepicker-toggle matSuffix [for]="fromPicker"></mat-datepicker-toggle>
+        <mat-datepicker #fromPicker></mat-datepicker>
+      </mat-form-field>
+    </div>
+
+    <!-- To Date -->
+    <div class="col-10 col-md-2">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>To Date</mat-label>
+        <input matInput [matDatepicker]="toPicker" formControlName="toDate">
+        <mat-datepicker-toggle matSuffix [for]="toPicker"></mat-datepicker-toggle>
+        <mat-datepicker #toPicker></mat-datepicker>
+      </mat-form-field>
+    </div>
+
+    <!-- Search By -->
+    <div class="col-10 col-md-2">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>Search By</mat-label>
+        <mat-select formControlName="searchBy">
+          <mat-option value="ownerName">Owner Name</mat-option>
+          <mat-option value="tagNo">Tag No</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <!-- Search Value -->
+    <div class="col-10 col-md-2">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>Search Value</mat-label>
+        <input matInput formControlName="searchText" placeholder="Search...">
+      </mat-form-field>
+    </div>
+
+    <!-- Buttons -->
+    <div class="col-10 col-md-4 d-flex flex-wrap gap-1 align-items-center">
+      <button type="button" class="btn"
+              (click)="filterData()" [disabled]="displayedData.data.length===0">Show</button>
+      <button type="button" class="btn"
+              (click)="showAll()" [disabled]="displayedData.data.length===0">Show All</button>
+      <button type="button" class="btn"
+              *ngIf="displayedData.data.length > 0" (click)="exportPDF()">PDF</button>
+      <button type="button" class="btn"
+              *ngIf="displayedData.data.length > 0" (click)="exportExcel()">Excel</button>
+    </div>
+
+  </div>
+
+  <!-- Responsive Table -->
+  <div class="table-responsive mt-3" *ngIf="displayedData.data.length > 0">
+    <table class="table table-bordered table-hover table-striped w-100">
+      <thead class="table-light">
+        <tr>
+          <th>Sr No</th>
+          <th>ID</th>
+          <th>Tag No</th>
+          <th>Owner Name</th>
+          <th>Card Type</th>
+          <th>Liable Type</th>
+          <th>Status</th>
+          <th>DateTime</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let e of displayedData.data; let i = index">
+          <td>{{ paginator.pageIndex * paginator.pageSize + i + 1 }}</td>
+          <td>{{ e.id }}</td>
+          <td>{{ e.tagNo }}</td>
+          <td>{{ e.ownerName }}</td>
+          <td>{{ e.cardType }}</td>
+          <td>{{ e.liableType }}</td>
+          <td>{{ e.status }}</td>
+          <td>{{ e.dateTime | date:'dd-MM-yyyy HH:mm:ss' }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- No Data -->
+  <div *ngIf="displayedData.data.length === 0" class="text-center mt-3 text-danger fw-bold fs-5">
+    Data Not Available
+  </div>
+
+  <!-- Paginator -->
+  <mat-paginator [pageSizeOptions]="[10,25,50]" [pageSize]="10" showFirstLastButtons></mat-paginator>
+
+</form>

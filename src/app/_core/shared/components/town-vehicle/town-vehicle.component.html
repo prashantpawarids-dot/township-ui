@@ -1,0 +1,119 @@
+<h6>Reg. No. <span class="title-red">Eg. MH12AT4545</span> &#40; Do not use space, / ,- ,# , etc. &#41;</h6>
+<div>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4 ">
+                <mat-form-field class="full-width">
+                    <mat-label>Vehicle Type</mat-label>
+                    <input type="text" placeholder="Select Vehicle Type" aria-label="vtype" matInput name="vForm"
+                        #vForm="ngModel" [(ngModel)]="vehicle.vType" [matAutocomplete]="autoVehicle">
+                    <mat-autocomplete #autoVehicle="matAutocomplete">
+                        @for (option of vehicleTypes; track option) {
+                        <mat-option [value]="option">{{option}}</mat-option>
+                        }
+                    </mat-autocomplete>
+                </mat-form-field>
+            </div>
+            <div class="col-md-4 ">
+                <mat-form-field class="full-width">
+                    <mat-label>Reg. No.</mat-label>
+                    <input matInput [(ngModel)]="vehicle.regNo" name="vehicleRegNo" #vehicleRegNo="ngModel" />
+                </mat-form-field>
+            </div>
+            <div class="col-md-4 ">
+                <mat-form-field class="full-width">
+                    <mat-label>Make</mat-label>
+                    <input matInput [(ngModel)]="vehicle.vMake" name="vehicleMake" #vehicleMake="ngModel" />
+                </mat-form-field>
+            </div>
+            <div class="col-md-4 ">
+                <mat-form-field class="full-width">
+                    <mat-label>Color</mat-label>
+                    <input matInput [(ngModel)]="vehicle.vColor" name="vehicleColor" #vehicleColor="ngModel" />
+                </mat-form-field>
+            </div>
+            <div class="col-md-4 ">
+                <mat-form-field class="full-width">
+                    <mat-label>Sticker</mat-label>
+                    <input matInput [(ngModel)]="vehicle.stickerNo" name="vehicleSticker" #vehicleSticker="ngModel" />
+                </mat-form-field>
+            </div>
+
+            <div class="col-md-4">
+    <mat-form-field class="full-width">
+        <mat-label>Status</mat-label>
+        <mat-select [(ngModel)]="vehicle.isactive" name="vehicleStatus" #vehicleStatus="ngModel">
+            <mat-option [value]="1">Active</mat-option>
+            <mat-option [value]="0">Inactive</mat-option>
+        </mat-select>
+    </mat-form-field>
+</div>
+
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="button-row m-b-10">
+                    <button mat-stroked-button (click)="addUpdateVehicleData()">
+                        {{isUpdate ? 'Update Record' : 'Add Record'}} </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="container">
+    <table mat-table *ngIf="dataToDisplayVehicle.length > 0" [dataSource]="dataSourceVehicle" class="mat-elevation-z8">
+
+        <!--- Note that these columns can be defined in any order.
+              The actual rendered columns are set as a property on the row definition" -->
+
+        <ng-container matColumnDef="srno">
+            <th mat-header-cell *matHeaderCellDef>Sr No </th>
+            <td mat-cell *matCellDef="let element"> {{element.srno}} </td>
+        </ng-container>
+
+        <!-- vehicleType Column -->
+        <ng-container matColumnDef="vehicleType">
+            <th mat-header-cell *matHeaderCellDef> Vehicle Type </th>
+            <td mat-cell *matCellDef="let element"> {{element.vType}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="vehicleRegNo">
+            <th mat-header-cell *matHeaderCellDef> Reg. No. </th>
+            <td mat-cell *matCellDef="let element"> {{element.regNo}} </td>
+        </ng-container>
+        <ng-container matColumnDef="vehicleMake">
+            <th mat-header-cell *matHeaderCellDef>Make </th>
+            <td mat-cell *matCellDef="let element"> {{element.vMake}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="vehicleColor">
+            <th mat-header-cell *matHeaderCellDef> Color </th>
+            <td mat-cell *matCellDef="let element"> {{element.vColor}} </td>
+        </ng-container>
+        <ng-container matColumnDef="vehicleSticker">
+            <th mat-header-cell *matHeaderCellDef> Sticker </th>
+            <td mat-cell *matCellDef="let element"> {{element.stickerNo}} </td>
+        </ng-container>
+<ng-container matColumnDef="vehicleStatus">
+  <th mat-header-cell *matHeaderCellDef> Status </th>
+  <td mat-cell *matCellDef="let element">
+    {{ element.isactive === 1 ? 'Active' : 'Inactive' }}
+  </td>
+</ng-container>
+
+        <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef> Actions </th>
+            <td mat-cell *matCellDef="let element">
+                <button mat-stroked-button class="" (click)="editVehicleData(element)">Edit</button>
+                <!-- <button mat-stroked-button class="m-l-10" (click)="removeVehicleData(element)">Remove</button> -->
+            </td>
+
+        </ng-container>
+
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumnsVehicle"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumnsVehicle;"></tr>
+    </table>
+</div>

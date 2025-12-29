@@ -1,0 +1,58 @@
+<div class="container">
+    <div class="row" [formGroup]="userForm">
+        <ng-container *ngIf="companyOptions.length">
+            <div class="col-md-4">
+              <mat-form-field class="full-width">
+                <mat-label>Company</mat-label>
+                <input type="text" placeholder="Select Project"
+                    aria-label="Neighbourhood" matInput
+                    formControlName="companyID" [matAutocomplete]="autoNeighbour">
+                <mat-autocomplete #autoNeighbour="matAutocomplete" [displayWith]="displayCompanyName">
+                    @for (option of companyOptions; track option) {
+                    <mat-option  [value]="option.id">{{option.companyName}}</mat-option>
+                    }
+                </mat-autocomplete>
+              </mat-form-field>
+            </div>
+            </ng-container>
+        <div class="col-md-4">
+            <mat-form-field class="full-width">
+                <mat-label>User ID</mat-label>
+                <input formControlName="uid" matInput />
+            </mat-form-field>
+        </div>
+        <div class="col-md-4">
+            <mat-form-field class="full-width">
+                <mat-label>User Password</mat-label>
+                <input formControlName="password" matInput />
+            </mat-form-field>
+        </div>
+        <div class="col-md-4">
+            <mat-form-field class="full-width">
+                <mat-label>Profile Name</mat-label>
+                <input formControlName="name" matInput />
+            </mat-form-field>
+        </div>
+        <div class="col-md-4">
+            <mat-form-field class="full-width">
+                <mat-label>Phone</mat-label>
+                <input formControlName="phone" matInput />
+            </mat-form-field>
+        </div>
+    <div class="col-md-4">
+            <mat-form-field class="full-width">
+                <mat-label>User Email</mat-label>
+                <input formControlName="email" matInput />
+            </mat-form-field>
+        </div>    
+    </div>
+    
+    <div class="row">
+        <div class="col-md-12">
+            <div class="button-row m-b-10">
+                <button *ngIf="!viewMode" mat-stroked-button (click)="editMode ? onUpdate() : onSave()">{{editMode ? "Update" : "Save"}}</button>
+                <button class="m-l-10" mat-flat-button (click)="onCancel()">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
