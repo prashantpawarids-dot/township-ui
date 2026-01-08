@@ -69,12 +69,12 @@ buildings: any[] = [];
   constructor(private fb: FormBuilder, private http: HttpClient ,private sortService: TableSortService) {}
 
   ngOnInit() {
-
+let today=new Date();
     this.reportForm = this.fb.group({
       project: [''],
       building: [''],
-      fromDate: [''],
-      toDate: [''],
+      fromDate: [today],
+      toDate: [today],
       searchType: [''],
       searchText: ['']
     });

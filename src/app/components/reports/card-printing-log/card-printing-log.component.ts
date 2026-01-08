@@ -61,12 +61,13 @@ export class CardPrintingLogComponent implements OnInit {
   };
 
   constructor(private fb: FormBuilder, private http: HttpClient, private sortService: TableSortService) {
+    let today=new Date();
     this.reportForm = this.fb.group({
       cardType: [[]],
       searchBy: [''],
       searchValue: [''],
-       fromDate: [''],
-  toDate: [''],
+       fromDate: [today],
+  toDate: [today],
     });
   }
 

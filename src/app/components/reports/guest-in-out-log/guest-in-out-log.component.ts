@@ -59,11 +59,12 @@ filteredData:any[]=[];
   constructor(private fb: FormBuilder, private http: HttpClient,private sortService: TableSortService) {}
 
   ngOnInit(): void {
+    let today=new Date();
     this.guestLogForm = this.fb.group({
       searchType: [''],
       searchText: [''],
-      fromDate: [''],
-      toDate: [''],
+      fromDate: [today],
+      toDate: [today],
       buildingName: [[]],
       nrdName: [[]]
     });

@@ -60,13 +60,14 @@ buildings: any[] = [];
   ];
 
   constructor(private fb: FormBuilder, private http: HttpClient,private sortService: TableSortService) {
+    let today=new Date();
     this.reportresidentForm = fb.group({
       searchType: [''],
       searchText: [''],
       project: [],
       building: [],
-      fromDate: [''],
-      toDate: ['']
+      fromDate: [today],
+      toDate: [today]
     });
   }
 

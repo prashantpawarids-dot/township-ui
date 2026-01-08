@@ -802,13 +802,29 @@ getGuest(): Observable<any[]> {
       catchError(this.handleError));
   }
 
-    getReader(id?: number): Observable<any> {
-    let url = this.baseUrl + 'Reader'
-    return this.http.get(url).pipe(map(res => {
-      return res;
+  //   getReader(id?: number): Observable<any> {
+  //   let url = this.baseUrl + 'Reader'
+  //   return this.http.get(url).pipe(map(res => {
+  //     return res;
+  //   }),
+  //     catchError(this.handleError));
+  // }
+
+  getReader(id?: number): Observable<any> {
+  const url = this.baseUrl + 'Reader';
+  const roleid = localStorage.getItem('roleid'); // fetch role
+
+  return this.http.get<any[]>(url).pipe(
+    map(res => {
+      // Admin sees everything, others see only not deleted
+      return roleid === '1'
+        ? res
+        : res.filter(item => !item.isDeleted); 
     }),
-      catchError(this.handleError));
-  }
+    catchError(this.handleError)
+  );
+}
+
   //     getReaderLocation(id?: number): Observable<any> {
   //   let url = this.baseUrl + 'ReaderLocation'
   //   return this.http.get(url).pipe(map(res => {
@@ -1471,13 +1487,51 @@ deleteServiceType(id: number): Observable<any> {
 /**
  * Delete Reader Relay by ID
  */
+// deleteReaderRelay(id: number): Observable<any> {
+//   const url = `${this.baseUrl}ReaderRelay/DeleteID/${id}`;
+//   return this.http.delete(url).pipe(
+//     map(res => res),
+//     catchError(this.handleError)
+//   );
+// }
+
+
 deleteReaderRelay(id: number): Observable<any> {
-  const url = `${this.baseUrl}ReaderRelay/DeleteID/${id}`;
+  const url = `${this.baseUrl}Reader/DeleteReader/${id}`;
   return this.http.delete(url).pipe(
     map(res => res),
     catchError(this.handleError)
   );
 }
+
+blockRevokeAccess(payload: {
+  id: number;
+  iDnumber: number;
+  blockRevokType: 'B' | 'R';
+  fromdate?: string;
+  todate?: string;
+}) {
+  const url = `${this.baseUrl}AccessRights/AddUpdateAccessBlockRevoke/${payload.id}`;
+
+  const body: any = {
+    id: payload.id,
+    iDnumber: payload.iDnumber,
+    blockRevokType: payload.blockRevokType,
+    fromdate: payload.fromdate ?? null,
+    todate: payload.todate ?? null
+  };
+
+  return this.http.post(url, body, {
+    headers: { 'Content-Type': 'application/json' }
+  });
+}
+
+
+
+
+
+
+
 
 
 

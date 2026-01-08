@@ -62,10 +62,11 @@ export class CardEncodingLogComponent implements OnInit {
   };
 
   constructor(private fb: FormBuilder, private http: HttpClient ,private sortService: TableSortService) {
+    let today=new Date();
 this.reportForm = this.fb.group({
   dateField: ['cardIssueDate'], // default
-  fromDate: [''],
-  toDate: [''],
+  fromDate: [today],
+  toDate: [today],
   cardType: [[]],
   searchBy: [''],
   searchValue: ['']

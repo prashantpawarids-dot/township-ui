@@ -60,9 +60,11 @@ export class VisitorInOutLogComponent implements OnInit, AfterViewInit {
   buildingList: string[] = [];
 
   constructor(private fb: FormBuilder, private http: HttpClient ,private sortService: TableSortService) {
+    let today=new Date();
     this.reportForm = this.fb.group({
-      fromDate: [''],
-      toDate: [''],
+      
+      fromDate: [today],
+      toDate: [today],
       searchType: [''],
       searchText: [''],
       nrd: [[]],

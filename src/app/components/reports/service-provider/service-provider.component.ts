@@ -52,11 +52,12 @@ filteredData: any[] = []; // Add this property
   constructor(private fb: FormBuilder, private http: HttpClient) {}
 
   ngOnInit(): void {
+    let today=new Date();
     this.serviceForm = this.fb.group({
       searchType: [''],
       searchText: [''],
-      fromDate: [''],
-      toDate: ['']
+      fromDate: [today],
+      toDate: [today]
     });
 
     this.loadData();

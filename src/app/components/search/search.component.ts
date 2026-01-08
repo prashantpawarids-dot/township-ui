@@ -6,10 +6,6 @@ import { MatTableDataSource } from '@angular/material/table';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MaterialModule } from 'src/app/_core/shared/material/material.module';
 import { AuthService } from 'src/app/services/auth.service';
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
-import * as XLSX from 'xlsx';
-import { saveAs } from 'file-saver';
 import Swal from 'sweetalert2';
 import { Observable } from 'rxjs';
 
@@ -364,14 +360,27 @@ export class SearchComponent {
     });
   }
 
-  setReaderRelay() {
-    this.title = 'Reader Relay';
-    this.authService.getReaderRelay().subscribe(res => {
-      this.dataToDisplay = [...res];
-      this.dataSource.data = (this.dataToDisplay);
-      this.displayedColumns = ['srno', 'fullname', 'actions']
-    });
-  }
+  // setReaderRelay() {
+  //   this.title = 'Reader Relay';
+  //   this.authService.getReaderRelay().subscribe(res => {
+  //     this.dataToDisplay = [...res];
+  //     this.dataSource.data = (this.dataToDisplay);
+  //     this.displayedColumns = ['srno', 'fullname', 'actions']
+  //   });
+  // }
+
+setReaderRelay() {
+  this.title = 'Reader Relay';
+  
+  this.authService.getReader().subscribe(res => {
+    this.dataToDisplay = [...res];
+    this.dataSource.data = this.dataToDisplay;
+
+    // Only show srno, readerLocation, actions
+    this.displayedColumns = ['srno', 'readerLocation', 'actions'];
+  });
+}
+
 
   viewData(data: any) {
     if (this.returnPath) {
@@ -430,10 +439,10 @@ export class SearchComponent {
 
 deleteData(element: any) {
   // Check if already deleted
-  if (element.logicalDeleted === 1 ||   element.isactive === false) {
-    this.showSwal('error', `This ${this.title} is already deleted`);
-    return;
-  }
+  if (element.logicalDeleted === 1 || element.isactive === false || element.isDeleted === true) {
+  this.showSwal('error', `This ${this.title} is already deleted`);
+  return;
+}
 
    const deleteMethods: { [key: string]: (id: any) => Observable<any> } = {
     '/tenant': this.authService.deleteTenant.bind(this.authService),
@@ -491,6 +500,133 @@ private showSwal(icon: 'success' | 'error', title: string) {
     position: 'center'
   });
 }
+
+/** ------------------- Block / Revoke ------------------- */
+blockOrRevoke(element: any) {
+  // Check current block status
+  if (!element.isBlocked) {
+    // BLOCK flow
+    Swal.fire({
+      title: 'Are you sure?',
+      text: `Do you want to block this ${this.title}?`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes',
+      cancelButtonText: 'No'
+    }).then(result => {
+      if (result.isConfirmed) this.openBlockDatePopup(element);
+    });
+  } else {
+    // REVOKE flow
+    Swal.fire({
+      title: 'Revoke Access?',
+      text: `Do you want to revoke access for this ${this.title}?`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Yes',
+      cancelButtonText: 'No'
+    }).then(result => {
+      if (result.isConfirmed) {
+        this.callBlockRevokeApi(element, 'R');
+      }
+    });
+  }
+}
+
+openBlockDatePopup(element: any) {
+  Swal.fire({
+    title: 'Select Block Duration',
+    html: `
+      <label>From Date</label>
+      <input type="datetime-local" id="fromDate" class="swal2-input">
+      <label>To Date</label>
+      <input type="datetime-local" id="toDate" class="swal2-input">
+    `,
+    confirmButtonText: 'Block',
+    showCancelButton: true,
+    preConfirm: () => {
+      const fromdate = (document.getElementById('fromDate') as HTMLInputElement)?.value;
+      const todate = (document.getElementById('toDate') as HTMLInputElement)?.value;
+
+      if (!fromdate || !todate) {
+        Swal.showValidationMessage('Both dates are required');
+        return false;
+      }
+      return { fromdate, todate };
+    }
+  }).then(result => {
+    if (result.isConfirmed && result.value) {
+      this.callBlockRevokeApi(
+        element,
+        'B',
+        result.value.fromdate,
+        result.value.todate
+      );
+    }
+  });
+}
+
+callBlockRevokeApi(
+  element: any,
+  blockRevokeType: 'B' | 'R',
+  fromdate?: string,
+  todate?: string
+) {
+  const iDnumber = Number(element.idNumber);
+  if (isNaN(iDnumber)) {
+    Swal.fire({ icon: 'error', title: 'Invalid ID number' });
+    return;
+  }
+
+  // Prepare payload for POST API
+  const payload: any = {
+    id: element.accessBlockId ?? 0, // 0 if new block
+    iDnumber,
+    blockRevokType: blockRevokeType
+  };
+
+  if (blockRevokeType === 'B') {
+    if (!fromdate || !todate) {
+      Swal.fire({ icon: 'error', title: 'Both dates are required' });
+      return;
+    }
+    payload.fromdate = new Date(fromdate).toISOString();
+    payload.todate = new Date(todate).toISOString();
+  }
+
+  console.log('Sending payload to backend:', payload);
+
+  // Call backend API
+  this.authService.blockRevokeAccess(payload).subscribe({
+    next: (res: any) => {
+      Swal.fire({
+        icon: 'success',
+        title: blockRevokeType === 'B'
+          ? `${this.title} blocked successfully`
+          : `${this.title} access revoked successfully`,
+        showConfirmButton: false,
+        timer: 2000
+      });
+
+      // Update element status
+      element.accessBlockId = res?.id || element.accessBlockId;
+      element.isBlocked = blockRevokeType === 'B';
+      element.accessBlockType = blockRevokeType; // keep it in sync
+    },
+    error: (err) => {
+      console.error('API Error:', err);
+      Swal.fire({ icon: 'error', title: 'Operation failed' });
+    }
+  });
+}
+
+
+
+
+
+
+
+
 
 
 

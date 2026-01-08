@@ -64,10 +64,11 @@ filteredData: any[] = [];
   ];
 
   constructor(private fb: FormBuilder, private http: HttpClient ,private sortService: TableSortService) {
+    let today=new Date();
     this.reportForm = this.fb.group({
-  fromDate: [''],
+  fromDate: [today],
   fromTime: [''],   // <-- new
-  toDate: [''],
+  toDate: [today],
   toTime: [''],     // <-- new
   buildings: [[]],
   searchType: [''],

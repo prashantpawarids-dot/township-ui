@@ -59,11 +59,12 @@ export class CardLostDamagedComponent implements OnInit {
   ];
 
   constructor(private fb: FormBuilder, private http: HttpClient, private sortService: TableSortService) {
+    let today=new Date();
     this.reportForm = this.fb.group({
       liableType: ['lost'],
       cardType: [''],
-      fromDate: [''],
-      toDate: ['']
+      fromDate: [today],
+      toDate: [today]
     });
   }
 

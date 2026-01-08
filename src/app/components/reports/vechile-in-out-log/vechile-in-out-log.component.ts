@@ -552,10 +552,11 @@ filteredData: any[] = [];
 
 
   constructor(private fb: FormBuilder, private http: HttpClient ,private sortService: TableSortService) {
+    let today=new Date();
    this.reportForm = this.fb.group({
-  fromDate: [''],
+  fromDate: [today],
   fromTime: [''],     // ⬅ ADD
-  toDate: [''],
+  toDate: [today],
   toTime: [''],       // ⬅ ADD
   vehicleType: [[]],
   inOut: [[]],

@@ -67,6 +67,11 @@
         <td mat-cell *matCellDef="let element"> {{element.serviceType}} </td>
       </ng-container>
 
+<!-- Reader Location Column -->
+<ng-container matColumnDef="readerLocation">
+  <th mat-header-cell *matHeaderCellDef> Full Name </th>
+  <td mat-cell *matCellDef="let element"> {{ element.readerLocation }} </td>
+</ng-container>
 
       <!-- full name Column -->
       <ng-container matColumnDef="fullname">
@@ -133,6 +138,23 @@
       (click)="deleteData(element)">
       Delete
     </button>
+
+
+    <button
+  *ngIf="
+    returnPath === '/land-owner' ||
+    returnPath === '/resident' ||
+    returnPath === '/tenant' ||
+    returnPath === '/service-provider'
+  "
+  mat-stroked-button
+  class="m-l-10"
+  color="primary"
+  (click)="blockOrRevoke(element)">
+  {{ element.isBlocked ? 'Revoke' : 'Block' }}
+</button>
+
+
         </td>
 
       </ng-container>

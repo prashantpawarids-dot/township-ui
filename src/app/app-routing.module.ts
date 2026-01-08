@@ -260,6 +260,10 @@ const routes: Routes = [
             loadComponent: () => import('./components/reports/contractor-employee/contractor-employee.component').then((c) => c.ContractorEmployeeComponent)
           },
           {
+            path: 'employee',
+            loadComponent: () => import('./components/reports/employee/employee.component').then((c) => c.EmployeeComponent)
+          },
+          {
             path: 'landOwner',
             loadComponent: () => import('./components/reports/land-owner/land-owner.component').then((c) => c.LandOwnerComponent)
           },

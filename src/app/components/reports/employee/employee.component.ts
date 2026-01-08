@@ -19,7 +19,7 @@ import { debounceTime, distinctUntilChanged } from 'rxjs';
 import { TableSortService } from 'src/app/_core/shared/services/table-sort.services';
 
 @Component({
-  selector: 'app-contractor-employee',
+  selector: 'app-employee',
   standalone: true,
   imports: [
     CommonModule,
@@ -34,10 +34,10 @@ import { TableSortService } from 'src/app/_core/shared/services/table-sort.servi
     MatDatepickerModule,
     MatNativeDateModule
   ],
-  templateUrl: './contractor-employee.component.html',
+  templateUrl: './employee.component.html',
   styleUrls: ['../../../../table.css']
 })
-export class ContractorEmployeeComponent implements OnInit, AfterViewInit {
+export class EmployeeComponent implements OnInit, AfterViewInit {
 
   landOwnerForm!: FormGroup;
   dataSource = new MatTableDataSource<any>([]);
@@ -50,11 +50,10 @@ export class ContractorEmployeeComponent implements OnInit, AfterViewInit {
 
   searchByOptions = [
   { value: 'firstName', label: 'First Name' },
-  { value: 'middleName', label: 'Middle Name' },
   { value: 'lastName', label: 'Last Name' },
-  {value:'shortName',label:'Short Name'},
   { value: 'emailID', label: 'Email' },
-  { value: 'mobileNo', label: 'Mobile Number' }
+  { value: 'mobileNo', label: 'Mobile Number' },
+  { value: 'role', label: 'Role' }
 ];
 
 
@@ -118,7 +117,7 @@ export class ContractorEmployeeComponent implements OnInit, AfterViewInit {
   }
 
   loadData() {
-    this.http.get<any[]>(`${environment.apiurl}Contractor`).subscribe({
+    this.http.get<any[]>(`${environment.apiurl}Employee`).subscribe({
       next: (res) => {
         this.allData = res || [];
       },
@@ -198,13 +197,13 @@ export class ContractorEmployeeComponent implements OnInit, AfterViewInit {
     if (fromDate) {
       const from = new Date(fromDate);
       from.setHours(0, 0, 0, 0);
-      filtered = filtered.filter(x => x.registrationIssueDate && new Date(x.registrationIssueDate) >= from);
+      filtered = filtered.filter(x => x.doj && new Date(x.doj) >= from);
     }
 
     if (toDate) {
       const to = new Date(toDate);
       to.setHours(23, 59, 59, 999);
-      filtered = filtered.filter(x => x.registrationIssueDate && new Date(x.registrationIssueDate) <= to);
+      filtered = filtered.filter(x => x.doj && new Date(x.doj) <= to);
     }
 
     if (searchText && searchText.trim() !== '') {
@@ -260,7 +259,7 @@ exportPDF() {
     // Title
     doc.setFontSize(18);
     doc.setFont('helvetica', 'bold');
-    doc.text('CONTRACTOR REPORT', pageWidth / 2, 25, { align: 'center' });
+    doc.text('EMPLOYEE REPORT', pageWidth / 2, 25, { align: 'center' });
 
     // Printed Date
     const now = new Date();
@@ -275,7 +274,7 @@ exportPDF() {
 
     // 🔹 DOJ Min–Max calculation
     const dates = this.filteredData
-      .map(e => e.registrationIssueDate ? new Date(e.registrationIssueDate) : null)
+      .map(e => e.doj ? new Date(e.doj) : null)
       .filter(d => d && !isNaN(d.getTime())) as Date[];
 
     const minDate = dates.length ? new Date(Math.min(...dates.map(d => d.getTime()))) : null;
@@ -287,37 +286,48 @@ exportPDF() {
     // Show From–To
     doc.text(`From: ${from}  -  To: ${to}`, pageWidth / 2, 32, { align: 'center' });
 
+    // Table
     autoTable(doc, {
-  startY: 40,
-  head: [[
-    'SR NO',
-    'FIRST NAME',
-    'MIDDLE NAME',
-    'LAST NAME',
-    'SHORT NAME',
-    'GENDER',
-    'EMAIL',
-    'MOBILE',
-    'ADDRESS',
-    'REGISTRATION DATE'
-  ]],
-  body: this.filteredData.map((r, i) => [
-    i + 1,
-    r.firstName || '',
-    r.middleName || '',
-    r.lastName || '',
-    r.shortName||'',
-    r.gender || '',
-    r.emailID || '',
-    r.mobileNo || '',
-    r.address||'',
-    r.registrationIssueDate ? new Date(r.registrationIssueDate).toLocaleDateString('en-GB') : 'N/A'
-  ]),
-  headStyles: { fillColor: [220, 220, 220], textColor: 0, fontStyle: 'bold' },
-  bodyStyles: { fontSize: 9, textColor: [0, 0, 0] }
-});
+      startY: 40,
+      head: [[
+        'SR NO',
+        'ID',
+        'FIRST NAME',
+        'LAST NAME',
+        'GENDER',
+        'ROLE',
+        'DATE OF JOINING'
+      ]],
+      body: this.filteredData.map((r, i) => [
+        i + 1,
+        r.idNumber || '',
+        r.firstName || '',
+        r.lastName || '',
+        r.gender || '',
+        r.role || '',
+        r.doj ? new Date(r.doj).toLocaleDateString('en-GB') : 'N/A'
+      ]),
+      headStyles: {
+        fillColor: [220, 220, 220],
+        textColor: 0,
+        fontStyle: 'bold'
+      },
+      bodyStyles: {
+        fontSize: 9,
+        textColor: [0, 0, 0]
+      },
+      didDrawPage: () => {
+        const pageCount = doc.getNumberOfPages();
+        const currentPage = doc.getCurrentPageInfo().pageNumber;
+        const pageHeight = doc.internal.pageSize.getHeight();
 
-    doc.save('CONTRACTOR.pdf');
+        doc.setFontSize(10);
+        doc.text(`Page ${currentPage} of ${pageCount}`, pageWidth / 2, pageHeight - 10, { align: 'center' });
+        doc.text('©Ids Id Smart Tech', 10, pageHeight - 10);
+      }
+    });
+
+    doc.save('EmployeeReport.pdf');
   };
 }
 
@@ -329,7 +339,7 @@ exportPDF() {
 
   // 🔹 DOJ Min–Max
   const dates = this.filteredData
-    .map(e => e.registrationIssueDate ? new Date(e.registrationIssueDate) : null)
+    .map(e => e.doj ? new Date(e.doj) : null)
     .filter(d => d && !isNaN(d.getTime())) as Date[];
 
   const minDate = dates.length ? new Date(Math.min(...dates.map(d => d.getTime()))) : null;
@@ -339,23 +349,23 @@ exportPDF() {
   const to = maxDate ? maxDate.toLocaleDateString('en-GB') : 'N/A';
 
   const excelData = this.filteredData.map((r, i) => ({
-  'SR NO': i + 1,
-  'FIRST NAME': r.firstName,
-  'MIDDLE NAME': r.middleName,
-  'LAST NAME': r.lastName,
-  'SHORT NAME': r.shortName || '',
-  'GENDER': r.gender,
-  'EMAIL': r.emailID,
-  'MOBILE': r.mobileNo,
-  'ADDRESS': r.address || '',
-  'REGISTRATION DATE': r.registrationIssueDate ? new Date(r.registrationIssueDate).toLocaleDateString('en-GB') : 'N/A'
-}));
-
+    'SR NO': i + 1,
+    'ID': r.idNumber,
+    'FIRST NAME': r.firstName,
+    'MIDDLE NAME': r.middleName,
+    'LAST NAME': r.lastName,
+    'GENDER': r.gender,
+    'ROLE': r.role,
+    'MOBILE': r.mobileNo,
+    'EMAIL': r.emailID,
+    'DOB': r.dob ? new Date(r.dob).toLocaleDateString('en-GB') : 'N/A',
+    'DATE OF JOINING': r.doj ? new Date(r.doj).toLocaleDateString('en-GB') : 'N/A'
+  }));
 
   const wb = XLSX.utils.book_new();
 
   const wsData: any[][] = [
-    ['CONTRACTOR REPORT', '', '', '', '', '', '', '', `From: ${from} - To: ${to}`, `Printed On: ${printedDate}`],
+    ['EMPLOYEE REPORT', '', '', '', '', '', '', '', `From: ${from} - To: ${to}`, `Printed On: ${printedDate}`],
     [],
     Object.keys(excelData[0])
   ];
@@ -389,7 +399,7 @@ exportPDF() {
   XLSX.utils.book_append_sheet(wb, ws, 'Employee Report');
 
   const buffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-  saveAs(new Blob([buffer]), 'CONTRACTOR.xlsx');
+  saveAs(new Blob([buffer]), 'EmployeeReport.xlsx');
 }
 
 

@@ -65,13 +65,14 @@ filteredData: any[] = [];
   constructor(private fb: FormBuilder, private http: HttpClient ,private sortService: TableSortService) {}
 
   ngOnInit(): void {
+    let today=new Date();
   this.landOwnerForm = this.fb.group({
     searchBy: [''],
     searchText: [''],
     neighbourhood: [[]],
     building: [[]],
-    fromDate: [''],
-    toDate: ['']
+    fromDate: [today],
+    toDate: [today]
   });
 
   // Load dropdowns from separate APIs

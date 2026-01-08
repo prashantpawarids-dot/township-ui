@@ -50,13 +50,13 @@ filteredData: any[] = [];
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   constructor(private fb: FormBuilder, private http: HttpClient,private sortService: TableSortService) {
-
+let today=new Date();
     this.reportForm = this.fb.group({
       searchBy: [''],
       searchText: [''],
       nrd: [[]],
-      fromDate: [''],
-      toDate: ['']
+      fromDate: [today],
+      toDate: [today]
     });
 
   }

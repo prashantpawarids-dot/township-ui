@@ -8,7 +8,7 @@ import { MaterialModule } from 'src/app/_core/shared/material/material.module';
 import { AlertService } from 'src/app/services/alert.service';
 import { AuthService } from 'src/app/services/auth.service';
 import { ErrorHandlerService } from 'src/app/services/error-handler.service';
-
+import { environment } from 'src/environments/environment';
 @Component({
   selector: 'app-reader-relay',
   imports: [
@@ -33,12 +33,16 @@ export class ReaderRelayComponent {
     readerip: new FormControl('', Validators.required),
     readerport: new FormControl('', Validators.required),
     readermode: new FormControl('', Validators.required),
-    readerLocation: new FormControl('', Validators.required),
+    // readerLocation: new FormControl('', Validators.required),
+    readerLocation: new FormControl(''), // remove Validators.required
     readertype: new FormControl('', Validators.required),
-    isActive: new FormControl(true, Validators.required),
-    isDeleted: new FormControl(true, Validators.required)
+    isActive: new FormControl(null, Validators.required),
+    isDeleted: new FormControl(null, Validators.required)
   });
   viewMode: boolean;
+locations: any[] = [];
+
+  private baseUrl = environment.apiurl; // Replace with your API URL
 
   constructor(
     private router: Router,
@@ -49,11 +53,19 @@ export class ReaderRelayComponent {
     private activatedRoute: ActivatedRoute
   ) { }
   
- editData(element) {
-    this.editMode = true;
-    this.readerForm.patchValue(element);
-  }
+//  editData(element) {
+//     this.editMode = true;
+//     this.readerForm.patchValue(element);
+//   }
+
+editData(element) {
+  this.editMode = true;
+  this.readerForm.patchValue(element);
+}
+
     ngOnInit(): void {
+        this.loadLocation();
+
     this.activatedRoute.queryParams.subscribe(params => {
       const id = params['id'];
       if (id) {
@@ -82,20 +94,58 @@ export class ReaderRelayComponent {
     });
   }
 
-   onUpdate() {
-    if (this.readerForm.valid) {
-      this.authService.updateReader(this.readerForm.value).subscribe({
-        next: (res) => {
-          this.alertService.openSuccess('Successfully Updated');
-          this.onCancel();
-        },
-        error: (err) => {
-          this.errorHandlerService.handleError(err);
-          this.cd.detectChanges();
-        }
-      });
+  loadLocation() {
+  this.authService.getReaderLocation().subscribe({
+    next: (data) => {
+      this.locations = data;
+      // console.log('Location JSON:', JSON.stringify(this.locations, null, 2));
+
+    },
+    error: (err) => {
+      console.error(err);
     }
+  });
+}
+
+
+  //  onUpdate() {
+  //   if (this.readerForm.valid) {
+  //     this.authService.updateReader(this.readerForm.value).subscribe({
+  //       next: (res) => {
+  //         this.alertService.openSuccess('Successfully Updated');
+  //         this.onCancel();
+  //       },
+  //       error: (err) => {
+  //         this.errorHandlerService.handleError(err);
+  //         this.cd.detectChanges();
+  //       }
+  //     });
+  //   }
+  // }
+onUpdate() {
+  if (this.readerForm.valid) {
+    const payload = this.readerForm.value;
+
+    // Prevent non-admin from un-deleting
+    const roleId = localStorage.getItem('roleid');
+    if (roleId !== '1' && payload.isDeleted === false) {
+      // If record was deleted, non-admin cannot revoke
+      this.alertService.openError('Only admin can revoke deleted records.');
+      return;
+    }
+
+    this.authService.updateReader(payload).subscribe({
+      next: (res) => {
+        this.alertService.openSuccess('Successfully Updated');
+        this.onCancel();
+      },
+      error: (err) => {
+        this.errorHandlerService.handleError(err);
+        this.cd.detectChanges();
+      }
+    });
   }
+}
 
   // ===============================
   // Save reader data
