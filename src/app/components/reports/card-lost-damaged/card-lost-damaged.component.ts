@@ -45,6 +45,23 @@ export class CardLostDamagedComponent implements OnInit {
   displayedData: any[] = [];
   pageSizes = [10, 20, 50, 100, 150, 200];
   @ViewChild(MatPaginator) paginator!: MatPaginator;
+mockData: any[] = [
+  { id: 'ID001', ownerName: 'John Doe', ownerId: 'CSN001', cardType: 'Resident', cardEncodedOn: new Date('2026-01-01T10:00:00'), cardPrintedOn: new Date('2026-01-01T11:00:00') , status: 'Lost' },
+  { id: 'ID002', ownerName: 'Jane Smith', ownerId: 'CSN002', cardType: 'Tenant', cardEncodedOn: new Date('2026-01-02T10:30:00'), cardPrintedOn: new Date('2026-01-02T11:15:00'), status: 'Damaged' },
+  { id: 'ID003', ownerName: 'Alice Johnson', ownerId: 'CSN003', cardType: 'Service provider', cardEncodedOn: new Date('2026-01-03T09:45:00'), cardPrintedOn: new Date('2026-01-03T10:30:00'), status: 'Lost' },
+  { id: 'ID004', ownerName: 'Bob Brown', ownerId: 'CSN004', cardType: 'Contractor Employee', cardEncodedOn: new Date('2026-01-04T10:00:00'), cardPrintedOn: new Date('2026-01-04T10:45:00'), status: 'Damaged' },
+  { id: 'ID005', ownerName: 'Charlie Davis', ownerId: 'CSN005', cardType: 'Nanded Employee', cardEncodedOn: new Date('2026-01-05T11:00:00'), cardPrintedOn: new Date('2026-01-05T11:30:00'), status: 'Lost' },
+  { id: 'ID006', ownerName: 'Eva Green', ownerId: 'CSN006', cardType: 'Land Owner', cardEncodedOn: new Date('2026-01-06T09:30:00'), cardPrintedOn: new Date('2026-01-06T10:15:00'), status: 'Damaged' },
+  { id: 'ID007', ownerName: 'Frank Hall', ownerId: 'CSN007', cardType: 'Guest', cardEncodedOn: new Date('2026-01-07T10:10:00'), cardPrintedOn: new Date('2026-01-07T10:50:00'), status: 'Lost' },
+  { id: 'ID008', ownerName: 'Grace Lee', ownerId: 'CSN008', cardType: 'Resident', cardEncodedOn: new Date('2026-01-08T11:20:00'), cardPrintedOn: new Date('2026-01-08T12:00:00'), status: 'Damaged' },
+  { id: 'ID009', ownerName: 'Henry Moore', ownerId: 'CSN009', cardType: 'Tenant', cardEncodedOn: new Date('2026-01-09T09:50:00'), cardPrintedOn: new Date('2026-01-09T10:40:00'), status: 'Lost' },
+  { id: 'ID010', ownerName: 'Ivy Nelson', ownerId: 'CSN010', cardType: 'Service provider', cardEncodedOn: new Date('2026-01-10T10:05:00'), cardPrintedOn: new Date('2026-01-10T10:55:00'), status: 'Damaged' },
+  { id: 'ID011', ownerName: 'Jack Owen', ownerId: 'CSN011', cardType: 'Contractor Employee', cardEncodedOn: new Date('2026-01-11T09:15:00'), cardPrintedOn: new Date('2026-01-11T10:05:00'), status: 'Lost' },
+  { id: 'ID012', ownerName: 'Kara Patel', ownerId: 'CSN012', cardType: 'Nanded Employee', cardEncodedOn: new Date('2026-01-12T10:20:00'), cardPrintedOn: new Date('2026-01-12T11:00:00'), status: 'Damaged' },
+  { id: 'ID013', ownerName: 'Leo Quinn', ownerId: 'CSN013', cardType: 'Land Owner', cardEncodedOn: new Date('2026-01-13T09:40:00'), cardPrintedOn: new Date('2026-01-13T10:20:00'), status: 'Lost' },
+  { id: 'ID014', ownerName: 'Mia Roberts', ownerId: 'CSN014', cardType: 'Guest', cardEncodedOn: new Date('2026-01-14T10:50:00'), cardPrintedOn: new Date('2026-01-14T11:30:00'), status: 'Damaged' },
+  { id: 'ID015', ownerName: 'Noah Scott', ownerId: 'CSN015', cardType: 'Resident', cardEncodedOn: new Date('2026-01-15T11:10:00'), cardPrintedOn: new Date('2026-01-15T11:50:00'), status: 'Lost' }
+];
 
   displayColumns: string[] = ['id', 'cardType', 'ownerName', 'ownerId', 'cardEncodedOn', 'cardPrintedOn', 'dateTime'];
 
@@ -62,14 +79,15 @@ export class CardLostDamagedComponent implements OnInit {
     let today=new Date();
     this.reportForm = this.fb.group({
       liableType: ['lost'],
-      cardType: [''],
+       cardType: [''],
       fromDate: [today],
       toDate: [today]
     });
   }
 
   ngOnInit() {
-      this.loadAllCardData();
+      // this.loadAllCardData();
+      this.allData = this.mockData;
     }
   
     private loadAllCardData(): void {
@@ -88,80 +106,145 @@ export class CardLostDamagedComponent implements OnInit {
       });
     }
   
-    onCardTypeChange(event: any) {
-      const selected = event.value;
-      if (selected.includes('all')) {
-        this.reportForm.get('cardType')?.setValue(
-          this.cardTypes.map(ct => ct.value),
-          { emitEvent: false }
-        );
-      } else {
-        this.reportForm.get('cardType')?.setValue(selected, { emitEvent: false });
-      }
-    }
-  
-    applyFilters(): void {
-    const { fromDate, toDate, cardType, searchBy, searchValue } = this.reportForm.value;
-    let filtered = [...this.allData];
-  
-    // 🔹 CARD TYPE FILTER
-    if (cardType && cardType.length > 0) {
-      let apiTypes: string[] = [];
-      if (cardType.includes('all')) {
-        apiTypes = this.allData.map(d => d.cardType);
-      } 
-      apiTypes = [...new Set(apiTypes)];
-      filtered = filtered.filter(d => apiTypes.includes(d.cardType));
-    }
-  
-    // 🔹 DATE FILTER (IGNORE TIME)
-    if (fromDate) {
-      const from = new Date(fromDate);
-      from.setHours(0, 0, 0, 0);
-  
-      filtered = filtered.filter(d => {
-        if (!d.cardPrintingDate) return false;
-        const recordDate = new Date(d.cardPrintingDate);
-        recordDate.setHours(0, 0, 0, 0);
-        return recordDate >= from;
-      });
-    }
-  
-    if (toDate) {
-      const to = new Date(toDate);
-      to.setHours(0, 0, 0, 0);
-  
-      filtered = filtered.filter(d => {
-        if (!d.cardPrintingDate) return false;
-        const recordDate = new Date(d.cardPrintingDate);
-        recordDate.setHours(0, 0, 0, 0);
-        return recordDate <= to;
-      });
-    }
-  
-    // 🔹 SEARCH FILTER
-    if (searchValue && searchValue.trim().length > 0) {
-      if (!searchBy) {
-        alert('Please select a search type');
-        this.filteredData = [];
-        this.displayedData = [];
-        this.paginator.length = 0;
-        return;
-      }
-  
-      const searchLower = searchValue.toLowerCase();
-      filtered = filtered.filter(d =>
-        d[searchBy]?.toString().toLowerCase().startsWith(searchLower)
-      );
-    }
-  
-    // 🔹 UPDATE TABLE + PAGINATOR
-    this.filteredData = filtered;
-    this.paginator.length = this.filteredData.length;
-    this.paginator.firstPage();
-    this.updateDisplayedData(0, this.paginator.pageSize || this.pageSizes[0]);
+   onCardTypeChange(event: any) {
+  const selected = event.value;
+
+  if (selected.includes('all')) {
+    // Select all card types if 'All' is clicked
+    this.reportForm.get('cardType')?.setValue(
+      this.cardTypes.map(ct => ct.value),
+      { emitEvent: false }
+    );
+  } else {
+    this.reportForm.get('cardType')?.setValue(selected, { emitEvent: false });
   }
+}
+
   
+  //   applyFilters(): void {
+  //   const { fromDate, toDate, cardType, searchBy, searchValue } = this.reportForm.value;
+  //   let filtered = [...this.allData];
+  
+  //   // 🔹 CARD TYPE FILTER
+  //   if (cardType && cardType.length > 0) {
+  //     let apiTypes: string[] = [];
+  //     if (cardType.includes('all')) {
+  //       apiTypes = this.allData.map(d => d.cardType);
+  //     } 
+  //     apiTypes = [...new Set(apiTypes)];
+  //     filtered = filtered.filter(d => apiTypes.includes(d.cardType));
+  //   }
+  
+  //   // 🔹 DATE FILTER (IGNORE TIME)
+  //   if (fromDate) {
+  //     const from = new Date(fromDate);
+  //     from.setHours(0, 0, 0, 0);
+  
+  //     filtered = filtered.filter(d => {
+  //       if (!d.cardPrintingDate) return false;
+  //       const recordDate = new Date(d.cardPrintingDate);
+  //       recordDate.setHours(0, 0, 0, 0);
+  //       return recordDate >= from;
+  //     });
+  //   }
+  
+  //   if (toDate) {
+  //     const to = new Date(toDate);
+  //     to.setHours(0, 0, 0, 0);
+  
+  //     filtered = filtered.filter(d => {
+  //       if (!d.cardPrintingDate) return false;
+  //       const recordDate = new Date(d.cardPrintingDate);
+  //       recordDate.setHours(0, 0, 0, 0);
+  //       return recordDate <= to;
+  //     });
+  //   }
+  
+  //   // 🔹 SEARCH FILTER
+  //   if (searchValue && searchValue.trim().length > 0) {
+  //     if (!searchBy) {
+  //       alert('Please select a search type');
+  //       this.filteredData = [];
+  //       this.displayedData = [];
+  //       this.paginator.length = 0;
+  //       return;
+  //     }
+  
+  //     const searchLower = searchValue.toLowerCase();
+  //     filtered = filtered.filter(d =>
+  //       d[searchBy]?.toString().toLowerCase().startsWith(searchLower)
+  //     );
+  //   }
+  
+  //   // 🔹 UPDATE TABLE + PAGINATOR
+  //   this.filteredData = filtered;
+  //   this.paginator.length = this.filteredData.length;
+  //   this.paginator.firstPage();
+  //   this.updateDisplayedData(0, this.paginator.pageSize || this.pageSizes[0]);
+  // }
+  applyFilters(): void {
+  const { fromDate, toDate, cardType, liableType } = this.reportForm.value;
+  let filtered = [...this.allData];
+
+  // // 🔹 LIABLE TYPE FILTER (lost, damage, both)
+  // if (liableType && liableType !== 'both') {
+  //   filtered = filtered.filter(d => d.status?.toLowerCase() === liableType);
+  // }
+
+  // 🔹 LIABLE TYPE FILTER (lost, damage, both)
+if (liableType && liableType !== 'both') {
+  filtered = filtered.filter(d => {
+    const status = d.status?.toLowerCase();
+    if (liableType === 'lost') return status === 'lost';
+    if (liableType === 'damage') return status === 'damaged'; // match spelling in mockData
+    return true;
+  });
+}
+
+
+  // 🔹 CARD TYPE FILTER
+if (cardType && cardType.length > 0) {
+  let types: string[] = [];
+  if (cardType.includes('all')) {
+    types = this.cardTypes.map(ct => ct.value); // all card types
+  } else {
+    types = cardType;
+  }
+  types = [...new Set(types)]; // remove duplicates
+  filtered = filtered.filter(d => types.includes(d.cardType));
+}
+
+
+  // 🔹 DATE FILTER (using cardEncodedOn)
+  if (fromDate) {
+    const from = new Date(fromDate);
+    from.setHours(0, 0, 0, 0);
+    filtered = filtered.filter(d => {
+      if (!d.cardEncodedOn) return false;
+      const recordDate = new Date(d.cardEncodedOn);
+      recordDate.setHours(0, 0, 0, 0);
+      return recordDate >= from;
+    });
+  }
+
+  if (toDate) {
+    const to = new Date(toDate);
+    to.setHours(0, 0, 0, 0);
+    filtered = filtered.filter(d => {
+      if (!d.cardEncodedOn) return false;
+      const recordDate = new Date(d.cardEncodedOn);
+      recordDate.setHours(0, 0, 0, 0);
+      return recordDate <= to;
+    });
+  }
+
+  // 🔹 UPDATE TABLE + PAGINATOR
+  this.filteredData = filtered;
+  this.paginator.length = this.filteredData.length;
+  this.paginator.firstPage();
+  this.updateDisplayedData(0, this.paginator.pageSize || this.pageSizes[0]);
+}
+
   
     public sortColumn(column: string) {
       if (this.sortService.getSortColumn() === column) {
@@ -244,20 +327,19 @@ export class CardLostDamagedComponent implements OnInit {
   
       // Table Body
       const body = this.filteredData.map((d, i) => [
-        i + 1,
-        d.idNumber || '',
-        d.shortname || '',
-        d.csn || '',
-        d.cardType || '',
-        d.cardPrintingDate ? new Date(d.cardPrintingDate).toLocaleString() : '',
-        
-        d.flatNumber || '',
-        d.status || ''
-      ]);
-  
-      autoTable(doc, {
-        startY: 35,
-        head: [['Sr No', 'ID Number', 'Short Name', 'CSN', 'Card Type', 'Card Printing Date', 'FlatNo', 'Status']],
+  i + 1,                                     // Sr No
+  d.id || '',                                // ID Number
+  d.ownerName || '',                          // Short Name
+  d.ownerId || '',                            // Owner ID
+  d.cardType || '',                           // Card Type
+  d.cardEncodedOn ? new Date(d.cardEncodedOn).toLocaleString() : '', // Card Encoded On
+  d.cardPrintedOn ? new Date(d.cardPrintedOn).toLocaleString() : '', // Card Printed On
+  d.status || ''                              // Status
+]);
+
+autoTable(doc, {
+  startY: 35,
+  head: [['Sr No', 'ID Number', 'Short Name', 'Owner ID', 'Card Type', 'Card Encoded On', 'Card Printed On', 'Status']],
         body,
         theme: 'grid',
         headStyles: { fillColor: [220, 220, 220], textColor: 0, fontStyle: 'bold' },
@@ -284,18 +366,17 @@ export class CardLostDamagedComponent implements OnInit {
       if (!this.filteredData.length) return;
   
       const printedDate = new Date().toLocaleString();
-      const excelData = this.filteredData.map((d, i) => ({
-        'Sr No': i + 1,
-        'ID Number': d.idNumber || '',
-        'Short Name': d.shortname || '',
-        'CSN': d.csn || '',
-        'Card Type': d.cardType || '',
-  'Card LOST&DAMAGE Date': d.cardPrintingDate ? DateTimeUtil.formatDateTime(d.cardPrintingDate) : '',
-  
-      
-        'FlatNo': d.flatNumber || '',
-        'Status': d.status || ''
-      }));
+     const excelData = this.filteredData.map((d, i) => ({
+  'Sr No': i + 1,
+  'ID Number': d.id || '',                // was d.idNumber
+  'Short Name': d.ownerName || '',        // was d.shortname
+  'Owner ID': d.ownerId || '',            // was d.csn
+  'Card Type': d.cardType || '',
+  'Card Encoded On': d.cardEncodedOn ? DateTimeUtil.formatDateTime(d.cardEncodedOn) : '',  // was cardPrintingDate
+  'Card Printed On': d.cardPrintedOn ? DateTimeUtil.formatDateTime(d.cardPrintedOn) : '',
+  'Status': d.status || ''                // same
+}));
+
   
       const wb = XLSX.utils.book_new();
       const wsData: any[][] = [

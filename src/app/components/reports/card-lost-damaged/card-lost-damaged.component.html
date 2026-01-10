@@ -16,11 +16,13 @@
     <div class="row mt-3 g-2">
       <div class="col-10 col-md-2">
         <mat-form-field appearance="fill" class="w-100">
-          <mat-label>Card Type</mat-label>
-          <mat-select formControlName="cardType">
-            <mat-option *ngFor="let card of cardTypes" [value]="card.value">{{ card.label }}</mat-option>
-          </mat-select>
-        </mat-form-field>
+  <mat-label>Card Type</mat-label>
+  <mat-select formControlName="cardType" multiple (selectionChange)="onCardTypeChange($event)">
+    <mat-option value="all">All</mat-option>
+    <mat-option *ngFor="let card of cardTypes" [value]="card.value">{{ card.label }}</mat-option>
+  </mat-select>
+</mat-form-field>
+
       </div>
 
       <div class="col-10 col-md-2">
@@ -56,7 +58,12 @@
     <thead class="table-light">
       <tr>
         <th>Sr No</th>
-
+<th (click)="sortColumn('id')">
+          IDNumber
+          <span *ngIf="getSortColumn() === 'id'">
+            {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+          </span>
+        </th>
 
         <th (click)="sortColumn('cardType')">
           Card Type
@@ -87,6 +94,13 @@
             {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
           </span>
         </th>
+
+        <th (click)="sortColumn('status')">
+          Status
+          <span *ngIf="getSortColumn() === 'status'">
+            {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+          </span>
+        </th>
       </tr>
     </thead>
 
@@ -96,9 +110,11 @@
         <td>{{ e.id }}</td>
         <td>{{ e.cardType }}</td>
         <td>{{ e.ownerName }}</td>
-        <td>{{ e.ownerId }}</td>
+      
         <td>{{ e.cardEncodedOn | date:'dd-MM-yyyy HH:mm:ss' }}</td>
         <td>{{ e.cardPrintedOn | date:'dd-MM-yyyy HH:mm:ss' }}</td>
+        <td>{{ e.status }}</td> <!-- NEW -->
+        
       </tr>
 
       <tr *ngIf="displayedData.length === 0">

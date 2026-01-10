@@ -42,7 +42,7 @@ export class InOutLogComponent implements OnInit, AfterViewInit {
   reportForm: FormGroup;
   inOutData: any[] = [];
   displayedData = new MatTableDataSource<any>([]); // table datasource
-  pageSizes = [10, 25, 50, 100, 150, 200];
+  
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
@@ -155,8 +155,32 @@ ngOnInit() {
 
 
   ngAfterViewInit() {
-    this.displayedData.paginator = this.paginator;
-  }
+  // Attach paginator to table datasource
+  this.displayedData.paginator = this.paginator;
+
+  // When user changes page (next/prev)
+  this.paginator.page.subscribe(() => {
+    this.updatePagedData();
+  });
+
+  // Show first page initially
+  this.updatePagedData();
+}
+
+
+updatePagedData() {
+  if (!this.filteredData || !this.paginator) return;
+
+  // Set total length for paginator
+  this.paginator.length = this.filteredData.length;
+
+  // Calculate start/end indexes based on current page
+  const startIndex = this.paginator.pageIndex * this.paginator.pageSize;
+  const endIndex = startIndex + this.paginator.pageSize;
+
+  // Slice filtered data for current page
+  this.displayedData.data = this.filteredData.slice(startIndex, endIndex);
+}
 
 
 public sortColumn(column: string) {
@@ -191,17 +215,6 @@ getSortDirection(): 'asc' | 'desc' {
 
 
 
-//   loadData() {
-//   this.http.get<any[]>(`${environment.apiurl}Report/InoutRegister`).subscribe(res => {
-//     this.inOutData = res || [];
-
-    
-//     this.displayedData.data = [...this.inOutData];
-
-//     // DO NOT assign to displayedData here. Table remains empty on page load.
-//     // this.displayedData.data = [...this.inOutData]; // REMOVE THIS
-//   });
-// }
 loadData() {
   this.http.get<any[]>(`${environment.apiurl}Report/InoutRegister`).subscribe(res => {
     this.inOutData = res || [];
@@ -424,31 +437,35 @@ if (f.cardType && f.cardType.length) {
   // Sort by time
   // --------------------------
   data = sortByTimeOnly(data, 'inoutTime', 'asc');
-  this.filteredData = data;
+  this.filteredData = data; // filtered and sorted data
 
-  // --------------------------
-  // Assign to table and paginator
-  // --------------------------
-  this.displayedData.data = data;
-  if (this.paginator) this.paginator.firstPage();
+if (this.paginator) {
+  this.paginator.length = this.filteredData.length;
+  this.paginator.pageIndex = 0; // reset to first page
+}
+this.updatePagedData();
+
+
+
+
 }
 
 
 
-  applyAutoFilter() {
-    const f = this.reportForm.value;
-    if (!f.searchValue?.trim()) {
-      this.displayedData.data = [...this.inOutData];
-      if (this.paginator) this.paginator.firstPage();
-      return;
-    }
+  // applyAutoFilter() {
+  //   const f = this.reportForm.value;
+  //   if (!f.searchValue?.trim()) {
+  //     this.displayedData.data = [...this.inOutData];
+  //     if (this.paginator) this.paginator.firstPage();
+  //     return;
+  //   }
 
-    const txt = f.searchValue.toLowerCase();
-    this.displayedData.data = this.inOutData.filter(item =>
-      item[f.searchType]?.toString().toLowerCase().startsWith(txt)
-    );
-    if (this.paginator) this.paginator.firstPage();
-  }
+  //   const txt = f.searchValue.toLowerCase();
+  //   this.displayedData.data = this.inOutData.filter(item =>
+  //     item[f.searchType]?.toString().toLowerCase().startsWith(txt)
+  //   );
+  //   if (this.paginator) this.paginator.firstPage();
+  // }
 
   showReports() {
   // Populate table only when user clicks Search
@@ -456,7 +473,7 @@ if (f.cardType && f.cardType.length) {
 }
 
 
-  showAll() {
+  Clear() {
     this.reportForm.reset({
       accessMode: '',
       fromDate: '',

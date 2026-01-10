@@ -40,6 +40,9 @@ export class DashboardComponent implements OnInit {
   controllerStatus = { connected: false, in: 0, out: 0 };
   vehicleStatus = { connected: false, in: 0, out: 0 };
 
+
+   
+
   visitorStatus = { twoWheeler: 0, fourWheeler: 0 };
 
   displayedCounts: { Encoded: number; NonEncoded: number; Total: number } = { Encoded: 0, NonEncoded: 0, Total: 0 };
