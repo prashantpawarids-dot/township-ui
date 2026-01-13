@@ -14,6 +14,7 @@ import { ErrorHandlerService } from 'src/app/services/error-handler.service';
 import { TownAddOnCardComponent } from 'src/app/_core/shared/components/town-add-on-card/town-add-on-card.component';
 
 @Component({
+  // AuthorityLevel
   selector: 'app-contractor',
   imports: [CommonModule, MaterialModule, FormsModule,
     TownLandOwnerComponent, TownVehicleComponent, TownAddAccessRightsComponent,

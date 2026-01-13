@@ -88,6 +88,13 @@
           </span>
         </th>
 
+         <th (click)="sortColumn('bloodGroup')">
+          Blood Group
+          <span *ngIf="getSortColumn() === 'bloodGroup'">
+            {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+          </span>
+        </th>
+
         <th (click)="sortColumn('dob')">
           DOB
           <span *ngIf="getSortColumn() === 'dob'">
@@ -126,6 +133,7 @@
         <td>{{ row.middleName }}</td>
         <td>{{ row.lastName }}</td>
         <td>{{ row.gender }}</td>
+        <td>{{row.bloodGroup}}</td>
         <td>{{ row.dob | date:'dd/MM/yyyy' }}</td>
         <td>{{ row.doj | date:'dd/MM/yyyy' }}</td>
         <td>{{ row.role }}</td>

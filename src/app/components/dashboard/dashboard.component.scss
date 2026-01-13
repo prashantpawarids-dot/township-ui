@@ -59,6 +59,8 @@
 .stats-grid {
   display: grid;
   gap: 16px;
+
+  
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   /* min-width 200px ensures cards are large enough on all screens */
 

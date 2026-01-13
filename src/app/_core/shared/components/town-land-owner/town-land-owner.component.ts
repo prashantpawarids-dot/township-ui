@@ -71,7 +71,7 @@ return;
     const reader = new FileReader();
     reader.onload = () => {
       this.photoPreview = reader.result;
-       //this.landOwner.photo = this.selectedFile
+       this.landOwner.photo = this.selectedFile
     };
     reader.readAsDataURL(this.selectedFile);
   }

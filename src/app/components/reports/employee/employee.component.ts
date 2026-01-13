@@ -295,6 +295,7 @@ exportPDF() {
         'FIRST NAME',
         'LAST NAME',
         'GENDER',
+        'BLOOD GROUP',
         'ROLE',
         'DATE OF JOINING'
       ]],
@@ -304,6 +305,7 @@ exportPDF() {
         r.firstName || '',
         r.lastName || '',
         r.gender || '',
+        r.bloodGroup || '',
         r.role || '',
         r.doj ? new Date(r.doj).toLocaleDateString('en-GB') : 'N/A'
       ]),
@@ -355,6 +357,7 @@ exportPDF() {
     'MIDDLE NAME': r.middleName,
     'LAST NAME': r.lastName,
     'GENDER': r.gender,
+    'BLOOD GROUP': r.bloodGroup,
     'ROLE': r.role,
     'MOBILE': r.mobileNo,
     'EMAIL': r.emailID,

@@ -6,8 +6,11 @@ import { MatTableDataSource } from '@angular/material/table';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MaterialModule } from 'src/app/_core/shared/material/material.module';
 import { AuthService } from 'src/app/services/auth.service';
+import { AuthorityService } from 'src/app/services/authority.service';
+
 import Swal from 'sweetalert2';
 import { Observable } from 'rxjs';
+import { Console } from 'console';
 
 @Component({
   selector: 'app-search',
@@ -31,16 +34,54 @@ export class SearchComponent {
   pageSizes = [3, 5, 7];
   pageSize = 10;
    showDownloadBtn: boolean = false;
+MODULE_KEY: number = -1;
+
+get auth() {
+  return this.authorityService;
+}
 
   ngAfterViewInit() {
     this.dataSource.paginator = this.paginator;
   }
+getModuleKeyForPath(path: string): number {
+  if (!path) return 0;
 
-  constructor(private route: ActivatedRoute, private router: Router,
+  // remove query params
+  const cleanPath = path.split('?')[0];
+
+  const map: { [key: string]: number } = {
+    '/master/company': 1,
+    '/master/profile': 2,
+    '/master/project': 3,
+    '/master/user': 4,
+    '/master/river-view-city': 5,
+    '/master/neighbourhood': 6,
+    '/master/building': 7,
+    '/master/reader-location': 8,
+    '/master/service-type': 9,
+    '/master/amenities': 10,
+    '/master/reader-relay': 11,
+
+    '/land-owner': 12,
+    '/resident': 13,
+    '/employee': 14,
+    '/card-lost-damage': 15,
+    '/tag-block-revoke': 16,
+    '/guest': 17,
+    '/visitor': 18
+  };
+
+  return map[cleanPath] ?? 0; // 0 = no authority
+}
+
+  constructor(private route: ActivatedRoute, private router: Router,private authorityService: AuthorityService ,
     private authService: AuthService) {
     this.route.queryParamMap.subscribe(params => {
       this.returnPath = params.get('returnPath');
       this.showDownloadBtn = this.returnPath?.startsWith('/master/') || false; // ✅ Show PDF only for master
+      this.MODULE_KEY = this.getModuleKeyForPath(this.returnPath || '');
+// console.log('MODULE_KEY:', this.MODULE_KEY);
+
       switch (this.returnPath) {
         case '/land-owner':
           this.resetFields();
@@ -125,6 +166,7 @@ export class SearchComponent {
   }
 
   title: string;
+
 
 
   searchData() {
@@ -594,7 +636,7 @@ callBlockRevokeApi(
     payload.todate = new Date(todate).toISOString();
   }
 
-  console.log('Sending payload to backend:', payload);
+  // console.log('Sending payload to backend:', payload);
 
   // Call backend API
   this.authService.blockRevokeAccess(payload).subscribe({

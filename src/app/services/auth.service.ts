@@ -1,10 +1,12 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpEventType } from '@angular/common/http';
-import { catchError, map, Observable, throwError } from 'rxjs';
+import { catchError, map, Observable, throwError,tap } from 'rxjs';
 import { landownerMapper, residentMapper, tenantMapper } from '../mapper/post-mapper';
 import { employeeMapperGet, landownerMapperGet } from '../mapper/get-mapper';
 import { environment } from 'src/environments/environment';
 import { BehaviorSubject } from 'rxjs';
+import { Console } from 'console';
+
 
 
 @Injectable({
@@ -325,7 +327,7 @@ get roleId(): string | null {
   postLandOwner(payload: any): Observable<any> {
     let url = this.baseUrl + 'Landowner/AddLandowner';
     let postPayload = landownerMapper(payload);
-    console.log("post payload", postPayload);
+    // console.log("post payload", postPayload);
     return this.http.post(url, postPayload).pipe(map(res => {
       return res;
     }),
@@ -1039,7 +1041,7 @@ getReaderLocationById(id: number): Observable<any> {
 
   updateUserById(payload: any): Observable<any> {
     let url = this.baseUrl + 'UserRegistration/UpdateUser/' + payload.id;
-    console.log(url);
+    // console.log(url);
     return this.http.post(url, payload).pipe(map(res => {
       return res;
     }),
@@ -1528,6 +1530,19 @@ blockRevokeAccess(payload: {
 
 
 
+getAuthorityModules(profileName: string): Observable<any[]> {
+  const url = `${this.baseUrl}Auth/GetAuthorityModules?ProfileName=${profileName}`;
+
+  return this.http.get<any[]>(url).pipe(
+    map(res => res.filter(m => m.viewreadonly === false)),
+    map(res =>
+      res.map(m => ({
+        moduleKey: m.moduleId,
+        authorityLevel: m.authority
+      }))
+    )
+  );
+}
 
 
 
