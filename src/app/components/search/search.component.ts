@@ -80,7 +80,7 @@ getModuleKeyForPath(path: string): number {
       this.returnPath = params.get('returnPath');
       this.showDownloadBtn = this.returnPath?.startsWith('/master/') || false; // ✅ Show PDF only for master
       this.MODULE_KEY = this.getModuleKeyForPath(this.returnPath || '');
-// console.log('MODULE_KEY:', this.MODULE_KEY);
+console.log('MODULE_KEY:', this.MODULE_KEY);
 
       switch (this.returnPath) {
         case '/land-owner':

@@ -192,7 +192,7 @@
     </button>
 
     <!-- Block / Revoke button (UNCHANGED as requested) -->
-    <button
+    <!-- <button
       mat-stroked-button
       class="m-l-10"
       color="primary"
@@ -203,6 +203,15 @@
         returnPath === '/tenant' ||
         returnPath === '/service-provider'
       ">
+      {{ element.isBlocked ? 'Revoke' : 'Block' }}
+    </button> -->
+
+     <button
+      mat-stroked-button
+      class="m-l-10"
+      color="primary"
+      (click)="blockOrRevoke(element)"
+      *ngIf="auth.canBlock(MODULE_KEY)">
       {{ element.isBlocked ? 'Revoke' : 'Block' }}
     </button>
 

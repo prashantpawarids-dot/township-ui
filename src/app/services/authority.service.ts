@@ -85,6 +85,7 @@ export class AuthorityService {
       if (a?.moduleKey != null && a?.authorityLevel != null) {
         const key = a.moduleKey;
         const level = Number(a.authorityLevel) || 0;
+        console.log(`Loading authority - ModuleKey: ${key}, Level: ${level}`);
         this.authorityMap.set(key, level);
       }
     });
@@ -113,7 +114,7 @@ export class AuthorityService {
   canView(moduleKey?: number | null): boolean {
     const level = this.getLevel(moduleKey);
 
-    // console.log('Checking VIEW for moduleKey', moduleKey, '=> level', level);
+   // console.log('Checking VIEW for moduleKey', moduleKey, '=> level', level);
     
     return level >=0;
   }
@@ -137,6 +138,12 @@ export class AuthorityService {
     const level = this.getLevel(moduleKey);
     //  console.log('Checking DELETE for moduleKey', moduleKey, '=> level', level>3);
     return level >3;
+  }
+
+   canBlock(moduleKey?: number | null): boolean {
+    const level = this.getLevel(moduleKey);
+    //  console.log('Checking DELETE for moduleKey', moduleKey, '=> level', level>3);
+    return level >2;
   }
 
   isFullAccess(moduleKey?: number | null): boolean {
