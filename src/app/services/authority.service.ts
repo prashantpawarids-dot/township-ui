@@ -79,6 +79,12 @@ export class AuthorityService {
     return level >2;
   }
 
+
+  canAdd(moduleKey?: number | null): boolean {
+    const level = this.getLevel(moduleKey);
+    //  console.log('Checking DELETE for moduleKey', moduleKey, '=> level', level>3);
+    return level >2;
+  }
   isFullAccess(moduleKey?: number | null): boolean {
     return this.getLevel(moduleKey) >3;
   }
