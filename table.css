@@ -1,0 +1,31 @@
+/* Table header color */
+table thead th {
+  color: #7c3131; /* custom header text color */
+  font-size: 15px;
+}
+
+/* Table row hover */
+table tbody tr:hover {
+  background: #f7f7f7; /* light hover */
+}
+table.table thead th {
+  border: 1px solid #c0c0c0; /* darker gray for header border */
+}
+
+
+/* Button custom color & hover */
+button,
+button.mat-flat-button,
+button.mat-button,
+button.btn {
+  background: linear-gradient(135deg, #6ec1e4, #3da0d9) !important; /* light blue gradient */
+  color: #fff !important; /* text color */
+  transition: 0.25s ease-in-out;
+}
+
+/* Button hover effect */
+button:hover,
+button.mat-flat-button:hover,
+button.btn:hover {
+  background: linear-gradient(135deg, #7ec9f5, #4db0e0) !important;
+}

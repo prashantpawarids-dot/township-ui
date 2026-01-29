@@ -1,0 +1,67 @@
+<form [formGroup]="reportForm" class="container-fluid">
+
+  <div class="row mt-3 g-2">
+
+    <!-- Search By -->
+    <div class="col-12 col-md-4">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>Search By</mat-label>
+        <mat-select formControlName="searchType">
+          <mat-option value="name">Neighbourhood</mat-option>
+          <mat-option value="status">Status</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <!-- Search Text -->
+    <div class="col-12 col-md-4">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>Search Text</mat-label>
+        <input matInput formControlName="searchText" placeholder="Type to filter">
+      </mat-form-field>
+    </div>
+
+    <!-- Buttons -->
+    <div class="col-12 col-md-4 d-flex flex-wrap gap-1 align-items-center mt-2">
+      <button type="button" class="btn btn-primary" (click)="showReports()">Search</button>
+      <button type="button" class="btn btn-secondary" (click)="showAll()">All</button>
+      <button type="button" class="btn btn-success" *ngIf="displayedData.length > 0" (click)="exportReports()">Export PDF</button>
+      <button type="button" class="btn btn-info" *ngIf="displayedData.length > 0" (click)="exportExcel()">Export Excel</button>
+    </div>
+
+  </div>
+
+  <!-- Table -->
+  <div class="table-responsive mt-3">
+    <table class="table table-bordered table-hover table-striped">
+      <thead class="table-light">
+        <tr>
+          <th>Sr No</th>
+          <th>Neighbourhood Name</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngIf="pagedData.length === 0">
+          <td colspan="3" class="text-center">No records found</td>
+        </tr>
+        <tr *ngFor="let n of pagedData; let i = index">
+          <td>{{ paginator.pageIndex * paginator.pageSize + i + 1 }}</td>
+          <td>{{ n.name }}</td>
+          <td [ngStyle]="{'color': n.isActive ? 'green' : 'red'}">{{ n.isActive ? 'Active' : 'Inactive' }}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Paginator -->
+    <mat-paginator
+      #paginator
+      [length]="displayedData.length"
+      [pageSizeOptions]="[10, 25, 50, 100, 150, 200]"
+      [pageSize]="10"
+      showFirstLastButtons
+      (page)="onPageChange()">
+    </mat-paginator>
+  </div>
+
+</form>

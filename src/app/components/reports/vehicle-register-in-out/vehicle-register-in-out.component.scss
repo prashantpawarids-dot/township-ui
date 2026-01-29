@@ -1,0 +1,43 @@
+/* Horizontal filter toolbar */
+.filter-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: flex-end;
+  // padding-bottom: 10px;
+}
+
+/* Input width */
+.filter-toolbar mat-form-field {
+  width: 180px;
+}
+
+/* Buttons aligned right */
+// .action-buttons {
+//   display: flex;
+//   gap: 8px;
+//   margin-left: auto;
+// }
+
+/* Table area */
+.table-wrapper {
+  margin-top: 15px;
+  overflow-x: auto;
+}
+
+/* Responsive (Mobile) */
+@media (max-width: 768px) {
+  .filter-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filter-toolbar mat-form-field,
+  .action-buttons {
+    width: 100%;
+  }
+
+  .action-buttons {
+    justify-content: space-between;
+  }
+}

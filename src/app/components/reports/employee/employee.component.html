@@ -1,0 +1,160 @@
+<form [formGroup]="landOwnerForm" class="container-fluid">
+
+  <div class="row mt-3 g-2">
+
+    <div class="col-md-3">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>Joining From </mat-label>
+        <input matInput [matDatepicker]="fromPicker" formControlName="fromDate">
+        <mat-datepicker-toggle matSuffix [for]="fromPicker"></mat-datepicker-toggle>
+        <mat-datepicker #fromPicker></mat-datepicker>
+      </mat-form-field>
+    </div>
+
+    <div class="col-md-3">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>Joining To</mat-label>
+        <input matInput [matDatepicker]="toPicker" formControlName="toDate">
+        <mat-datepicker-toggle matSuffix [for]="toPicker"></mat-datepicker-toggle>
+        <mat-datepicker #toPicker></mat-datepicker>
+      </mat-form-field>
+    </div>
+
+    <div class="col-md-3">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>Search By</mat-label>
+        <mat-select formControlName="searchBy">
+          <mat-option *ngFor="let s of searchByOptions" [value]="s.value">
+            {{ s.label }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <div class="col-md-3">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>Search</mat-label>
+        <input matInput formControlName="searchText">
+      </mat-form-field>
+    </div>
+
+    <div class="col-md-6 mt-0 d-flex gap-2">
+      <button type="button" class="btn" (click)="applyFilters()">Search</button>
+      <button type="button" class="btn" (click)="showAll()">Clear</button>
+      <button type="button" class="btn" *ngIf="dataSource.data.length" (click)="exportPDF()">PDF</button>
+      <button type="button" class="btn" *ngIf="dataSource.data.length" (click)="exportExcel()">Excel</button>
+    </div>
+
+  </div>
+
+  <div class="table-responsive mt-3">
+  <table class="table table-bordered table-hover table-striped"
+         style="table-layout:auto; white-space:nowrap;">
+    <thead class="table-light">
+      <tr>
+        <th>Sr No</th>
+
+        <th (click)="sortColumn('idNumber')">
+          ID
+          <span *ngIf="getSortColumn() === 'idNumber'">
+            {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+          </span>
+        </th>
+
+        <th (click)="sortColumn('firstName')">
+          First Name
+          <span *ngIf="getSortColumn() === 'firstName'">
+            {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+          </span>
+        </th>
+
+        <th (click)="sortColumn('middleName')">
+          Middle Name
+          <span *ngIf="getSortColumn() === 'middleName'">
+            {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+          </span>
+        </th>
+
+        <th (click)="sortColumn('lastName')">
+          Last Name
+          <span *ngIf="getSortColumn() === 'lastName'">
+            {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+          </span>
+        </th>
+
+        <th (click)="sortColumn('gender')">
+          Gender
+          <span *ngIf="getSortColumn() === 'gender'">
+            {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+          </span>
+        </th>
+
+         <th (click)="sortColumn('bloodGroup')">
+          Blood Group
+          <span *ngIf="getSortColumn() === 'bloodGroup'">
+            {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+          </span>
+        </th>
+
+        <th (click)="sortColumn('dob')">
+          DOB
+          <span *ngIf="getSortColumn() === 'dob'">
+            {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+          </span>
+        </th>
+
+        <th (click)="sortColumn('doj')">
+          Date of Joining
+          <span *ngIf="getSortColumn() === 'doj'">
+            {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+          </span>
+        </th>
+
+        <th (click)="sortColumn('role')">
+          Role
+          <span *ngIf="getSortColumn() === 'role'">
+            {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+          </span>
+        </th>
+
+        <th (click)="sortColumn('createdon')">
+          Created On
+          <span *ngIf="getSortColumn() === 'createdon'">
+            {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+          </span>
+        </th>
+      </tr>
+    </thead>
+
+     <tbody *ngIf="dataSource.data.length">
+      <tr *ngFor="let row of paginatedData; let i = index">
+        <td>{{ i + 1 + (paginator.pageIndex * paginator.pageSize) }}</td>
+        <td>{{ row.idNumber }}</td>
+        <td>{{ row.firstName }}</td>
+        <td>{{ row.middleName }}</td>
+        <td>{{ row.lastName }}</td>
+        <td>{{ row.gender }}</td>
+        <td>{{row.bloodGroup}}</td>
+        <td>{{ row.dob | date:'dd/MM/yyyy' }}</td>
+        <td>{{ row.doj | date:'dd/MM/yyyy' }}</td>
+        <td>{{ row.role }}</td>
+        <td>{{ row.createdon | date:'dd/MM/yyyy' }}</td>
+      </tr>
+
+      <tr *ngIf="paginatedData.length === 0">
+        <td colspan="10" class="text-center">No Data Found</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+
+  
+
+  <mat-paginator
+    [pageSizeOptions]="[10,25,50,100]"
+    [pageSize]="10"
+    showFirstLastButtons>
+  </mat-paginator>
+
+</form>

@@ -1,0 +1,17 @@
+<div class="d-grid p-1">
+  <div class="user-info px-2 py-1">
+    <div class="d-flex justify-content-between">
+      <strong class="user-name">{{getName}}</strong>
+      <button type="button" (click)="onLogout()" class="ps-3 btn text-dark btn-link">Log out</button>
+    </div>
+    <!-- <div class="text-muted">
+  Last login time: {{ lastLoginTime | date:'hh:mm a' }}
+</div> -->
+
+<div class="text-muted d-flex justify-content-between">
+      <span>Last login time: {{ lastLoginTime | date:'hh:mm a' }}</span>
+      <span>Version 26.1.1</span>
+    </div>
+
+  </div>
+</div>

@@ -1,0 +1,132 @@
+<form [formGroup]="reportForm" class="container-fluid">
+
+  <!-- Filters -->
+  <div class="row mt-3 g-2">
+    <!-- From Date -->
+    <div class="col-10 col-md-2">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>From Date</mat-label>
+        <input matInput [matDatepicker]="fromPicker" formControlName="fromDate">
+        <mat-datepicker-toggle matSuffix [for]="fromPicker"></mat-datepicker-toggle>
+        <mat-datepicker #fromPicker></mat-datepicker>
+      </mat-form-field>
+    </div>
+
+    <!-- To Date -->
+    <div class="col-10 col-md-2">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>To Date</mat-label>
+        <input matInput [matDatepicker]="toPicker" formControlName="toDate">
+        <mat-datepicker-toggle matSuffix [for]="toPicker"></mat-datepicker-toggle>
+        <mat-datepicker #toPicker></mat-datepicker>
+      </mat-form-field>
+    </div>
+
+    <!-- Search By -->
+    <div class="col-10 col-md-2">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>Search By</mat-label>
+        <mat-select formControlName="searchBy">
+          <mat-option value="id">ID</mat-option>
+          <mat-option value="vehicleNo">Vehicle No</mat-option>
+          <mat-option value="ownerName">Owner Name</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <!-- Search Value -->
+    <div class="col-10 col-md-2">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>Search Value</mat-label>
+        <input matInput formControlName="searchText" placeholder="Search...">
+      </mat-form-field>
+    </div>
+
+    <!-- Buttons -->
+    <div class="col-10 col-md-4 d-flex flex-wrap gap-1 align-items-center">
+      <button type="button" class="btn" (click)="filterData()">Search</button>
+      <button type="button" class="btn" (click)="Clear()">Clear</button>
+      <button type="button" class="btn" (click)="exportPDF()" *ngIf="filteredData.length > 0">PDF</button>
+      <button type="button" class="btn" (click)="exportExcel()" *ngIf="filteredData.length > 0">Excel</button>
+    </div>
+  </div>
+
+  <!-- Vehicle Table with Sorting -->
+<div class="table-responsive mt-3">
+  <table class="table table-bordered table-hover table-striped w-100">
+    <thead class="table-light">
+      <tr>
+        <th>Sr No</th>
+        <th (click)="sortColumn('id')">
+          ID
+          <span *ngIf="getSortColumn() === 'id'">
+            {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+          </span>
+        </th>
+        <th (click)="sortColumn('vehicleNo')">
+          Vehicle No
+          <span *ngIf="getSortColumn() === 'vehicleNo'">
+            {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+          </span>
+        </th>
+        <th (click)="sortColumn('ownerName')">
+          Owner Name
+          <span *ngIf="getSortColumn() === 'ownerName'">
+            {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+          </span>
+        </th>
+        <th (click)="sortColumn('vehicleType')">
+          Vehicle Type
+          <span *ngIf="getSortColumn() === 'vehicleType'">
+            {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+          </span>
+        </th>
+        <th (click)="sortColumn('encodedBy')">
+          Encoded By
+          <span *ngIf="getSortColumn() === 'encodedBy'">
+            {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+          </span>
+        </th>
+        <th (click)="sortColumn('encodedOn')">
+          Encoded On
+          <span *ngIf="getSortColumn() === 'encodedOn'">
+            {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+          </span>
+        </th>
+        <th (click)="sortColumn('status')">
+          Status
+          <span *ngIf="getSortColumn() === 'status'">
+            {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+          </span>
+        </th>
+      </tr>
+    </thead>
+    <tbody *ngIf="getPagedData().length > 0">
+      <tr *ngFor="let e of getPagedData(); let i = index">
+        <td>{{ pageIndex * pageSize + i + 1 }}</td>
+        <td>{{ e.id }}</td>
+        <td>{{ e.vehicleNo }}</td>
+        <td>{{ e.ownerName }}</td>
+        <td>{{ e.vehicleType }}</td>
+        <td>{{ e.encodedBy }}</td>
+        <td>{{ e.encodedOn | date:'dd-MM-yyyy HH:mm:ss' }}</td>
+        <td>{{ e.status }}</td>
+      </tr>
+    </tbody>
+    <tr *ngIf="getPagedData().length === 0">
+      <td colspan="8" class="text-center">No Data Found</td>
+    </tr>
+  </table>
+</div>
+
+
+  
+
+  <!-- Paginator -->
+  <mat-paginator #paginator
+                 [pageSizeOptions]="[10,25,50,100,150,200,250,300]"
+                 [pageSize]="10"
+                 showFirstLastButtons
+                 (page)="onPageChange($event)">
+  </mat-paginator>
+</form>

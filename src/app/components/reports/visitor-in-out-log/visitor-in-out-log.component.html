@@ -1,0 +1,184 @@
+<form [formGroup]="reportForm" class="container-fluid">
+
+  <!-- Filters -->
+  <div class="row mt-3 g-2">
+
+    <!-- From Date -->
+    <div class="col-12 col-md-2">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>From Date</mat-label>
+        <input matInput [matDatepicker]="fromPicker" formControlName="fromDate">
+        <mat-datepicker-toggle matSuffix [for]="fromPicker"></mat-datepicker-toggle>
+        <mat-datepicker #fromPicker></mat-datepicker>
+      </mat-form-field>
+    </div>
+
+
+    <!-- To Date -->
+    <div class="col-12 col-md-2">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>To Date</mat-label>
+        <input matInput [matDatepicker]="toPicker" formControlName="toDate">
+        <mat-datepicker-toggle matSuffix [for]="toPicker"></mat-datepicker-toggle>
+        <mat-datepicker #toPicker></mat-datepicker>
+      </mat-form-field>
+    </div>
+
+    <!-- NRD Multi-select -->
+    <div class="col-12 col-md-2">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>Neighbourhood</mat-label>
+        <mat-select formControlName="nrd" multiple (selectionChange)="onNRDSelect($event)">
+          <mat-option [value]="'All'">All</mat-option>
+          <mat-option *ngFor="let n of neighbourhoods" [value]="n">{{ n }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <!-- Building Multi-select -->
+    <div class="col-12 col-md-2">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>Building</mat-label>
+        <mat-select formControlName="building" multiple (selectionChange)="onBuildingSelect($event)">
+          <mat-option [value]="'All'">All</mat-option>
+          <mat-option *ngFor="let b of buildings" [value]="b">{{ b }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+
+
+
+    <!-- Search By -->
+    <div class="col-12 col-md-2">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>Search By</mat-label>
+        <mat-select formControlName="searchType">
+          <mat-option *ngFor="let s of searchTypeOptions" [value]="s.value">{{ s.label }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <!-- Search Text -->
+    <div class="col-12 col-md-2">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>Search</mat-label>
+        <input matInput formControlName="searchText">
+      </mat-form-field>
+    </div>
+
+    <!-- Buttons -->
+    <div class="col-12 d-flex gap-2 mt-2 justify-content-end">
+      <button type="button" class="btn" (click)="showReports()">Search</button>
+      <button type="button" class="btn" (click)="showAll()">Clear</button>
+      <button type="button" class="btn" (click)="exportExcel()" *ngIf="displayedData.data.length>0">Excel</button>
+      <button type="button" class="btn" (click)="exportReports()" *ngIf="displayedData.data.length>0">PDF</button>
+    </div>
+
+
+  </div>
+
+  <!-- Visitor Table -->
+  <div class="table-responsive mt-3">
+    <table class="table table-bordered table-striped table-hover">
+      <thead class="table-light">
+        <tr>
+          <th>Sr No</th>
+
+          <th (click)="sortColumn('shortName')">
+            Visitor Name
+            <span *ngIf="getSortColumn() === 'shortName'">
+              {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+            </span>
+          </th>
+
+          <th (click)="sortColumn('mobileNo')">
+            Mobile No
+            <span *ngIf="getSortColumn() === 'mobileNo'">
+              {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+            </span>
+          </th>
+
+          <th (click)="sortColumn('visitStartTime')">
+            Start Time
+            <span *ngIf="getSortColumn() === 'visitStartTime'">
+              {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+            </span>
+          </th>
+
+          <th (click)="sortColumn('visitEndTime')">
+            End Time
+            <span *ngIf="getSortColumn() === 'visitEndTime'">
+              {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+            </span>
+          </th>
+
+          <th (click)="sortColumn('visitPurpose')">
+            Purpose
+            <span *ngIf="getSortColumn() === 'visitPurpose'">
+              {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+            </span>
+          </th>
+
+          <th (click)="sortColumn('visitDescription')">
+            Description
+            <span *ngIf="getSortColumn() === 'visitDescription'">
+              {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+            </span>
+          </th>
+
+
+          <th (click)="sortColumn('visitStatus')">
+            Status
+            <span *ngIf="getSortColumn() === 'visitStatus'">
+              {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+            </span>
+          </th>
+
+          <th (click)="sortColumn('nrdName')">
+            NRD
+            <span *ngIf="getSortColumn() === 'nrdName'">
+              {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+            </span>
+          </th>
+
+          <th (click)="sortColumn('buildingName')">
+            Building
+            <span *ngIf="getSortColumn() === 'buildingName'">
+              {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+            </span>
+          </th>
+        </tr>
+      </thead>
+
+      <tbody *ngIf="displayedData.data.length > 0">
+        <tr *ngFor="let e of displayedData.data; let i = index">
+          <td>{{ getSrNo(i) }}</td>
+          <td>{{ e.shortName }}</td>
+          <td>{{ e.mobileNo }}</td>
+          <td>{{ e.visitStartTime | date:'dd-MM-yyyy HH:mm' }}</td>
+          <td>{{ e.visitEndTime | date:'dd-MM-yyyy HH:mm' }}</td>
+          <td>{{ e.visitPurpose }}</td>
+          <td>{{ e.visitDescription }}</td>
+
+          <td>{{ e.visitStatus }}</td>
+          <td>{{ e.nrdName }}</td>
+          <td>{{ e.buildingName }}</td>
+        </tr>
+
+        <tr *ngIf="displayedData.data.length === 0">
+          <td colspan="10" class="text-center">No Data Found</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <mat-paginator [pageSizeOptions]="pageSizes" [pageSize]="10" showFirstLastButtons>
+    </mat-paginator>
+  </div>
+
+
+  <div *ngIf="displayedData.data.length === 0" class="text-center mt-3">
+    <strong>No Data Found</strong>
+  </div>
+
+</form>

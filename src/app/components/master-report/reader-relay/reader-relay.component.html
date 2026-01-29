@@ -1,0 +1,61 @@
+<form [formGroup]="reportForm" class="container-fluid">
+
+  <!-- Filters -->
+  <div class="row mt-3 g-2">
+    <div class="col-12 col-md-4">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>Search By</mat-label>
+        <mat-select formControlName="searchType">
+          <mat-option *ngFor="let s of searchType" [value]="s.value">
+            {{ s.label }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <div class="col-12 col-md-4">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>Search Text</mat-label>
+        <input matInput formControlName="searchText">
+      </mat-form-field>
+    </div>
+
+    <div class="col-12 col-md-3 d-flex flex-wrap gap-1 align-items-center">
+      <button type="button" class="btn" (click)="showReports()">Show</button>
+      <button type="button" class="btn" (click)="showAll()">All</button>
+      <button type="button" class="btn" *ngIf="displayedData.length > 0" (click)="exportReports()">Export PDF</button>
+      <button type="button" class="btn" *ngIf="displayedData.length > 0" (click)="exportExcel()">Export Excel</button>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="table-responsive mt-3">
+    <table class="table table-bordered table-hover table-striped">
+      <thead class="table-light">
+        <tr>
+          <th>Sr No</th>
+          <th>Reader Mode</th>
+          <th>Reader Location</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let r of pagedData; let i = index">
+          <td>{{ paginator.pageIndex * paginator.pageSize + i + 1 }}</td>
+          <td>{{ r.readermode }}</td>
+          <td>{{ r.readerLocation }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Paginator -->
+  <mat-paginator
+    #paginator
+    [length]="displayedData.length"
+    [pageSizeOptions]="pageSizes"
+    [pageSize]="10"
+    showFirstLastButtons
+    (page)="onPageChange($event)">
+  </mat-paginator>
+
+</form>

@@ -1,0 +1,186 @@
+<form [formGroup]="reportForm" class="container-fluid">
+
+  <!-- Filters Row -->
+  <div class="row mt-3 g-2">
+
+    <!-- From Date -->
+    <div class="col-12 col-md-2">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>From Date</mat-label>
+        <input matInput [matDatepicker]="fromPicker" formControlName="fromDate">
+        <mat-datepicker-toggle matSuffix [for]="fromPicker"></mat-datepicker-toggle>
+        <mat-datepicker #fromPicker></mat-datepicker>
+      </mat-form-field>
+    </div>
+
+    <!-- To Date -->
+    <div class="col-12 col-md-2">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>To Date</mat-label>
+        <input matInput [matDatepicker]="toPicker" formControlName="toDate">
+        <mat-datepicker-toggle matSuffix [for]="toPicker"></mat-datepicker-toggle>
+        <mat-datepicker #toPicker></mat-datepicker>
+      </mat-form-field>
+    </div>
+
+    <div class="col-12 col-md-2">
+  <mat-form-field appearance="outline" class="w-100">
+    <mat-label>Neighbourhood</mat-label>
+    <mat-select formControlName="nrd" multiple (selectionChange)="onNRDChange()">
+      <mat-option *ngFor="let n of nrdList" [value]="n">
+        {{ n }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+</div>
+
+
+    <!-- Search By -->
+    <div class="col-12 col-md-2">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>Search By</mat-label>
+        <mat-select formControlName="searchBy">
+          <mat-option value="regNo">Registration No</mat-option>
+          <mat-option value="vType">Vehicle Type</mat-option>
+          <mat-option value="vMake">Vehicle Make</mat-option>
+          <mat-option value="vColor">Color</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <!-- Search Value -->
+    <div class="col-12 col-md-2">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>Search Value</mat-label>
+        <input matInput formControlName="searchText">
+      </mat-form-field>
+    </div>
+
+    <!-- Buttons -->
+    <div class="col-12 col-md-5 d-flex flex-row flex-wrap gap-2 align-items-center">
+  <button type="button" class="btn" (click)="filterData()">Search</button>
+  <button type="button" class="btn" (click)="showAll()">Clear</button>
+
+  <button type="button" class="btn" *ngIf="displayedData.data.length > 0" (click)="exportPDF()">PDF</button>
+
+  <button type="button" class="btn" *ngIf="displayedData.data.length > 0" (click)="exportExcel()">Excel</button>
+</div>
+
+
+  </div>
+
+  <!-- Table -->
+<div class="table-responsive mt-3">
+  <table class="table table-bordered table-striped table-hover">
+    <thead class="table-light">
+      <tr>
+        <th>SrNo</th>
+
+        
+
+        <th (click)="sortColumn('regNo')">
+          Registration No
+          <span *ngIf="getSortColumn() === 'regNo'">
+            {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+          </span>
+        </th>
+
+        <th (click)="sortColumn('vType')">
+          Vehicle Type
+          <span *ngIf="getSortColumn() === 'vType'">
+            {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+          </span>
+        </th>
+
+        <th (click)="sortColumn('shortname')">
+          Owner Name
+          <span *ngIf="getSortColumn() === 'shortname'">
+            {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+          </span>
+        </th>
+<th (click)="sortColumn('idNumber')">
+         Owner ID
+          <span *ngIf="getSortColumn() === 'idNumber'">
+            {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+          </span>
+        </th>
+        <th (click)="sortColumn('nrd')">
+          Neighbourhood
+          <span *ngIf="getSortColumn() === 'nrd'">
+            {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+          </span>
+        </th>
+
+        <th (click)="sortColumn('building')">
+          Building
+          <span *ngIf="getSortColumn() === 'building'">
+            {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+          </span>
+        </th>
+
+        <th (click)="sortColumn('flatNumber')">
+          Flat Number
+          <span *ngIf="getSortColumn() === 'flatNumber'">
+            {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+          </span>
+        </th>
+
+        <th (click)="sortColumn('tagUID')">
+          Tag UID
+          <span *ngIf="getSortColumn() === 'tagUID'">
+            {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+          </span>
+        </th>
+
+        <th (click)="sortColumn('stickerNo')">
+          Sticker No
+          <span *ngIf="getSortColumn() === 'stickerNo'">
+            {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+          </span>
+        </th>
+
+        <th (click)="sortColumn('createdon')">
+          Created On
+          <span *ngIf="getSortColumn() === 'createdon'">
+            {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+          </span>
+        </th>
+      </tr>
+    </thead>
+
+    <tbody *ngIf="displayedData.data.length > 0; else noData">
+      <tr *ngFor="let e of displayedData.data; let i = index">
+        <td>{{ paginator.pageIndex * paginator.pageSize + i + 1 }}</td>
+        
+        <td>{{ e.regNo || '-' }}</td>
+        <td>{{ e.vType || '-' }}</td>
+        <td>{{ e.shortname || '-' }}</td>
+        <td>{{ e.idNumber || '-' }}</td>
+        <td>{{ e.nrd || '-' }}</td>
+        <td>{{ e.building || '-' }}</td>
+        <td>{{ e.flatNumber || '-' }}</td>
+        <td>{{ e.tagUID || '-' }}</td>
+        <td>{{ e.stickerNo || '-' }}</td>
+        <td>{{ e.createdon || '-' }}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <ng-template #noData>
+    <tr>
+      <td [attr.colspan]="11" class="text-center text-danger fw-bold">
+        No Data Found
+      </td>
+    </tr>
+  </ng-template>
+</div>
+
+
+
+
+  
+
+  <!-- Paginator -->
+  <mat-paginator [pageSizeOptions]="[10, 25, 50,150,200,250,300]" [pageSize]="10" showFirstLastButtons></mat-paginator>
+
+</form>

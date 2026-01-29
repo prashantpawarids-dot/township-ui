@@ -1,0 +1,82 @@
+<form [formGroup]="reportForm" class="container-fluid">
+
+  <!-- Filters -->
+  <div class="row mt-3 g-2">
+
+    <!-- Search By -->
+    <div class="col-md-4">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>Search By</mat-label>
+        <mat-select formControlName="searchType">
+          <mat-option *ngFor="let s of searchType" [value]="s.value">
+            {{ s.label }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <!-- Search Text -->
+    <div class="col-md-4">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>Search Text</mat-label>
+        <input matInput formControlName="searchText">
+      </mat-form-field>
+    </div>
+
+    <!-- Buttons -->
+    <div class="col-md-4 d-flex flex-wrap gap-2 align-items-center mt-1">
+      <button type="button" class="btn btn-primary" (click)="showReports()">Search</button>
+      <button type="button" class="btn btn-secondary" (click)="showAll()">All</button>
+      <button type="button" class="btn btn-success" *ngIf="displayedData.data.length > 0" (click)="exportReports()">PDF</button>
+      <button type="button" class="btn btn-info" *ngIf="displayedData.data.length > 0" (click)="exportExcel()">Excel</button>
+    </div>
+
+  </div>
+
+  <!-- Table -->
+ <div class="table-responsive mt-3">
+  <table class="table table-bordered table-hover table-striped">
+
+    <thead class="table-light">
+      <tr>
+        <th>Sr No</th>
+        <th>Company Code</th>
+        <th>Company Name</th>
+        <th>City</th>
+        <th>Address</th>
+        <th>Contact Person</th>
+        <th>Contact No.</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr *ngFor="let e of displayedData.data; let i = index">
+        <td>{{ paginator.pageIndex * paginator.pageSize + i + 1 }}</td>
+        <td>{{ e.companyCode }}</td>
+        <td>{{ e.companyName }}</td>
+        <td>{{ e.city }}</td>
+        <td>{{ e.address }}</td>
+        <td>{{ e.contactPerson }}</td>
+        <td>{{ e.contactNumber }}</td>
+
+        <!-- 🔥 Status (Active / Inactive) -->
+        <td [ngStyle]="{'color': e.isactive ? 'green' : 'red', 'font-weight': 'bold'}">
+          {{ e.isactive ? 'Active' : 'Inactive' }}
+        </td>
+      </tr>
+    </tbody>
+
+  </table>
+</div>
+
+
+  <!-- Paginator -->
+  <mat-paginator
+    #paginator
+    [pageSizeOptions]="pageSizes"
+    [pageSize]="10"
+    showFirstLastButtons>
+  </mat-paginator>
+
+</form>

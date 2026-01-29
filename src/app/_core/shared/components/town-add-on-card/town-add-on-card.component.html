@@ -1,0 +1,293 @@
+<div class="container">
+    <div class="row">
+        <div class="col-md-3">
+  <mat-form-field class="full-width">
+    <mat-label>ID</mat-label>
+    <input
+      [(ngModel)]="addonCard.idNumber"
+      name="addonid"
+      #addonid="ngModel"
+      matInput
+    />
+  </mat-form-field>
+</div>
+        <div class="col-md-3 ">   
+             
+            <button mat-raised-button (click)="addonphoto.click()">
+                <mat-icon>add</mat-icon>
+                Upload Photo</button> 
+            <input accept="image/*" #addonphoto type="file"  class="input_fileupload--hidden" (change)="onFileSelected($event)"
+                [(ngModel)]="addonCard.photo" name="addonphotoname" #addonphotoname="ngModel"/>
+       <div>
+                <img *ngIf="photoPreview" [src]="photoPreview" alt="photoPreview"
+                    width="150" height="100"
+                    style="border: 1px solid #ccc; background-color: gray;" />
+            </div>
+            
+            <div *ngFor="let f of files">
+                <span>{{f.name}}</span>
+
+                <!-- <img [src]="f.preview" alt="Previetw" style="width: 100px; display: block; margin: 5px 0;" />
+
+                <button mat-icon-button color="primary" title="delete" >
+                    
+                    <mat-icon>close</mat-icon>
+                </button> --><!--(click)="removeFile(f)">-->
+            </div>
+        </div> 
+
+           
+
+           
+
+            <!-- //upload end -->
+
+        <div class="col-md-3 ">
+            <mat-form-field class="full-width">
+                <mat-label>First Name</mat-label>
+                <input [(ngModel)]="addonCard.firstName" name="addonfname" #addonfname="ngModel" matInput autoCapitalizeFirst />
+            </mat-form-field>
+        </div>
+        <div class="col-md-3 ">
+            <mat-form-field class="full-width">
+                <mat-label>Middle Name</mat-label>
+                <input [(ngModel)]="addonCard.middleName" name="addonmname" #addonmname="ngModel" matInput />
+            </mat-form-field>
+        </div>
+    </div>
+    <div class="row">
+
+        <div class="col-md-3 ">
+            <mat-form-field class="full-width">
+                <mat-label>Last Name</mat-label>
+                <input [(ngModel)]="addonCard.lastName" name="addonlname" #addonlname="ngModel" matInput />
+            </mat-form-field>
+        </div>
+        <div class="col-md-3 ">
+            <label id="gender-label" class="gender-label">Gender</label>
+            <mat-radio-group [(ngModel)]="addonCard.gender" name="addongender" #addongender="ngModel"
+                aria-label="Gender">
+                <mat-radio-button value="Male">Male</mat-radio-button>
+                <mat-radio-button value="Female">Female</mat-radio-button>
+            </mat-radio-group>
+        </div>
+        <div class="col-md-3 ">
+            <mat-form-field class="full-width">
+                <mat-label>Blood Group</mat-label>
+                <input  type="text" placeholder="Select Blood Group" aria-label="blood Group"
+                    matInput name="bloodGroup" #buildingForm="ngModel" [(ngModel)]="addonCard.bloodGroup"
+                    readonly
+                    [matAutocomplete]="autobuilding"
+                    (click)="bloodGroupTrigger.openPanel()"
+                    #bloodGroupTrigger="matAutocompleteTrigger">
+                <mat-autocomplete #autobuilding="matAutocomplete">
+                    @for (option of bloodGroupOptions; track option) {
+                    <mat-option [value]="option">{{option}}</mat-option>
+                    }
+                </mat-autocomplete>
+            </mat-form-field>
+        </div>
+        <div class="col-md-3 ">
+            <mat-form-field class="full-width">
+                <mat-label>Date of Birth</mat-label>
+                <input [(ngModel)]="addonCard.dob" name="addondob" #addondob="ngModel" matInput
+                    [matDatepicker]="addonpicker">
+                <mat-hint>DD/MM/YYYY</mat-hint>
+                <mat-datepicker-toggle matIconSuffix [for]="addonpicker"></mat-datepicker-toggle>
+                <mat-datepicker #addonpicker></mat-datepicker>
+            </mat-form-field>
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-md-3 ">
+            <mat-form-field class="full-width">
+                <mat-label>Mobile No</mat-label>
+                <input  [(ngModel)]="addonCard.mobileNo" name="addonmobile" #mobile="ngModel"
+                    matInput type="number" maxlength="10" data-for="phoneNumber" />
+            </mat-form-field>
+        </div>
+        <div class="col-md-3 ">
+            <mat-form-field class="full-width">
+                <mat-label>PAN No</mat-label>
+                <input [(ngModel)]="addonCard.paNnumber" minlength="10" maxlength="10" name="addonpan" #addonpan="ngModel" matInput />
+            </mat-form-field>
+        </div>
+        <div class="col-md-3 ">
+            <mat-form-field class="full-width">
+                <mat-label>License No</mat-label>
+                <input [(ngModel)]="addonCard.licenseNo" name="addonlicence" #addonlicence="ngModel" matInput />
+            </mat-form-field>
+        </div>
+        <div class="col-md-3 ">
+            <mat-form-field class="full-width">
+                <mat-label>Passport No</mat-label>
+                <input [(ngModel)]="addonCard.passportNo" name="addonpassport" #addonpassport="ngModel" matInput />
+            </mat-form-field>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-3 ">
+            <mat-form-field class="full-width">
+                <mat-label>Aadhar Card</mat-label>
+                <input [(ngModel)]="addonCard.aadharCardId" name="addonaadhar" #addonaadhar="ngModel" minlength="12" maxlength="16" matInput />
+            </mat-form-field>
+        </div>
+        <div class="col-md-3 ">
+            <mat-form-field class="full-width">
+                <mat-label>Voter ID</mat-label>
+                <input [(ngModel)]="addonCard.voterID" name="addonvoter" #addonvoter="ngModel" matInput />
+            </mat-form-field>
+        </div>
+        <ng-container *ngIf="tenantType == 0">
+            <div class="col-md-3">
+                <mat-form-field class="full-width">
+                    <mat-label>Agreement From</mat-label>
+                    <input [(ngModel)]="addonCard.aggreement_From" name="aggreement_From" #aggreement_From="ngModel"  
+                    matInput [matDatepicker]="pickerAgreeFrom">
+                    <mat-hint>DD/mm/YYYY</mat-hint>
+                    <mat-datepicker-toggle matIconSuffix [for]="pickerAgreeFrom"></mat-datepicker-toggle>
+                    <mat-datepicker #pickerAgreeFrom></mat-datepicker>
+                </mat-form-field>
+            </div>
+            <div class="col-md-3">
+                <mat-form-field class="full-width">
+                    <mat-label>Agreement To</mat-label>
+                    <input [(ngModel)]="addonCard.aggreement_To" name="aggreement_To"   #aggreement_To="ngModel"  
+                    matInput [matDatepicker]="pickerAgreeTo">
+                    <mat-hint>DD/mm/YYYY</mat-hint>
+                    <mat-datepicker-toggle matIconSuffix [for]="pickerAgreeTo"></mat-datepicker-toggle>
+                    <mat-datepicker #pickerAgreeTo></mat-datepicker>
+                </mat-form-field>
+            </div>
+            <div class="col-md-3">
+                <mat-form-field class="full-width">
+                    <mat-label>Registration Issue Date</mat-label>
+                    <input [(ngModel)]="addonCard.registrationIssueDate" name="registrationIssueDate" #dob="ngModel" matInput
+                        [matDatepicker]="picker">
+                    <mat-hint>DD/mm/YYYY</mat-hint>
+                    <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                    <mat-datepicker #picker></mat-datepicker>
+                </mat-form-field>
+            </div>
+        </ng-container>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="button-row m-b-10">
+                <button mat-stroked-button (click)="addData()">Add Record</button>
+                <button class="m-l-10" mat-flat-button>Clear</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container">
+    <table mat-table *ngIf="dataToDisplay.length > 0" [dataSource]="dataSource" class="mat-elevation-z8">
+
+        <!--- Note that these columns can be defined in any order.
+          The actual rendered columns are set as a property on the row definition" -->
+
+        <ng-container matColumnDef="srno">
+            <th mat-header-cell *matHeaderCellDef>Sr No </th>
+            <td mat-cell *matCellDef="let element"> {{element.srno}} </td>
+        </ng-container>
+
+        <!-- id Column -->
+        <ng-container matColumnDef="id">
+            <th mat-header-cell *matHeaderCellDef> Id </th>
+            <td mat-cell *matCellDef="let element"> {{element.idNumber}} </td>
+        </ng-container>
+
+        <!-- Weight Column -->
+        <!-- <ng-container matColumnDef="photo">
+        <th mat-header-cell *matHeaderCellDef> Photo </th>
+        <td mat-cell *matCellDef="let element"> {{element.photo}} </td>
+    </ng-container> -->
+
+        <!-- Symbol Column -->
+        <ng-container matColumnDef="fname">
+            <th mat-header-cell *matHeaderCellDef> First Name </th>
+            <td mat-cell *matCellDef="let element"> {{element.firstName}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="lname">
+            <th mat-header-cell *matHeaderCellDef> Last Name </th>
+            <td mat-cell *matCellDef="let element"> {{element.lastName}} </td>
+        </ng-container>
+
+        <!-- Name Column -->
+        <ng-container matColumnDef="mname">
+            <th mat-header-cell *matHeaderCellDef> Middle Name </th>
+            <td mat-cell *matCellDef="let element"> {{element.middleName}} </td>
+        </ng-container>
+
+        <!-- Weight Column -->
+        <!-- <ng-container matColumnDef="gender">
+            <th mat-header-cell *matHeaderCellDef> Gender </th>
+            <td mat-cell *matCellDef="let element"> {{element.gender}} </td>
+        </ng-container> -->
+
+        <!-- Symbol Column -->
+        <!-- <ng-container matColumnDef="blood">
+        <th mat-header-cell *matHeaderCellDef> Blood </th>
+        <td mat-cell *matCellDef="let element"> {{element.blood}} </td>
+    </ng-container> -->
+
+        <!-- <ng-container matColumnDef="dob">
+        <th mat-header-cell *matHeaderCellDef> DOB </th>
+        <td mat-cell *matCellDef="let element"> {{element.dob}} </td>
+    </ng-container> -->
+
+        <!-- Name Column -->
+        <ng-container matColumnDef="mobile">
+            <th mat-header-cell *matHeaderCellDef> Mobile </th>
+            <td mat-cell *matCellDef="let element"> {{element.mobileNo}} </td>
+        </ng-container>
+
+        <!-- Weight Column -->
+        <!-- <ng-container matColumnDef="pan">
+        <th mat-header-cell *matHeaderCellDef> PAN No </th>
+        <td mat-cell *matCellDef="let element"> {{element.pan}} </td>
+    </ng-container> -->
+
+        <!-- Symbol Column -->
+        <!-- <ng-container matColumnDef="licence">
+        <th mat-header-cell *matHeaderCellDef> Licence No </th>
+        <td mat-cell *matCellDef="let element"> {{element.licence}} </td>
+    </ng-container> -->
+
+        <!-- <ng-container matColumnDef="passport">
+        <th mat-header-cell *matHeaderCellDef> Passport No </th>
+        <td mat-cell *matCellDef="let element"> {{element.passport}} </td>
+    </ng-container> -->
+
+        <!-- Name Column -->
+        <!-- <ng-container matColumnDef="aadhar">
+        <th mat-header-cell *matHeaderCellDef> Aadhar No </th>
+        <td mat-cell *matCellDef="let element"> {{element.aadhar}} </td>
+    </ng-container> -->
+
+        <!-- Weight Column -->
+        <!-- <ng-container matColumnDef="voter">
+        <th mat-header-cell *matHeaderCellDef> Voter ID </th>
+        <td mat-cell *matCellDef="let element"> {{element.voter}} </td>
+    </ng-container> -->
+
+        <!-- Weight Column -->
+        <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef> Actions </th>
+            <td mat-cell *matCellDef="let element">
+                <button mat-stroked-button (click)="openAddonDialog(element)">View</button>
+                <button mat-stroked-button class="m-l-10" (click)="editData(element)">Edit</button>
+                <!-- <button mat-stroked-button class="m-l-10" (click)="removeData(element)">Remove</button> -->
+            </td>
+
+        </ng-container>
+
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+</div>

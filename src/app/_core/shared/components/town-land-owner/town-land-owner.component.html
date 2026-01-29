@@ -1,0 +1,577 @@
+<div class="container">
+    <div class="row">
+        <div class="col-2 text-center">
+            <div>
+                <img *ngIf="photoPreview" [src]="photoPreview" alt="photoPreview"
+                    width="150" height="100"
+                    style="border: 1px solid #ccc; background-color: gray;" />
+            </div>
+            <button [disabled]="disableFields" mat-raised-button (click)="onClick($event)">
+                <mat-icon>add</mat-icon>
+                Upload Photo
+            </button>
+
+            <input accept="image/*" name="photo" #fileUpload type="file"
+                class="input_fileupload--hidden" (change)="onFileSelected($event)" />
+        </div>
+        <div class="row col-10 px-0 mx-0">
+            <div class="col-4">
+                <mat-form-field class="full-width">
+                    <mat-label>First Name</mat-label>
+                    <input [disabled]="disableFields" [(ngModel)]="landOwner.firstName" name="fname" #fname="ngModel"
+                        matInput autoCapitalizeFirst />
+                </mat-form-field>
+            </div>
+            <div class="col-4">
+                <mat-form-field class="full-width">
+                    <mat-label>Middle Name</mat-label>
+                    <input [disabled]="disableFields" [(ngModel)]="landOwner.middleName" name="mname" #mname="ngModel"
+                    matInput autoCapitalizeFirst />
+                </mat-form-field>
+            </div>
+            <div class="col-4">
+                <mat-form-field class="full-width">
+                    <mat-label>Last Name</mat-label>
+                    <input [disabled]="disableFields" [(ngModel)]="landOwner.lastName" name="lname" #lname="ngModel"
+                        matInput autoCapitalizeFirst />
+                </mat-form-field>
+            </div>
+            <div class="col-3">
+                <mat-form-field class="full-width">
+                    <mat-label>Ice No</mat-label>
+                    <input [disabled]="disableFields" [(ngModel)]="landOwner.icEno" name="iceNo" #iceNo="ngModel"
+                        matInput />
+                </mat-form-field>
+            </div>
+            <!-- <div class="col-3">
+                <label id="gender-label" class="gender-label">Gender</label>
+                <mat-radio-group [disabled]="disableFields" [(ngModel)]="landOwner.gender" name="gender" #gender="ngModel"
+                    aria-label="Gender">
+                    <mat-radio-button value="Male">Male</mat-radio-button>
+                    <mat-radio-button value="Female">Female</mat-radio-button>
+                </mat-radio-group>
+            </div> -->
+            <div class="col-3">
+    <label id="gender-label" class="gender-label">Gender</label>
+    <mat-radio-group [disabled]="disableFields" [(ngModel)]="landOwner.gender" name="gender" #gender="ngModel"
+        aria-label="Gender" style="display: flex; gap: 10px;">
+        <mat-radio-button value="Male">Male</mat-radio-button>
+        <mat-radio-button value="Female">Female</mat-radio-button>
+    </mat-radio-group>
+</div>
+            <div class="col-3 ms-3">
+                <mat-form-field class="full-width">
+                    <mat-label>Blood Group</mat-label>
+                    <input [disabled]="disableFields" type="text" placeholder="Select Blood Group" aria-label="blood Group"
+                        matInput name="bloodGroup" #buildingForm="ngModel" [(ngModel)]="landOwner.bloodGroup"
+                        readonly
+                        (click)="bloodGroupLandOwnerTrigger.openPanel()"
+                        [matAutocomplete]="autobuilding"
+                        #bloodGroupLandOwnerTrigger="matAutocompleteTrigger">
+                    <mat-autocomplete #autobuilding="matAutocomplete">
+                        @for (option of bloodGroupOptions; track option) {
+                        <mat-option [value]="option">{{option}}</mat-option>
+                        }
+                    </mat-autocomplete>
+                </mat-form-field>
+            </div>
+            <div class="col-3" *ngIf="isEmployee">
+                <mat-form-field class="full-width">
+                    <mat-label>ID</mat-label>
+                    <input [(ngModel)]="landOwner.idNumber" name="lid" #lid="ngModel" matInput />
+                </mat-form-field>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-3">
+            <mat-form-field class="full-width">
+                <mat-label>Date of Birth</mat-label>
+                <input [disabled]="disableFields" [(ngModel)]="landOwner.dob" name="dob" #dob="ngModel"  matInput
+                    [matDatepicker]="picker">
+                <mat-hint>DD/mm/YYYY</mat-hint>
+                <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                <mat-datepicker #picker></mat-datepicker>
+            </mat-form-field>
+        </div>
+        <div class="col-md-3">
+            <mat-form-field class="full-width">
+                <mat-label>Email ID </mat-label>
+                <input [disabled]="disableFields" [(ngModel)]="landOwner.emailID" name="emailid" #emailid="ngModel"
+                    matInput />
+            </mat-form-field>
+        </div>
+        <div class="col-md-3">
+            <mat-form-field class="full-width">
+                <mat-label>Mobile No</mat-label>
+                <input [disabled]="disableFields" [(ngModel)]="landOwner.mobileNo" name="mobile" #mobile="ngModel"
+                    matInput type="text" maxlength="10" data-for="phoneNumber" />
+            </mat-form-field>
+        </div>
+        <div class="col-md-3" *ngIf="!isEmployee">
+            <mat-form-field class="full-width">
+                <mat-label>Landline No</mat-label>
+                <input type="text" maxlength="8" data-for="phoneNumber" [disabled]="disableFields" [(ngModel)]="landOwner.landLine" name="landlineNo"
+                    #landlineNo="ngModel" matInput />
+            </mat-form-field>
+        </div>
+        <div class="col-md-3" *ngIf="isEmployee">
+            <mat-form-field class="full-width">
+                <mat-label>Designation</mat-label>
+                <input [disabled]="disableFields" [(ngModel)]="landOwner.role" name="role" #pan="ngModel"
+                    matInput />
+            </mat-form-field>
+        </div>
+    </div>
+    <div *ngIf="!hideGovtIDFields" class="row">
+        <div class="col-md-3">
+            <mat-form-field class="full-width">
+                <mat-label>PAN No</mat-label>
+                <input [disabled]="disableFields" [(ngModel)]="landOwner.paNnumber" (ngModelChange)="onPanChange($event)" name="pan" #pan="ngModel"
+                    minlength="10" maxlength="10" matInput />
+            </mat-form-field>
+        </div>
+        <div class="col-md-3">
+            <mat-form-field class="full-width">
+                <mat-label>License No</mat-label>
+                <input [disabled]="disableFields" [(ngModel)]="landOwner.licenseNo" name="licenseNo"
+                    #licenseNo="ngModel" matInput />
+            </mat-form-field>
+        </div>
+        <div class="col-md-3">
+            <mat-form-field class="full-width">
+                <mat-label>Passport No</mat-label>
+                <input [disabled]="disableFields" [(ngModel)]="landOwner.passportNo" name="passportNo"
+                    #passportNo="ngModel" matInput />
+            </mat-form-field>
+        </div>
+        <div class="col-md-3">
+            <mat-form-field class="full-width">
+                <mat-label>Voter ID</mat-label>
+                <input [disabled]="disableFields" [(ngModel)]="landOwner.voterID" name="voterId" #voterId="ngModel"
+                    matInput />
+            </mat-form-field>
+        </div>
+    </div>
+    <div *ngIf="!hideGovtIDFields" class="row">
+
+        <div class="col-md-3">
+            <mat-form-field class="full-width">
+                <mat-label>Aadhar Card</mat-label>
+                <input [disabled]="disableFields" [(ngModel)]="landOwner.aadharCardId" name="adharNo" #adharNo="ngModel"
+                    matInput minlength="16" maxlength="16" />
+            </mat-form-field>
+        </div>
+        <div class="col-md-3">
+            <mat-form-field class="full-width">
+                <mat-label>Neighbourhood</mat-label>
+                <input [disabled]="disableFields" (change)="filterResident()" type="text" placeholder="Select Neighbourhood"
+                    aria-label="Neighbourhood" matInput name="nrdForm" #neighbourForm="ngModel"
+                    [(ngModel)]="landOwner.nrd"
+                    readonly
+                    (click)="neighbourLandOwnerTrigger.openPanel()"
+                    [matAutocomplete]="autoNeighbour"
+                    #neighbourLandOwnerTrigger="matAutocompleteTrigger">
+                <mat-autocomplete #autoNeighbour="matAutocomplete" [displayWith]="displayNeighbourhood">
+                    @for (option of neighbourhoodOptions; track option) {
+                    <mat-option [value]="option.id">{{option.name}}</mat-option>
+                    }
+                </mat-autocomplete>
+            </mat-form-field>
+        </div>
+        <div class="col-md-3">
+            <mat-form-field class="full-width">
+                <mat-label>Building</mat-label>
+                <input [disabled]="disableFields" (change)="filterResident()" type="text" placeholder="Select building" aria-label="Building"
+                    matInput name="buildingForm" #buildingForm="ngModel" [(ngModel)]="landOwner.building"
+                    readonly
+                    (click)="buildingLandOwnerTrigger.openPanel()"
+                    [matAutocomplete]="autobuilding"
+                    #buildingLandOwnerTrigger="matAutocompleteTrigger">
+                <mat-autocomplete #autobuilding="matAutocomplete"  [displayWith]="displayBuilding">
+                    @for (option of buildingOptions; track option) {
+                    <mat-option [value]="option.id">{{option.name}}</mat-option>
+                    }
+                </mat-autocomplete>
+            </mat-form-field>
+        </div>
+        <div class="col-md-3">
+            <mat-form-field class="full-width">
+                <mat-label>Flat No</mat-label>
+                <input [disabled]="disableFields" (input)="filterResident()" [(ngModel)]="landOwner.flatNumber" name="flatNo" #flatNo="ngModel"
+                    matInput />
+            </mat-form-field>
+        </div>
+    </div>
+
+    <div *ngIf="isTenant" class="row">
+        <ng-container>
+            <div class="col-md-3">
+                <mat-form-field class="full-width">
+                    <mat-label>Agreement From</mat-label>
+                    <input [disabled]="disableFields" [(ngModel)]="landOwner.aggreement_From" name="aggreement_From" #aggreement_From="ngModel"  
+                    matInput [matDatepicker]="pickerAgreeFrom">
+                    <mat-hint>DD/mm/YYYY</mat-hint>
+                    <mat-datepicker-toggle matIconSuffix [for]="pickerAgreeFrom"></mat-datepicker-toggle>
+                    <mat-datepicker #pickerAgreeFrom></mat-datepicker>
+                </mat-form-field>
+                <!-- <mat-form-field class="full-width">
+                    <mat-label>Agreement From</mat-label>
+                    <input [disabled]="disableFields" [(ngModel)]="landOwner.aggreement_From" name="aggreement_From"
+                        #aggreement_From="ngModel" matInput [matDatepicker]="pickerAgreeFrom">
+                    <mat-hint>DD/mm/YYYY</mat-hint>
+                    <mat-datepicker-toggle matIconSuffix [for]="pickerAgreeFrom"></mat-datepicker-toggle>
+                    <mat-datepicker #pickerAgreeFrom></mat-datepicker>
+                </mat-form-field> -->
+            </div>
+            <div class="col-md-3">
+                <mat-form-field class="full-width">
+                    <mat-label>Agreement To</mat-label>
+                    <input [disabled]="disableFields" [(ngModel)]="landOwner.aggreement_To" name="aggreement_To"   #aggreement_To="ngModel"  
+                    matInput [matDatepicker]="pickerAgreeTo">
+                    <mat-hint>DD/mm/YYYY</mat-hint>
+                    <mat-datepicker-toggle matIconSuffix [for]="pickerAgreeTo"></mat-datepicker-toggle>
+                    <mat-datepicker #pickerAgreeTo></mat-datepicker>
+                </mat-form-field>
+                <!-- <mat-form-field class="full-width">
+                    <mat-label>Agreement To</mat-label>
+                    <input [disabled]="disableFields" [(ngModel)]="landOwner.aggreement_To" name="aggreement_To" #aggreement_To="ngModel"
+                        matInput [matDatepicker]="pickerAgreeTo">
+                    <mat-hint>DD/mm/YYYY</mat-hint>
+                    <mat-datepicker-toggle matIconSuffix [for]="pickerAgreeTo"></mat-datepicker-toggle>
+                    <mat-datepicker #pickerAgreeTo></mat-datepicker>
+                </mat-form-field> -->
+            </div>
+            <div class="col-md-3">
+                <mat-form-field class="full-width">
+                    <mat-label>Registration Issue Date</mat-label>
+                    <input [disabled]="disableFields" [(ngModel)]="landOwner.registrationIssueDate" name="registrationIssueDate" #dob="ngModel" matInput
+                        [matDatepicker]="picker">
+                    <mat-hint>DD/mm/YYYY</mat-hint>
+                    <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                    <mat-datepicker #picker></mat-datepicker>
+                </mat-form-field>
+            </div>
+        </ng-container>
+        
+        <div class="col-md-3">
+            <mat-radio-group [disabled]="disableFields" (change)="tenantType($event)" [(ngModel)]="landOwner.tenentType" name="tenentType"
+                #tenentType="ngModel" aria-label="Tenent Type">
+                <mat-radio-button [value]="0">Cot Basis</mat-radio-button>
+                <mat-radio-button [value]="1">Regular</mat-radio-button>
+            </mat-radio-group>
+        </div>
+    </div>
+    <div *ngIf="isGuest || isVisitor" class="row">
+        <ng-container *ngIf="isGuest">
+            <div class="col-md-3">
+                <mat-form-field class="full-width">
+                    <mat-label>Valid From</mat-label>
+                    <input [disabled]="disableFields" [(ngModel)]="landOwner.validFrom" name="validFrom"
+                        #validFrom="ngModel" matInput [matDatepicker]="pickerValidFrom">
+                    <mat-hint>DD/mm/YYYY</mat-hint>
+                    <mat-datepicker-toggle matIconSuffix [for]="pickerValidFrom"></mat-datepicker-toggle>
+                    <mat-datepicker #pickerValidFrom></mat-datepicker>
+                </mat-form-field>
+            </div>
+            <div class="col-md-3">
+                <mat-form-field class="full-width">
+                    <mat-label>Valid Till</mat-label>
+                    <input [disabled]="disableFields" [(ngModel)]="landOwner.validTill" name="validTill"
+                        #validTill="ngModel" matInput [matDatepicker]="guestpickerValidTill">
+                    <mat-hint>DD/mm/YYYY</mat-hint>
+                    <mat-datepicker-toggle matIconSuffix [for]="guestpickerValidTill"></mat-datepicker-toggle>
+                    <mat-datepicker #guestpickerValidTill></mat-datepicker>
+                </mat-form-field>
+            </div>
+        </ng-container>
+
+        <div class="col-md-6">
+            <mat-form-field class="full-width">
+                <mat-label>Resident</mat-label>
+                <input disabled readonly matInput placeholder="Resident" [(ngModel)]="landOwner.rname" aria-label="Resident" style="word-wrap:true;">
+            </mat-form-field>
+        </div>
+        <ng-container *ngIf="isVisitor">
+            <div class="col-md-3">
+                <mat-form-field class="full-width">
+                    <mat-label>Visit Purpose</mat-label>
+                    <input [disabled]="disableFields" [(ngModel)]="landOwner.visitPurpose" name="visitPurpose" #visitPurpose="ngModel"
+                        matInput />
+                </mat-form-field>
+            </div>
+            <div class="col-md-3">
+                <mat-form-field class="full-width">
+                    <mat-label>Visit Desription</mat-label>
+                    <input [disabled]="disableFields" [(ngModel)]="landOwner.visitDesription" name="visitDesription" #visitDesription="ngModel"
+                        matInput />
+                </mat-form-field>
+            </div>
+            <div class="col-md-3">
+                <mat-form-field class="full-width">
+                    <mat-label>Visit Start Date</mat-label>
+                    <input [disabled]="disableFields" [(ngModel)]="landOwner.visitStartDate" name="visitVisitStartDate"
+                        #visitStartDate="ngModel" matInput [matDatepicker]="pickerVisitStartDate">
+                    <mat-hint>DD/mm/YYYY</mat-hint>
+                    <mat-datepicker-toggle matIconSuffix [for]="pickerVisitStartDate"></mat-datepicker-toggle>
+                    <mat-datepicker #pickerVisitStartDate></mat-datepicker>
+                </mat-form-field>
+            </div>
+            <div class="col-md-3">
+                <mat-form-field class="full-width">
+                    <mat-label>Visit Start Time</mat-label>
+                    <input matInput type="time" [(ngModel)]="landOwner.visitStartTime"/>
+                </mat-form-field>
+            </div>
+            <div class="col-md-3">
+                <mat-form-field class="full-width">
+                    <mat-label>Visit End Date</mat-label>
+                    <input [disabled]="disableFields" [(ngModel)]="landOwner.visitEndDate" name="visitEndDate"
+                        #visitEndDate="ngModel" matInput [matDatepicker]="pickerVisitEndDate">
+                    <mat-hint>DD/mm/YYYY</mat-hint>
+                    <mat-datepicker-toggle matIconSuffix [for]="pickerVisitEndDate"></mat-datepicker-toggle>
+                    <mat-datepicker #pickerVisitEndDate></mat-datepicker>
+                </mat-form-field>
+            </div>
+            <div class="col-md-3">
+                <mat-form-field class="full-width">
+                    <mat-label>Visit End Time</mat-label>
+                    <input matInput type="time" [(ngModel)]="landOwner.visitEndTime"/>
+                </mat-form-field>
+            </div>
+            <div class="col-md-3">
+                <mat-form-field class="full-width">
+                    <mat-label>Visit Status</mat-label>
+                    <input [disabled]="disableFields" [(ngModel)]="landOwner.visitStatus" name="visitStatus" #visitStatus="ngModel"
+                        matInput />
+                </mat-form-field>
+            </div>
+            <div class="col-md-3">
+                <mat-form-field class="full-width">
+                    <mat-label>Vehicle Type</mat-label>
+                    <input type="text" placeholder="Select Vehicle Type" aria-label="vtype" matInput name="vForm"
+                        #vForm="ngModel" [(ngModel)]="landOwner.vType" [matAutocomplete]="autoVehicle">
+                    <mat-autocomplete #autoVehicle="matAutocomplete">
+                        @for (option of vehicleTypes; track option) {
+                        <mat-option [value]="option">{{option}}</mat-option>
+                        }
+                    </mat-autocomplete>
+                </mat-form-field>
+            </div>
+            <div class="col-md-3">
+                <mat-form-field class="full-width">
+                    <mat-label>Reg. No.</mat-label>
+                    <input matInput [(ngModel)]="landOwner.regNo" name="vehicleRegNo" #vehicleRegNo="ngModel" />
+                </mat-form-field>
+            </div>
+        </ng-container>
+    </div>
+    <div *ngIf="isResident" class="row">
+        <div class="col-md-3">
+            <mat-form-field class="full-width">
+                <mat-label>Registration Issue Date</mat-label>
+                <input [disabled]="disableFields" [(ngModel)]="landOwner.registrationIssueDate" name="registrationIssueDate" #dob="ngModel" matInput
+                    [matDatepicker]="picker">
+                <mat-hint>DD/mm/YYYY</mat-hint>
+                <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                <mat-datepicker #picker></mat-datepicker>
+            </mat-form-field>
+        </div>
+    </div>
+
+    <!-- <div *ngIf="isContractor" class="row">
+        <div class="col-md-3">
+            <mat-form-field class="full-width">
+                <mat-label>Contractor type</mat-label>
+                <input [disabled]="disableFields" type="text" placeholder="Select Contractor type"
+                    aria-label="Contractor type" matInput name="contactorType" #neighbourForm="ngModel"
+                    [(ngModel)]="landOwner.contactorType" [matAutocomplete]="autoNeighbour">
+                <mat-autocomplete #autoNeighbour="matAutocomplete" [displayWith]="displayContractor">
+                    @for (option of contractorOptions; track option) {
+                    <mat-option [value]="option.id">{{option.name}}</mat-option>
+                    }
+                </mat-autocomplete>
+            </mat-form-field>
+        </div>
+        <div class="col-md-3">
+            <mat-form-field class="full-width">
+                <mat-label>Company</mat-label>
+                <input type="text" placeholder="Your Company"
+                    aria-label="Neighbourhood" matInput
+                    [(ngModel)]="landOwner.company">
+               
+              </mat-form-field>
+        </div>
+       
+        <div class="col-md-3">
+            <mat-form-field class="full-width">
+                <mat-label>Agency Name</mat-label>
+                <input matInput [(ngModel)]="landOwner.agency" name="agency" #agencyRegNo="ngModel" />
+            </mat-form-field>
+        </div>
+        <div class="col-md-3">
+            <mat-form-field class="full-width">
+                <mat-label>Date of Joining</mat-label>
+                <input [disabled]="disableFields" [(ngModel)]="landOwner.validFromDate" name="validFromDate" #dob="ngModel" matInput
+                    [matDatepicker]="picker">
+                <mat-hint>DD/mm/YYYY</mat-hint>
+                <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                <mat-datepicker #picker></mat-datepicker>
+            </mat-form-field>
+        </div>
+    </div> -->
+
+
+    <div *ngIf="isContractor" class="row">
+    <div class="col-md-3">
+    <mat-form-field class="full-width">
+        <mat-label>Select Neighbourhood</mat-label>
+        <mat-select [disabled]="disableFields" 
+                    name="contractorNeighbourhood" 
+                    [(ngModel)]="landOwner.neighbourhood" 
+                    multiple>
+            <mat-select-trigger>
+                {{landOwner.neighbourhood?.[0] || 'Select Neighbourhood'}}
+                @if ((landOwner.neighbourhood?.length || 0) > 1) {
+                <span class="additional-selection">
+                    (+{{(landOwner.neighbourhood?.length || 0) - 1}}
+                    {{landOwner.neighbourhood?.length === 2 ? 'other' : 'others'}})
+                </span>
+                }
+            </mat-select-trigger>
+            @for (option of neighbourhoodOptions; track option) {
+            <mat-option [value]="option.name">{{option.name}}</mat-option>
+            }
+        </mat-select>
+    </mat-form-field>
+</div>
+    
+    <div class="col-md-3">
+        <mat-form-field class="full-width">
+            <mat-label>Aadhar No</mat-label>
+            <input [disabled]="disableFields" [(ngModel)]="landOwner.aadharCardId" 
+                name="contractorAadhar" matInput minlength="16" maxlength="16" />
+        </mat-form-field>
+    </div>
+    
+    <div class="col-md-3">
+        <mat-form-field class="full-width">
+            <mat-label>PAN No</mat-label>
+            <input [disabled]="disableFields" [(ngModel)]="landOwner.paNnumber" 
+                (ngModelChange)="onPanChange($event)" name="contractorPan" 
+                minlength="10" maxlength="10" matInput />
+        </mat-form-field>
+    </div>
+    
+    <div class="col-md-3">
+        <mat-form-field class="full-width">
+            <mat-label>Contractor type</mat-label>
+            <input [disabled]="disableFields" type="text" placeholder="Select Contractor type"
+                aria-label="Contractor type" matInput name="contactorType" #neighbourForm="ngModel"
+                [(ngModel)]="landOwner.contactorType"
+                readonly
+                (click)="contractorTypeTrigger.openPanel()"
+                [matAutocomplete]="autoContractorType"
+                #contractorTypeTrigger="matAutocompleteTrigger">
+            <mat-autocomplete #autoContractorType="matAutocomplete" [displayWith]="displayContractor">
+                @for (option of contractorOptions; track option) {
+                <mat-option [value]="option.id">{{option.name}}</mat-option>
+                }
+            </mat-autocomplete>
+        </mat-form-field>
+    </div>
+    
+    <div class="col-md-3">
+        <mat-form-field class="full-width">
+            <mat-label>Company</mat-label>
+            <input type="text" placeholder="Your Company"
+                aria-label="Neighbourhood" matInput name="companyName"
+                [(ngModel)]="landOwner.company">
+        </mat-form-field>
+    </div>
+    
+    <div class="col-md-3">
+    <mat-form-field class="full-width">
+        <mat-label>Validity From</mat-label>
+        <input [disabled]="disableFields" [(ngModel)]="landOwner.validFromDate" 
+            name="validFromDate" matInput [matDatepicker]="pickerValidityFrom">
+        <mat-hint>DD/mm/YYYY</mat-hint>
+        <mat-datepicker-toggle matIconSuffix [for]="pickerValidityFrom"></mat-datepicker-toggle>
+        <mat-datepicker #pickerValidityFrom></mat-datepicker>
+    </mat-form-field>
+</div>
+
+<div class="col-md-3">
+    <mat-form-field class="full-width">
+        <mat-label>Validity To</mat-label>
+        <input [disabled]="disableFields" [(ngModel)]="landOwner.validToDate" 
+            name="validToDate" matInput [matDatepicker]="pickerValidityTo">
+        <mat-hint>DD/mm/YYYY</mat-hint>
+        <mat-datepicker-toggle matIconSuffix [for]="pickerValidityTo"></mat-datepicker-toggle>
+        <mat-datepicker #pickerValidityTo></mat-datepicker>
+    </mat-form-field>
+</div>
+    
+    <div class="col-md-3">
+        <mat-form-field class="full-width">
+            <mat-label>Agency Name</mat-label>
+            <input matInput [(ngModel)]="landOwner.agency" name="agency" #agencyRegNo="ngModel" />
+        </mat-form-field>
+    </div>
+    
+    <div class="col-md-3">
+        <mat-form-field class="full-width">
+            <mat-label>Date of Joining</mat-label>
+            <input [disabled]="disableFields" [(ngModel)]="landOwner.validFromDate" name="validFromDate" matInput
+                [matDatepicker]="pickerDOJ">
+            <mat-hint>DD/mm/YYYY</mat-hint>
+            <mat-datepicker-toggle matIconSuffix [for]="pickerDOJ"></mat-datepicker-toggle>
+            <mat-datepicker #pickerDOJ></mat-datepicker>
+        </mat-form-field>
+    </div>
+</div>
+
+    <div *ngIf="isEmployee" class="row">
+        <div class="col-md-3">
+            <mat-form-field class="full-width">
+                <mat-label>Date of Joining</mat-label>
+                <input [disabled]="disableFields" [(ngModel)]="landOwner.doj" name="doj" #dob="ngModel" matInput
+                    [matDatepicker]="picker">
+                <mat-hint>DD/mm/YYYY</mat-hint>
+                <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                <mat-datepicker #picker></mat-datepicker>
+            </mat-form-field>
+        </div>
+        <div class="col-md-3">
+            <mat-form-field class="full-width">
+                <mat-label>Project</mat-label>
+                <input [disabled]="disableFields" type="text" placeholder="Select Project"
+                    aria-label="Proejct" matInput name="projecst" #neighbourForm="ngModel"
+                    [(ngModel)]="landOwner.siteID" [matAutocomplete]="autoNeighbour">
+                <mat-autocomplete #autoNeighbour="matAutocomplete" [displayWith]="displayProject">
+                    @for (option of projectOptions; track option) {
+                    <mat-option [value]="option.siteId">{{option.name}}</mat-option>
+                    }
+                </mat-autocomplete>
+            </mat-form-field>
+        </div>
+        <div class="col-md-3">
+            <label class="gender-label">Is Resident</label>
+            <mat-radio-group [disabled]="disableFields" [(ngModel)]="landOwner.isResident" name="isResident"
+                #tenentType="ngModel" aria-label="is Resident">
+                <mat-radio-button [value]="1">Yes</mat-radio-button>
+                <mat-radio-button [value]="0">No</mat-radio-button>
+            </mat-radio-group>
+        </div>
+         <div class="col-md-3" *ngIf="landOwner.isResident">
+            <mat-form-field class="full-width">
+                <mat-label>Resident ID</mat-label>
+                <input [disabled]="disableFields" [(ngModel)]="landOwner.residentID" name="residentID" #pan="ngModel"
+                    matInput />
+            </mat-form-field>
+        </div>
+
+    </div>
+    
+</div>

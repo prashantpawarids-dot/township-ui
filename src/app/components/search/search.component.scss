@@ -1,0 +1,53 @@
+// /* Table container */
+// .mat-elevation-z8 {
+//   border: 1px solid #e0e0e0 !important;
+//   border-radius: 6px;
+//   overflow: hidden;
+//   width: auto;
+//   display: inline-table; /* auto width based on content */
+//   margin: 10px auto; /* spacing around table */
+//   box-shadow: none !important;
+//   background: #fff;
+// }
+
+// /* Header cells */
+// .mat-mdc-header-cell,
+// th.mat-header-cell {
+//   border-bottom: 1px solid #e0e0e0 !important;
+//   background-color: #f7f7f7 !important;
+//   font-weight: 600 !important;
+//   padding: 10px 16px !important;
+//   color: #333;
+//   text-align: left;
+//   white-space: nowrap;
+// }
+
+// /* Data cells */
+// .mat-mdc-cell,
+// td.mat-cell {
+//   border-bottom: 1px solid #eeeeee !important;
+//   padding: 10px 16px !important;
+//   color: #555;
+//   white-space: nowrap;
+// }
+
+// /* Rows */
+// .mat-mdc-row,
+// tr.mat-row {
+//   transition: background-color 0.2s ease;
+// }
+
+// /* Zebra striping */
+// tr.mat-row:nth-child(even) {
+//   background-color: #fafafa;
+// }
+
+// /* Hover effect (subtle but attractive) */
+// tr.mat-row:hover {
+//   background-color: #f0f6ff;
+// }
+
+// /* Remove last row border */
+// tr.mat-row:last-child td {
+//   border-bottom: none !important;
+// }

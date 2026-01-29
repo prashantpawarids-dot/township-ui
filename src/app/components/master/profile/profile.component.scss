@@ -1,0 +1,73 @@
+table {
+    width: 100%;
+    table-layout: auto;
+  }
+  mat-card {
+    padding: 10px;
+    margin-bottom: 20px;
+  }
+  mat-card-title {
+    font-weight: bold;
+    background-color: hsl(224, 100%, 39%);
+    color: white;
+    padding: 10px;
+  }
+  .m-t-20 {
+    margin-top: 20px;
+  }
+  
+  .m-l-10 {
+    margin-left: 10px;
+  }
+  
+  .text-end {
+    text-align: end;
+  }
+  
+  tr{
+    min-height: 1%;
+    height: 1%;
+  }
+
+  .table td {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    height: 20px !important;
+    padding : 2px 6px !important;
+  }
+
+  // .checkbox-size {
+  //   height: 18px;
+  //   width: 18px;
+  //   // accent-color: blue;
+  // }
+
+  .checkbox-size {
+  width: 18px;
+  height: 18px;
+  background-color: white; /* white box */
+  border: 2px solid #f0f0f0; /* black border */
+  -webkit-appearance: none; /* remove default style */
+  -moz-appearance: none;
+  appearance: none;
+  cursor: pointer;
+  position: relative;
+}
+
+/* The checkmark */
+.checkbox-size:checked::before {
+  content: '✔';       /* the checkmark */
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-weight: bold;
+  color: black;       /* black checkmark */
+  font-size: 14px;
+}
+
+/* Hover effect optional */
+.checkbox-size:hover {
+  background-color: #f0f0f0;
+}

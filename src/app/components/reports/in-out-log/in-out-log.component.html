@@ -1,0 +1,195 @@
+<form [formGroup]="reportForm" class="container-fluid">
+  <div class="row mt-3 g-2">
+
+    
+
+   <!-- FROM DATE & TIME -->
+<div class="col-10 col-md-2">
+  <mat-form-field appearance="outline" class="w-100">
+    <mat-label>From Date</mat-label>
+    <input matInput [matDatepicker]="fromPicker" formControlName="fromDate">
+    <mat-datepicker-toggle matSuffix [for]="fromPicker"></mat-datepicker-toggle>
+    <mat-datepicker #fromPicker></mat-datepicker>
+  </mat-form-field>
+</div>
+<div class="col-2 col-md-1">
+  <input type="time" class="form-control" formControlName="fromTime">
+</div>
+
+<!-- TO DATE & TIME -->
+<div class="col-10 col-md-2">
+  <mat-form-field appearance="outline" class="w-100">
+    <mat-label>To Date</mat-label>
+    <input matInput [matDatepicker]="toPicker" formControlName="toDate">
+    <mat-datepicker-toggle matSuffix [for]="toPicker"></mat-datepicker-toggle>
+    <mat-datepicker #toPicker></mat-datepicker>
+  </mat-form-field>
+</div>
+<div class="col-2 col-md-1">
+  <input type="time" class="form-control" formControlName="toTime">
+</div>
+
+
+    <!-- Card Type -->
+    <div class="col-10 col-md-2">
+<mat-form-field appearance="outline" class="w-100">
+  <mat-label>Card Type</mat-label>
+  <mat-select formControlName="cardType" multiple (selectionChange)="onCardTypeChange($event)">
+    <mat-option [value]="'ALL'">All</mat-option> <!-- Select All -->
+    <mat-option *ngFor="let c of cardTypes" [value]="c.value">{{ c.label }}</mat-option>
+  </mat-select>
+</mat-form-field>
+
+    </div>
+<!-- Access Mode -->
+    <div class="col-10 col-md-2">
+     <mat-form-field appearance="outline" class="w-100">
+  <mat-label>IN/OUT</mat-label>
+  <mat-select formControlName="accessMode" multiple (selectionChange)="onAccessModeChange($event)">
+    <mat-option [value]="'ALL'">All</mat-option> <!-- Select All -->
+    <mat-option *ngFor="let a of accessModes" [value]="a.value">{{ a.label }}</mat-option>
+  </mat-select>
+</mat-form-field>
+
+    </div>
+    
+    
+
+
+    <!-- Neighbourhood -->
+     <div class="col-10 col-md-2">
+<mat-form-field appearance="outline" class="w-100">
+  <mat-label>Neighbourhood</mat-label>
+  <mat-select formControlName="neighbourhood" multiple (selectionChange)="onNeighbourhoodChange($event)">
+    <mat-option [value]="'ALL'">All</mat-option> <!-- Select All -->
+    <mat-option *ngFor="let n of neighbourhoods" [value]="n.value">{{ n.label }}</mat-option>
+  </mat-select>
+</mat-form-field>
+</div>
+
+<!-- Building -->
+ <div class="col-10 col-md-2">
+<mat-form-field appearance="outline" class="w-100">
+  <mat-label>Building</mat-label>
+  <mat-select formControlName="buildingName" multiple (selectionChange)="onBuildingChange($event)">
+    <mat-option [value]="'ALL'">All</mat-option> <!-- Select All -->
+    <mat-option *ngFor="let b of buildings" [value]="b.value">{{ b.label }}</mat-option>
+  </mat-select>
+</mat-form-field>
+
+ </div>
+
+
+    <!-- Search Type -->
+    <div class="col-10 col-md-2">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>Search By</mat-label>
+        <mat-select formControlName="searchType">
+          <mat-option *ngFor="let s of searchTypes" [value]="s.value">{{ s.label }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <!-- Search Value -->
+    <div class="col-10 col-md-2">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>Search Value</mat-label>
+        <input matInput formControlName="searchValue">
+      </mat-form-field>
+    </div>
+
+    <!-- Buttons -->
+    <div class="col-10 col-md-4 d-flex flex-wrap gap-1 align-items-center">
+      <button type="button" class="btn" (click)="showReports()">Search</button>
+      <button type="button" class="btn" (click)="Clear()">Clear</button>
+      <button type="button" class="btn" *ngIf="displayedData.data.length" (click)="exportPDF()">PDF</button>
+      <button type="button" class="btn" *ngIf="displayedData.data.length" (click)="exportExcel()">Excel</button>
+    </div>
+
+  </div>
+
+  <!-- Table -->
+<div class="table-responsive mt-3">
+  <table class="table table-bordered table-hover table-striped">
+    <thead class="table-light">
+      <tr>
+        <th>Sr No</th>
+
+        <th (click)="sortColumn('ownerName')">
+          Owner Name
+          <span *ngIf="getSortColumn() === 'ownerName'">
+            {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+          </span>
+        </th>
+
+        <th (click)="sortColumn('nrdName')">
+          Neighbourhood
+          <span *ngIf="getSortColumn() === 'nrdName'">
+            {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+          </span>
+        </th>
+
+        <th (click)="sortColumn('buildingName')">
+          Building
+          <span *ngIf="getSortColumn() === 'buildingName'">
+            {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+          </span>
+        </th>
+
+        <th (click)="sortColumn('csnNumber')">
+          CSN
+          <span *ngIf="getSortColumn() === 'csnNumber'">
+            {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+          </span>
+        </th>
+
+        <th (click)="sortColumn('accessmode')">
+          Access Mode
+          <span *ngIf="getSortColumn() === 'accessmode'">
+            {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+          </span>
+        </th>
+
+        <th (click)="sortColumn('inoutTime')">
+          AccessTime
+          <span *ngIf="getSortColumn() === 'inoutTime'">
+            {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+          </span>
+        </th>
+
+        <th (click)="sortColumn('cardType')">
+          Card Type
+          <span *ngIf="getSortColumn() === 'cardType'">
+            {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+          </span>
+        </th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr *ngFor="let e of displayedData.data; let i = index">
+        <td>{{ paginator.pageIndex * paginator.pageSize + i + 1 }}</td>
+        <td>{{ e.ownerName }}</td>
+        <td>{{ e.nrdName }}</td>
+        <td>{{ e.buildingName }}</td>
+        <td>{{ e.csnNumber }}</td>
+        <td>{{ e.accessmode }}</td>
+        <td>{{ e.inoutTime | date:'dd-MM-yyyy HH:mm:ss' }}</td>
+        <td>{{ e.cardType }}</td>
+      </tr>
+
+      <tr *ngIf="displayedData.data.length === 0">
+        <td colspan="8" class="text-center">No Data Found</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+
+  <mat-paginator
+    [pageSizeOptions]="[10, 25, 50, 100,150,200,250,300]"
+    [pageSize]="10"
+    showFirstLastButtons
+    (page)="updatePagedData()">
+  </mat-paginator>
+</form>

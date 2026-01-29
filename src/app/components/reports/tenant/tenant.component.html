@@ -1,0 +1,187 @@
+<form [formGroup]="reportForm" class="container-fluid">
+
+  <!-- Filters -->
+  <div class="row mt-3 g-2">
+
+
+     <!-- Date From -->
+    <div class="col-6 col-md-3">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>From Date</mat-label>
+        <input matInput [matDatepicker]="fromPicker" formControlName="fromDate">
+        <mat-datepicker-toggle matSuffix [for]="fromPicker"></mat-datepicker-toggle>
+        <mat-datepicker #fromPicker></mat-datepicker>
+      </mat-form-field>
+    </div>
+
+    <!-- Date To -->
+    <div class="col-6 col-md-3">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>To Date</mat-label>
+        <input matInput [matDatepicker]="toPicker" formControlName="toDate">
+        <mat-datepicker-toggle matSuffix [for]="toPicker"></mat-datepicker-toggle>
+        <mat-datepicker #toPicker></mat-datepicker>
+      </mat-form-field>
+    </div>
+
+    <!-- Project -->
+    <div class="col-12 col-md-3">
+  <mat-form-field appearance="outline" class="w-100">
+    <mat-label>Neighbourhood</mat-label>
+    <mat-select formControlName="project" multiple (selectionChange)="onProjectSelect($event)">
+  <mat-option (click)="toggleSelectAllProject()" value="ALL">
+    All
+  </mat-option>
+  <mat-option *ngFor="let p of projectList" [value]="p">{{ p }}</mat-option>
+</mat-select>
+
+  </mat-form-field>
+</div>
+
+    <!-- Building -->
+    <div class="col-12 col-md-3">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>Building</mat-label>
+        <mat-select formControlName="building" multiple (selectionChange)="onBuildingSelect($event)">
+  <mat-option (click)="toggleSelectAllBuilding()" value="ALL">
+    All
+  </mat-option>
+  <mat-option *ngFor="let b of buildingList" [value]="b">{{ b }}</mat-option>
+</mat-select>
+
+      </mat-form-field>
+    </div>
+
+   
+
+  </div>
+
+
+  <!-- Search Type + Search Text -->
+  <div class="row align-items-center mt-3">
+
+    <!-- Search By -->
+    <div class="col-auto">
+      <mat-form-field appearance="outline">
+        <mat-label>Search By</mat-label>
+        <mat-select formControlName="searchType">
+          <mat-option *ngFor="let s of searchType" [value]="s.value">{{ s.label }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <!-- Search Text -->
+    <div class="col-auto">
+      <mat-form-field appearance="outline">
+        <mat-label>Search</mat-label>
+        <input matInput formControlName="searchText" placeholder="Start typing...">
+      </mat-form-field>
+    </div>
+
+    <!-- Buttons -->
+    <div class="col-auto d-flex gap-2">
+      <button type="button" class="btn" (click)="search()">Search</button>
+      <button type="button" class="btn" (click)="showAll()">Clear</button>
+
+      <button type="button" class="btn"
+              *ngIf="displayedData.data.length > 0"
+              (click)="exportPDF()">PDF</button>
+
+      <button type="button" class="btn"
+              *ngIf="displayedData.data.length > 0"
+              (click)="exportExcel()">Excel</button>
+    </div>
+
+  </div>
+
+
+  <!-- Table -->
+ <div class="table-responsive mt-3">
+ <table class="table table-bordered table-hover table-striped"
+         style="table-layout:auto; white-space:nowrap;">
+
+   <thead class="table-light">
+  <tr>
+    <th>Sr</th>
+    <th>ID</th>
+    <th>First Name</th>
+    <th>Middle Name</th>
+    <th>Last Name</th>
+    <th >Short Name</th>
+    <th>Tag</th>
+    <th>PAN</th>
+    <th>Passport</th>
+    <th>License</th>
+    <th>ICE</th>
+    <th>Aadhar No</th>
+    <th>Voter</th>
+    <th>Gender</th>
+    <th>Blood</th>
+    <th>DOB</th>
+    <th>Email</th>
+    <th>Mobile No</th>
+    <th>Landline</th>
+    <th>Flat</th>
+    <th>Issue On</th>
+    <th>Print On</th>
+    <th>Reg</th>
+    <th>Agree From</th>
+    <th>Agree To</th>
+    <th>Building</th>
+    <th>Neighbourhood</th>
+  </tr>
+</thead>
+
+<tbody   *ngIf="displayedData.data.length > 0">
+  <tr *ngFor="let e of displayedData.data; let i=index">
+    <td>{{ i+1 }}</td>
+    <td>{{ e.idNumber }}</td>
+    <td>{{ e.firstName }}</td>
+    <td>{{ e.middleName }}</td>
+    <td>{{ e.lastName }}</td>
+    <td style="min-width:150px; white-space: nowrap;">{{ e.shortName }}</td>
+    <td>{{ e.tagNumber }}</td>
+    <td>{{ e.paNnumber }}</td>
+    <td>{{ e.passportNo }}</td>
+    <td>{{ e.licenseNo }}</td>
+    <td>{{ e.icEno }}</td>
+    <td>{{ e.aadharCardId }}</td>
+    <td>{{ e.voterID }}</td>
+    <td>{{ e.gender }}</td>
+    <td>{{ e.bloodGroup }}</td>
+    <td style="min-width:120px; white-space: nowrap;">{{ e.dob | date:'dd-MM-yyyy' }}</td>
+    <td>{{ e.emailID }}</td>
+    <td>{{ e.mobileNo }}</td>
+    <td>{{ e.landLine }}</td>
+    <td>{{ e.flatNumber }}</td>
+    <td>{{ e.cardIssueDate | date:'dd-MM-yyyy' }}</td>
+    <td>{{ e.cardPrintingDate | date:'dd-MM-yyyy' }}</td>
+    <td style="min-width:120px; white-space: nowrap;">{{ e.registrationIssueDate | date:'dd-MM-yyyy' }}</td>
+    <td style="min-width:120px; white-space: nowrap;">{{ e.aggreement_From | date:'dd-MM-yyyy' }}</td>
+    <td style="min-width:120px; white-space: nowrap;">{{ e.aggreement_To | date:'dd-MM-yyyy' }}</td>
+    <td>{{ e.buildingName }}</td>
+    <td>{{ e.nrdName }}</td>
+  </tr>
+</tbody>
+
+
+  </table>
+</div>
+
+
+  <!-- No data -->
+  <div *ngIf="displayedData.data.length === 0"
+       class="text-center text-danger fw-bold fs-5 mt-2">
+    No Data Found
+  </div>
+
+ <mat-paginator #paginator
+               [length]="totalItems"
+               [pageSize]="pageSize"
+               [pageSizeOptions]="[10, 25, 50, 100, 150, 200]"
+               (page)="onPageChange($event)"
+               showFirstLastButtons>
+</mat-paginator>
+
+
+</form>

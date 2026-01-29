@@ -1,0 +1,66 @@
+<app-navigation class="pc-sidebar" [ngClass]="{
+    'navbar-collapsed': navCollapsed,
+    'mob-open': navCollapsedMob
+  }" (NavCollapse)="this.navCollapsed = !this.navCollapsed" />
+<app-nav-bar (NavCollapsedMob)="navMobClick()" (NavCollapse)="this.navCollapsed = !this.navCollapsed" />
+<div class="pc-container">
+  <div class="coded-wrapper">
+    <div class="coded-content">
+      <div class="coded-inner-content">
+        <div class="side-padding sticky-breadcrumb">
+          <app-breadcrumb />
+        </div>
+        <div>
+          <!-- Search: -->
+          <!-- <div class="search-container">
+            <mat-form-field appearance="outline">
+              <mat-label>Search</mat-label>
+              <input matInput [(ngModel)]="searchQuery" placeholder="Enter search term" />
+            </mat-form-field>
+            
+            <button mat-stroked-button (click)="performSearch()" style="margin-left: 10px;">
+              Search
+            </button>
+  
+            <button class="m-l-10" mat-flat-button (click)="showAll()">
+              Show All
+            </button>
+
+            <button class="m-l-10" mat-flat-button (click)="addNew()">
+              Add New
+            </button>
+          </div> -->
+  
+        </div>
+        <div class="main-body side-padding">
+          <div class="page-wrapper">
+            <router-outlet />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="pc-menu-overlay" (click)="closeMenu()" (keydown)="handleKeyDown($event)" tabindex="0"></div>
+</div>
+<footer class="pc-footer">
+  <div class="footer-wrapper container-fluid">
+    <div class="row">
+      <div class="col my-1">
+        <p class="m-0">
+          Copyright &copy;
+          <a href="" target="_blank">IDS ID SMARTTECH</a>
+        </p>
+      </div>
+      <div class="col-auto my-1">
+        <ul class="list-inline footer-link mb-0">
+          <li class="list-inline-item"><a href="" routerLink="/master">Home</a></li>
+          <li class="list-inline-item">
+            <a href="" routerLink="/master">Privacy Policy</a>
+          </li>
+          <li class="list-inline-item"><a href="" routerLink="/master">Contact us</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</footer>
+<app-configuration />

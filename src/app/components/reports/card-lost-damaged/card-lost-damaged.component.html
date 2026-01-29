@@ -1,0 +1,137 @@
+<form [formGroup]="reportForm">
+  <div class="container">
+
+    <!-- Liable Type Radio Buttons -->
+    <div class="row mb-3">
+      <div class="col-md-12">
+        <mat-radio-group formControlName="liableType">
+          <mat-radio-button value="lost" class="me-4">Lost</mat-radio-button>
+          <mat-radio-button value="damage" class="me-4">Damage</mat-radio-button>
+          <mat-radio-button value="both">Both</mat-radio-button>
+        </mat-radio-group>
+      </div>
+    </div>
+
+    <!-- Filters + Buttons in One Row -->
+    <div class="row mt-3 g-2">
+      <div class="col-10 col-md-2">
+        <mat-form-field appearance="fill" class="w-100">
+  <mat-label>Card Type</mat-label>
+  <mat-select formControlName="cardType" multiple (selectionChange)="onCardTypeChange($event)">
+    <mat-option value="all">All</mat-option>
+    <mat-option *ngFor="let card of cardTypes" [value]="card.value">{{ card.label }}</mat-option>
+  </mat-select>
+</mat-form-field>
+
+      </div>
+
+      <div class="col-10 col-md-2">
+        <mat-form-field appearance="fill" class="w-100">
+          <mat-label>From Date</mat-label>
+          <input matInput [matDatepicker]="fromPicker" formControlName="fromDate">
+          <mat-datepicker-toggle matSuffix [for]="fromPicker"></mat-datepicker-toggle>
+          <mat-datepicker #fromPicker></mat-datepicker>
+        </mat-form-field>
+      </div>
+
+      <div class="col-10 col-md-2">
+        <mat-form-field appearance="fill" class="w-100">
+          <mat-label>To Date</mat-label>
+          <input matInput [matDatepicker]="toPicker" formControlName="toDate">
+          <mat-datepicker-toggle matSuffix [for]="toPicker"></mat-datepicker-toggle>
+          <mat-datepicker #toPicker></mat-datepicker>
+        </mat-form-field>
+      </div>
+
+       <!-- Buttons -->
+   <div class="col-auto d-flex flex-nowrap gap-2 align-items-center">
+      <button type="button" class="btn" (click)="applyFilters()">Search</button>
+      <button type="button" class="btn" (click)="showAll()">Clear</button>
+      <button type="button" class="btn" *ngIf="displayedData.length>0" (click)="exportReports()">PDF</button>
+      <button type="button" class="btn" *ngIf="displayedData.length>0" (click)="exportToExcel()">Excel</button>
+    </div>
+    </div>
+
+    <!-- Table -->
+<div class="table-responsive mt-3">
+  <table class="table table-bordered table-hover table-striped">
+    <thead class="table-light">
+      <tr>
+        <th>Sr No</th>
+<th (click)="sortColumn('id')">
+          IDNumber
+          <span *ngIf="getSortColumn() === 'id'">
+            {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+          </span>
+        </th>
+
+        <th (click)="sortColumn('cardType')">
+          Card Type
+          <span *ngIf="getSortColumn() === 'cardType'">
+            {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+          </span>
+        </th>
+
+        <th (click)="sortColumn('ownerName')">
+          Sort Name
+          <span *ngIf="getSortColumn() === 'ownerName'">
+            {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+          </span>
+        </th>
+
+        
+
+        <th (click)="sortColumn('cardEncodedOn')">
+          Card Encoded On
+          <span *ngIf="getSortColumn() === 'cardEncodedOn'">
+            {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+          </span>
+        </th>
+
+        <th (click)="sortColumn('cardPrintedOn')">
+          Card Printed On
+          <span *ngIf="getSortColumn() === 'cardPrintedOn'">
+            {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+          </span>
+        </th>
+
+        <th (click)="sortColumn('status')">
+          Status
+          <span *ngIf="getSortColumn() === 'status'">
+            {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+          </span>
+        </th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr *ngFor="let e of displayedData; let i = index">
+        <td>{{ paginator.pageIndex * paginator.pageSize + i + 1 }}</td>
+        <td>{{ e.id }}</td>
+        <td>{{ e.cardType }}</td>
+        <td>{{ e.ownerName }}</td>
+      
+        <td>{{ e.cardEncodedOn | date:'dd-MM-yyyy HH:mm:ss' }}</td>
+        <td>{{ e.cardPrintedOn | date:'dd-MM-yyyy HH:mm:ss' }}</td>
+        <td>{{ e.status }}</td> <!-- NEW -->
+        
+      </tr>
+
+      <tr *ngIf="displayedData.length === 0">
+        <td colspan="7" class="text-center">No Data Found</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Paginator -->
+<mat-paginator
+  [pageSizeOptions]="pageSizes"
+  [pageSize]="10"
+  showFirstLastButtons
+  (page)="onPageChange($event)">
+</mat-paginator>
+
+
+  </div>
+</form>

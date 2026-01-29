@@ -1,0 +1,57 @@
+<mat-accordion class="example-headers-align" multi>
+    <mat-expansion-panel [expanded]="true">
+        <mat-expansion-panel-header>
+            <mat-panel-title> Resident </mat-panel-title> 
+            <div>
+            <div class="col-md-12">
+            <div class="button-row m-t-10 m-b-10">
+                <button style="height: 40;width: 90;" class="m-l-10" (click)="cancel()" mat-flat-button>Back To Search  </button>
+            </div>
+        </div>
+    </div>
+        </mat-expansion-panel-header>
+        <app-town-land-owner [landOwner]="resident" [isResident]="true" [isViewOrEdit]="isViewOrEdit"></app-town-land-owner>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="button-row m-t-10 m-b-10">
+                        <button *ngIf="!resident.isView" mat-stroked-button
+                            (click)="isViewOrEdit ? updateResident() : saveResident()">{{isViewOrEdit?
+                            'Update' : 'Save'}}</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </mat-expansion-panel>
+    <mat-expansion-panel *ngIf="isViewOrEdit">
+        <mat-expansion-panel-header>
+            <mat-panel-title> Add-on-Card </mat-panel-title>
+        </mat-expansion-panel-header>
+        <app-town-add-on-card [addonCard]="addonCard" [dataToDisplay]="addonCardList" [dataSource]="dataSource"
+        (addonEvent)="addAddOnTable($event)" (addonEventUpdate)="updateAddOnTable($event)"
+        (addonEventDelete)="deleteAddOnTable($event)" ></app-town-add-on-card>
+    </mat-expansion-panel>
+    <mat-expansion-panel *ngIf="isViewOrEdit">
+        <mat-expansion-panel-header>
+            <mat-panel-title> Vehicle </mat-panel-title>
+        </mat-expansion-panel-header>
+        <app-town-vehicle [vehicle]="vehicle" [dataToDisplayVehicle]="vehicleList"
+            [dataSourceVehicle]="dataSourceVehicle" (vehicleEvent)="updateVehicleTable($event)"></app-town-vehicle>
+    </mat-expansion-panel>
+    <mat-expansion-panel *ngIf="isViewOrEdit">
+        <mat-expansion-panel-header>
+            <mat-panel-title> Additional Access Rights </mat-panel-title>
+        </mat-expansion-panel-header>
+        <app-town-add-access-rights [addAccessRights]="addAccessRights" [dataToDisplayAAR]="dataToDisplayAAR"
+            [dataSourceAAR]="dataSourceAAR" (addAREvent)="updateAARTable($event)"></app-town-add-access-rights>
+    </mat-expansion-panel>
+</mat-accordion>
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="button-row m-t-10 m-b-10">
+                <button class="m-l-10" (click)="cancel()" mat-flat-button>Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>

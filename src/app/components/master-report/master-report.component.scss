@@ -1,0 +1,27 @@
+.full-width {
+    width: 100%;
+}
+
+.input_fileupload--hidden {
+    display: none;
+}
+
+.gender-label {
+    display: flex;
+    flex-direction: column;
+    margin-left: 10px;
+    align-items: flex-start;
+}
+
+.button-row {
+    display: flex;
+    justify-content: end;
+    flex-wrap: wrap
+}
+
+/*.custom-width {
+    width: 300px;
+    margin-right: 20px; 
+  }
+  */
+  

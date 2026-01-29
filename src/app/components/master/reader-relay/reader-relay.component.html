@@ -1,0 +1,83 @@
+<form [formGroup]="readerForm" class="container">
+  <div class="row">
+    <div class="col-md-4">
+      <mat-form-field class="full-width">
+        <mat-label>Reader ID</mat-label>
+        <input matInput formControlName="id" />
+      </mat-form-field>
+    </div>
+
+    <div class="col-md-4">
+      <mat-form-field class="full-width">
+        <mat-label>Reader Code</mat-label>
+        <input matInput formControlName="code" id="code" />
+      </mat-form-field>
+    </div>
+
+    <div class="col-md-4">
+      <mat-form-field class="full-width">
+        <mat-label>Reader IP</mat-label>
+        <input matInput formControlName="readerip" />
+      </mat-form-field>
+    </div>
+
+    <div class="col-md-4">
+      <mat-form-field class="full-width">
+        <mat-label>Port Number</mat-label>
+        <input matInput formControlName="readerport" />
+      </mat-form-field>
+    </div>
+
+    <!-- <div class="col-md-4">
+      <mat-form-field class="full-width">
+        <mat-label>Location</mat-label>
+        <input matInput formControlName="readerLocation" />
+      </mat-form-field>
+    </div> -->
+
+    <div class="col-md-4">
+ <mat-form-field class="full-width">
+  <mat-label>Location Name</mat-label>
+  <mat-select formControlName="readerLocation">
+    <mat-option *ngFor="let loc of locations" [value]="loc.name">
+      {{ loc.name }}
+    </mat-option>
+  </mat-select>
+</mat-form-field>
+
+</div>
+
+  
+
+    <div class="col-md-4">
+      <mat-form-field class="full-width">
+        <mat-label>Reader Mode</mat-label>
+        <input matInput formControlName="readermode" />
+      </mat-form-field>
+    </div>
+
+    <div class="col-md-4">
+      <mat-form-field class="full-width">
+        <mat-label>Reader Type</mat-label>
+        <input matInput formControlName="readertype" />
+      </mat-form-field>
+    </div>
+
+    <div class="col-md-4">
+      <mat-checkbox formControlName="isActive">Active</mat-checkbox>
+    </div>
+
+    <div class="col-md-4">
+      <mat-checkbox formControlName="isDeleted">Deleted</mat-checkbox>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12">
+      <div class="button-row m-b-10">
+        <button *ngIf="!viewMode" mat-stroked-button (click)="editMode ? onUpdate() : onSave()">{{editMode ? "Update" : "Save"}}</button>
+                  <button class="m-l-10" mat-flat-button (click)="onCancel()">Cancel</button>
+      </div>
+    </div>
+  </div>
+</form>

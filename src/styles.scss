@@ -1,0 +1,120 @@
+@use '@angular/material' as mat;
+// main framework
+@import 'node_modules/bootstrap/scss/functions';
+@import 'node_modules/bootstrap/scss/variables';
+@import 'node_modules/bootstrap/scss/variables-dark';
+
+@import 'scss/settings/color-variables';
+@import 'scss/settings/theme-variables';
+@import 'scss/settings/bootstrap-variables';
+
+// bootstrap import
+@import 'scss/bootstrap/bootstrap.scss';
+
+@import 'node_modules/bootstrap/scss/utilities';
+@import 'node_modules/bootstrap/scss/utilities/api';
+
+// main framework
+@import 'scss/themes/generic.scss';
+@import 'scss/themes/general.scss';
+
+@import 'scss/themes/components/components.scss';
+
+// theme
+@import 'scss/themes/layouts/menu/sidebar.scss';
+@import 'scss/themes/layouts/navbar/navbar.scss';
+@import 'scss/themes/layouts/pc-common.scss';
+@import 'scss/themes/layouts/breadcrumb/breadcrumb.scss';
+@import 'scss/themes/layouts/footer/footer.scss';
+
+@import 'scss/themes/preset-style.scss';
+
+
+/* success-snackbar */
+.success-snackbar {
+    @include mat.snack-bar-overrides((container-color: #4caf50,
+            /* Green background for success */
+            supporting-text-color: white,
+            /* White text color */
+        ));
+}
+
+/* error-snackbar */
+.error-snackbar {
+    @include mat.snack-bar-overrides((container-color: #f44336,
+            /* Green background for success */
+            supporting-text-color: white,
+            /* White text color */
+        ));
+}
+
+html,
+body {
+    height: 100%;
+}
+
+body {
+    margin: 0;
+    font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+// landowner
+
+
+.full-width {
+    width: 100%;
+}
+
+.input_fileupload--hidden {
+    display: none;
+}
+
+.gender-label {
+    display: flex;
+    flex-direction: column;
+    margin-left: 10px;
+    align-items: flex-start;
+}
+
+.button-row {
+    display: flex;
+    justify-content: end;
+    flex-wrap: wrap
+}
+
+// Addom 
+
+table {
+    width: 100%;
+}
+
+.full-screen-modal .mat-dialog-container {
+    padding: 1em;
+    width: 100%;
+    height: 100%;
+}
+
+.additional-selection {
+    opacity: 0.75;
+    font-size: 0.75em;
+    line-height: 1;
+}
+
+//Vehicle
+
+.title-red {
+    color: $red;
+}
+
+//To hide incrementing option in input type
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}

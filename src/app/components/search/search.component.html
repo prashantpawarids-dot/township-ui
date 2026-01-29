@@ -1,0 +1,377 @@
+<div class="container mt-4 pt-2 px-0">
+  <!-- <h2>Search Component</h2> -->
+
+  <!-- Add New Button -->
+
+
+  <h4 *ngIf="title" class="mb-3"> {{ title }} </h4>
+  <!-- Search Controls -->
+  <div class="row mt-4">
+    <!-- Search Type Dropdown -->
+    <div class="col-md-2 pe-0">
+      <mat-form-field class="full-width">
+        <mat-label>Search By</mat-label>
+        <input type="text" placeholder="Select" aria-label="Searchby" matInput name="searchby" #searchby="ngModel"
+          [(ngModel)]="searchBy.keyName" [matAutocomplete]="autoSearch">
+        <mat-autocomplete #autoSearch="matAutocomplete" [displayWith]="displaSearchBy">
+          @for (option of searchByOptions; track option) {
+          <mat-option [value]="option.key">{{option.name}}</mat-option>
+          }
+        </mat-autocomplete>
+      </mat-form-field>
+    </div>
+
+    <!-- Search Input -->
+    <div class="col-md-4">
+      <mat-form-field class="full-width">
+        <mat-label>Search</mat-label>
+        <input [(ngModel)]="searchBy.query" name="search" #search="ngModel" matInput />
+      </mat-form-field>
+    </div>
+
+    <div class="col-md-4">
+      <button class="btn btn-primary mt-3" (click)="searchData()">
+        Search
+      </button>
+      <!-- <button *ngIf="title" (click)="navigateBack()" class="btn btn-primary m-l-10 mt-3">
+        Add New {{ title }}
+      </button> -->
+
+      <button
+  *ngIf="title && auth.canInsert(MODULE_KEY)"
+  (click)="navigateBack()"
+  class="btn btn-primary m-l-10 mt-3 mt-3">
+  Add New {{ title }}
+</button>
+
+      <!-- <button mat-raised-button color="btn btn-primary m-l-10 mt-3" *ngIf="showDownloadBtn" (click)="exportReports()">Export PDF</button>
+       <button mat-raised-button color="btn btn-primary m-l-10 mt-3" *ngIf="showDownloadBtn" (click)="exportExcel()">Export </button> -->
+    </div>
+
+  </div>
+
+  <!-- Filtered Results (Example) -->
+  <div class="container">
+    <table mat-table *ngIf="dataToDisplay.length > 0" [dataSource]="dataSource" class="mat-elevation-z8">
+
+      <!--- Note that these columns can be defined in any order.
+          The actual rendered columns are set as a property on the row definition" -->
+
+      <ng-container matColumnDef="srno">
+        <th mat-header-cell *matHeaderCellDef>Sr No </th>
+        <td mat-cell *matCellDef="let element; let i = index"> {{i + 1 + (paginator.pageIndex * paginator.pageSize)}}
+        </td>
+      </ng-container>
+
+      <!-- id Column -->
+      <ng-container matColumnDef="idNumber">
+        <th mat-header-cell *matHeaderCellDef> Id </th>
+        <td mat-cell *matCellDef="let element"> {{element.idNumber}} </td>
+      </ng-container>
+
+      <!-- serviceType Column -->
+      <ng-container matColumnDef="serviceType">
+        <th mat-header-cell *matHeaderCellDef>Service Type</th>
+        <td mat-cell *matCellDef="let element"> {{element.serviceType}} </td>
+      </ng-container>
+
+<!-- Reader Location Column -->
+<ng-container matColumnDef="readerLocation">
+  <th mat-header-cell *matHeaderCellDef> Full Name </th>
+  <td mat-cell *matCellDef="let element"> {{ element.readerLocation }} </td>
+</ng-container>
+
+      <!-- full name Column -->
+      <ng-container matColumnDef="fullname">
+        <th mat-header-cell *matHeaderCellDef> Full Name </th>
+        <td mat-cell *matCellDef="let element"> {{[element.firstName, element.middleName,
+          element.lastName,element.code].join(" ")}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="fname">
+        <th mat-header-cell *matHeaderCellDef> First Name </th>
+        <td mat-cell *matCellDef="let element"> {{element.firstName}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="lname">
+        <th mat-header-cell *matHeaderCellDef> Last Name </th>
+        <td mat-cell *matCellDef="let element"> {{element.lastName}} </td>
+      </ng-container>
+
+      <!-- Id Column -->
+      <ng-container matColumnDef="Id">
+        <th mat-header-cell *matHeaderCellDef> Id </th>
+        <td mat-cell *matCellDef="let element"> {{element.id}} </td>
+      </ng-container>
+
+      <!-- Discriminator Column -->
+      <ng-container matColumnDef="Discriminator">
+        <th mat-header-cell *matHeaderCellDef> Discriminator </th>
+        <td mat-cell *matCellDef="let element"> {{element.discriminator}} </td>
+      </ng-container>
+
+      <!-- Discriminator Column -->
+      <ng-container matColumnDef="Email">
+        <th mat-header-cell *matHeaderCellDef> Email </th>
+        <td mat-cell *matCellDef="let element"> {{element.email}} </td>
+      </ng-container>
+
+      <!-- Phone Column -->
+      <ng-container matColumnDef="Phone">
+        <th mat-header-cell *matHeaderCellDef> Phone </th>
+        <td mat-cell *matCellDef="let element"> {{element.phone}} </td>
+      </ng-container>
+
+      <!-- MobileNo Column -->
+      <ng-container matColumnDef="mobileNo">
+        <th mat-header-cell *matHeaderCellDef> Phone </th>
+        <td mat-cell *matCellDef="let element"> {{element.mobileNo}} </td>
+      </ng-container>
+
+
+      <!-- Weight Column -->
+      <!-- <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef> Actions </th>
+        <td mat-cell *matCellDef="let element">
+          <button mat-stroked-button (click)="viewData(element)">View</button>
+          <button mat-stroked-button class="m-l-10" (click)="editData(element)">Edit</button>
+         <button
+      *ngIf="returnPath === '/tenant' || returnPath === '/contractor'  || returnPath==='/master/amenities' || returnPath==='/master/building'
+      
+       || returnPath==='/master/company' || returnPath==='/guest' || returnPath==='/land-owner' || returnPath==='/master/neighbourhood' || returnPath==='/master/reader-location' 
+       || returnPath==='/master/reader-relay' || returnPath=='/resident' || returnPath=='/service-provider'"
+      mat-stroked-button
+      class="m-l-10"
+      color="warn"
+      (click)="deleteData(element)">
+      Delete
+    </button>
+
+
+    <button
+  *ngIf="
+    returnPath === '/land-owner' ||
+    returnPath === '/resident' ||
+    returnPath === '/tenant' ||
+    returnPath === '/service-provider'
+  "
+  mat-stroked-button
+  class="m-l-10"
+  color="primary"
+  (click)="blockOrRevoke(element)">
+  {{ element.isBlocked ? 'Revoke' : 'Block' }}
+</button>
+
+
+        </td>
+
+      </ng-container> -->
+
+      <!-- new code -->
+<!-- <ng-container matColumnDef="actions">
+  <th mat-header-cell *matHeaderCellDef> Actions </th>
+  <td mat-cell *matCellDef="let element">
+
+    
+    <button 
+      mat-stroked-button 
+      (click)="viewData(element)" 
+      *ngIf="auth.canView(MODULE_KEY)">
+      View
+    </button>
+
+    
+    <button 
+      mat-stroked-button 
+      class="m-l-10" 
+      (click)="editData(element)" 
+      *ngIf="auth.canUpdate(MODULE_KEY)">
+      Edit
+    </button>
+
+    
+    <button
+      mat-stroked-button
+      class="m-l-10"
+      color="warn"
+      (click)="deleteData(element)"
+      *ngIf="auth.canDelete(MODULE_KEY)">
+      Delete
+    </button>
+
+    
+
+    <button
+  mat-stroked-button
+  class="m-l-10"
+  color="primary"
+  (click)="blockOrRevoke(element)"
+  *ngIf="
+    auth.canBlock(MODULE_KEY) &&
+    (
+      returnPath === '/land-owner' ||
+      returnPath === '/resident' ||
+      returnPath === '/tenant' ||
+      returnPath === '/service-provider'
+    )
+  "
+>
+  {{ element.isBlocked ? 'Revoke' : 'Block' }}
+</button>
+
+
+  </td>
+</ng-container> -->
+
+<ng-container matColumnDef="actions">
+  <th mat-header-cell *matHeaderCellDef> Actions </th>
+  <td mat-cell *matCellDef="let element">
+
+    <!-- View button -->
+    <button 
+      mat-stroked-button 
+      (click)="viewData(element)">
+      View
+    </button>
+
+    <!-- Edit button -->
+    <button 
+      mat-stroked-button 
+      class="m-l-10" 
+      (click)="editData(element)">
+      Edit
+    </button>
+
+    <!-- Delete button -->
+    <button
+      mat-stroked-button
+      class="m-l-10"
+      color="warn"
+      (click)="deleteData(element)">
+      Delete
+    </button>
+
+    <!-- Block / Revoke button -->
+    <button
+      mat-stroked-button
+      class="m-l-10"
+      color="primary"
+      (click)="blockOrRevoke(element)"
+      *ngIf="
+        returnPath === '/land-owner' ||
+        returnPath === '/resident' ||
+        returnPath === '/tenant' ||
+        returnPath === '/service-provider'
+      "
+    >
+      {{ element.isBlocked ? 'Revoke' : 'Block' }}
+    </button>
+
+  </td>
+</ng-container>
+
+
+
+      <!-- Name Column -->
+      <!-- <ng-container matColumnDef="Name">
+        <th mat-header-cell *matHeaderCellDef> Name </th>
+        <td mat-cell *matCellDef="let element"> {{element.name}} </td>
+      </ng-container> -->
+
+      <ng-container matColumnDef="Name">
+  <th mat-header-cell *matHeaderCellDef>
+    {{ returnPath === '/master/user' ? 'Profile Name' : 'Name' }}
+  </th>
+  <td mat-cell *matCellDef="let element"> {{element.name}} </td>
+</ng-container>
+
+
+      <!-- profilename Column -->
+      <ng-container matColumnDef="profileName">
+        <th mat-header-cell *matHeaderCellDef> Profile Name </th>
+        <td mat-cell *matCellDef="let element"> {{element.profileName}} </td>
+      </ng-container>
+
+      <!-- Is Resident Column -->
+      <ng-container matColumnDef="Is Resident">
+        <th mat-header-cell *matHeaderCellDef> Is Resident </th>
+        <td mat-cell *matCellDef="let element"> {{element.isResident ? "Yes" : "No"}} </td>
+      </ng-container>
+
+      <!-- Flat number Column -->
+      <ng-container matColumnDef="flatNumber">
+        <th mat-header-cell *matHeaderCellDef> Flat Number </th>
+        <td mat-cell *matCellDef="let element"> {{element.flatNumber}} </td>
+      </ng-container>
+
+      <!-- Role Column -->
+      <ng-container matColumnDef="role">
+        <th mat-header-cell *matHeaderCellDef> Designation </th>
+        <td mat-cell *matCellDef="let element"> {{element.role}} </td>
+      </ng-container>
+
+
+      <!-- Service type Column -->
+      <ng-container matColumnDef="service type">
+        <th mat-header-cell *matHeaderCellDef> Service Type </th>
+        <td mat-cell *matCellDef="let element"> {{element.name}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="short name">
+        <th mat-header-cell *matHeaderCellDef>{{ title}}</th>
+        <td mat-cell *matCellDef="let element"> {{element.code}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="uid">
+        <th mat-header-cell *matHeaderCellDef> User Id </th>
+        <td mat-cell *matCellDef="let element"> {{element.uid}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="buildingName">
+        <th mat-header-cell *matHeaderCellDef> Building </th>
+        <td mat-cell *matCellDef="let element"> {{element.buildingName}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="nrdName">
+        <th mat-header-cell *matHeaderCellDef> Neighbourhood </th>
+        <td mat-cell *matCellDef="let element"> {{element.nrdName}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="contactorType">
+        <th mat-header-cell *matHeaderCellDef> Contactor Type </th>
+        <td mat-cell *matCellDef="let element"> {{element.contractorTypeName}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="comanyCode">
+        <th mat-header-cell *matHeaderCellDef> Company Code </th>
+        <td mat-cell *matCellDef="let element"> {{element.comanyCode}} </td>
+      </ng-container>
+      <ng-container matColumnDef="address">
+        <th mat-header-cell *matHeaderCellDef> Address </th>
+        <td mat-cell *matCellDef="let element">{{element.address}}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="companyName">
+        <th mat-header-cell *matHeaderCellDef> Company Name </th>
+        <td mat-cell *matCellDef="let element"> {{element.companyName}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="projectCode">
+        <th mat-header-cell *matHeaderCellDef> Project Code </th>
+        <td mat-cell *matCellDef="let element"> {{element.projectCode}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="projectName">
+        <th mat-header-cell *matHeaderCellDef> Project Name </th>
+        <td mat-cell *matCellDef="let element"> {{element.projectName}} </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+    <mat-paginator #paginator [length]="100" [pageSize]="10" [pageSizeOptions]="[5, 10, 25, 100]"
+      aria-label="Select page">
+    </mat-paginator>
+
+  </div>
+</div>

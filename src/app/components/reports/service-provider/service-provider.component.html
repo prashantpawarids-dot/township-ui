@@ -1,0 +1,139 @@
+<form [formGroup]="serviceForm" class="container-fluid">
+
+  <!-- Filters and Buttons -->
+  <div class="row mt-3 g-2">
+
+  
+
+    <!-- From Date -->
+    <div class="col-10 col-md-2">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>Created From</mat-label>
+        <input matInput [matDatepicker]="picker1" formControlName="fromDate">
+        <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+        <mat-datepicker #picker1></mat-datepicker>
+      </mat-form-field>
+    </div>
+
+    <!-- To Date -->
+    <div class="col-10 col-md-2">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>Created To</mat-label>
+        <input matInput [matDatepicker]="picker2" formControlName="toDate">
+        <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
+        <mat-datepicker #picker2></mat-datepicker>
+      </mat-form-field>
+    </div>
+
+
+     <div class="col-10 col-md-2">
+      <mat-form-field appearance="outline" class="w-100">
+  <mat-label>Neighbourhood</mat-label>
+  <mat-select formControlName="neighbourhood" multiple (selectionChange)="onNeighbourhoodChange($event)">
+    <mat-option [value]="'ALL'">All</mat-option>
+    <mat-option *ngFor="let n of neighbourhoods" [value]="n.value">{{ n.label }}</mat-option>
+  </mat-select>
+</mat-form-field>
+
+     </div>
+      <!-- Search By -->
+    <div class="col-10 col-md-3">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>Search By</mat-label>
+        <mat-select formControlName="searchType">
+          <mat-option *ngFor="let s of searchType" [value]="s.value">
+            {{ s.label }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <!-- Search Text -->
+    <div class="col-10 col-md-3">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>Search</mat-label>
+        <input matInput formControlName="searchText" placeholder="Type to search..." />
+      </mat-form-field>
+    </div>
+
+    <!-- Buttons -->
+    <div class="col-auto d-flex gap-2 align-items-center">
+      <button type="button" class="btn" (click)="filterData()">Search</button>
+      <button type="button" class="btn"
+              (click)="clear()" [disabled]="allData.length === 0">Clear</button>
+      <button type="button" class="btn"
+              *ngIf="dataSource.data.length > 0" (click)="exportPDF()">PDF</button>
+      <button type="button" class="btn"
+              *ngIf="dataSource.data.length > 0" (click)="exportExcel()">Excel</button>
+    </div>
+
+  </div>
+
+  <!-- Table -->
+  <div class="table-responsive mt-3" >
+    <table class="table table-bordered table-striped">
+  <thead class="table-light">
+    <tr>
+      <th>Sr</th>
+      <th>ID</th>
+      <th>ShortName</th>
+      <th>FirstName</th>
+      <th>MiddleName</th>
+      <th>LastName</th>
+      <th>Mobile</th>
+      <th>Gender</th>
+      <th>Email</th>
+      <th>Aadhar</th>
+      <th>VoterID</th>
+      <th>Address</th>
+      <th>ServiceType</th>
+      <th>DOB</th>
+      <th>Neighbourhood</th>
+      <th>Building</th>
+      <th>ValidFrom</th>
+      <th>ValidTo</th>
+      <th>Created On</th>
+    </tr>
+  </thead>
+
+  <tbody *ngIf="dataSource.data.length > 0">
+    <tr *ngFor="let row of dataSource.connect() | async; let i = index">
+      <td>{{ i + 1 }}</td>
+      <td>{{ row.idNumber }}</td>
+      <td>{{ row.shortName }}</td>
+      <td>{{ row.firstName }}</td>
+      <td>{{ row.middleName }}</td>
+      <td>{{ row.lastName }}</td>
+      <td>{{ row.mobileNo }}</td>
+      <td>{{ row.gender }}</td>
+      <td>{{ row.emailID }}</td>
+      <td>{{ row.aadharCardId }}</td>
+      <td>{{ row.voterID }}</td>
+      <td>{{ row.address }}</td>
+      <td>{{ row.serviceType }}</td>
+      <td>{{ row.doj | date:'dd-MM-yyyy' }}</td>
+      <td>{{row.nrd}}</td>
+      <td>{{row.building}}</td>
+      <td>{{ row.validFromDate | date:'dd-MM-yyyy HH:mm' }}</td>
+<td>{{ row.validToDate | date:'dd-MM-yyyy HH:mm' }}</td>
+<td>{{row.createdOn | date:'dd-MM-yyyy'}}</td>
+
+    </tr>
+  </tbody>
+</table>
+
+  </div>
+
+  <!-- No Data -->
+  <div *ngIf="dataSource.data.length === 0" class="text-center mt-3 text-danger fw-bold fs-5">
+    No Data Available
+  </div>
+
+  <!-- Paginator -->
+  <mat-paginator #paginator
+                 [pageSizeOptions]="[10, 25, 50, 100]"
+                 [pageSize]="10"
+                 showFirstLastButtons>
+  </mat-paginator>
+
+</form>

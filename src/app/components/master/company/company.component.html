@@ -1,0 +1,168 @@
+<!-- <div class="container">
+    <div class="row" [formGroup]="companyForm">
+        <div class="col-md-4">
+            <mat-form-field class="full-width">
+                <mat-label>ID</mat-label>
+                <input formControlName="id" readonly matInput />
+            </mat-form-field>
+        </div>
+        <div class="col-md-4">
+            <mat-form-field class="full-width">
+                <mat-label>Company Code</mat-label>
+                <input formControlName="comanyCode" matInput />
+            </mat-form-field>
+        </div>
+        <div class="col-md-4">
+            <mat-form-field class="full-width">
+                <mat-label>Company Name</mat-label>
+                <input formControlName="companyName" matInput />
+            </mat-form-field>
+        </div>
+        <div class="col-md-4">
+            <mat-form-field class="full-width">
+                <mat-label>Address</mat-label>
+                <input formControlName="address" matInput />
+            </mat-form-field>
+        </div>
+        <div class="col-md-4">
+            <mat-form-field class="full-width">
+                <mat-label>Mobile Number</mat-label>
+                <input type="text" maxlength="10" formControlName="mobileNo" matInput />
+            </mat-form-field>
+        </div>
+        <div class="col-md-4">
+            <mat-form-field class="full-width">
+                <mat-label>Contact Person</mat-label>
+                <input formControlName="contactPerson" matInput />
+            </mat-form-field>
+        </div>
+        <div class="col-md-4">
+            <mat-form-field class="full-width">
+                <mat-label>Contact Mobile</mat-label>
+                <input type="text" maxlength="10" formControlName="contactMobile" matInput />
+            </mat-form-field>
+        </div>
+        <div class="col-md-4">
+            <mat-form-field class="full-width">
+                <mat-label>LandLine Number</mat-label>
+                <input type="text" maxlength="8" formControlName="landLine" matInput />
+            </mat-form-field>
+        </div>
+        <div class="col-md-4">
+            <mat-form-field class="full-width">
+                <mat-label>GST Number</mat-label>
+                <input formControlName="gsTnumber" matInput />
+            </mat-form-field>
+        </div>
+        
+        <div class="col-md-4">
+            <mat-form-field class="full-width">
+                <mat-label>Pan Number</mat-label>
+                <input formControlName="pannumber" [disabled]="viewMode" matInput />
+            </mat-form-field>
+        </div>
+    </div>
+    <div class="row">
+          <div class="col-md-12">
+              <div class="button-row m-b-10">
+                  <button *ngIf="!viewMode" mat-stroked-button (click)="editMode ? onUpdate() : onSave()">{{editMode ? "Update" : "Save"}}</button>
+                  <button class="m-l-10" mat-flat-button (click)="onCancel()">Cancel</button>
+              </div>
+          </div>
+      </div>
+    
+</div> -->
+
+
+
+<div class="container p-3" [formGroup]="companyForm">
+
+    <table class="table-custom">
+        <tr>
+            <td>
+                <mat-form-field class="full-width">
+                    <mat-label>ID</mat-label>
+                    <input formControlName="id" readonly matInput />
+                </mat-form-field>
+            </td>
+
+            <td>
+                <mat-form-field class="full-width">
+                    <mat-label>Company Code</mat-label>
+                    <input formControlName="companyCode" matInput />
+                </mat-form-field>
+            </td>
+
+            <td>
+                <mat-form-field class="full-width">
+                    <mat-label>Company Name</mat-label>
+                    <input formControlName="companyName" matInput />
+                </mat-form-field>
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                <mat-form-field class="full-width">
+                    <mat-label>Address</mat-label>
+                    <input formControlName="address" matInput />
+                </mat-form-field>
+            </td>
+
+            <td>
+                <mat-form-field class="full-width">
+                    <mat-label>Mobile Number</mat-label>
+                    <input type="text" maxlength="10" formControlName="mobileNo" matInput />
+                </mat-form-field>
+            </td>
+
+            <td>
+                <mat-form-field class="full-width">
+                    <mat-label>Contact Person</mat-label>
+                    <input formControlName="contactPerson" matInput />
+                </mat-form-field>
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                <mat-form-field class="full-width">
+                    <mat-label>Contact Mobile</mat-label>
+                    <input type="text" maxlength="10" formControlName="contactMobile" matInput />
+                </mat-form-field>
+            </td>
+
+            <td>
+                <mat-form-field class="full-width">
+                    <mat-label>LandLine Number</mat-label>
+                    <input type="text" maxlength="8" formControlName="landLine" matInput />
+                </mat-form-field>
+            </td>
+
+            <td>
+                <mat-form-field class="full-width">
+                    <mat-label>GST Number</mat-label>
+                    <input formControlName="gstNumber" matInput />
+                </mat-form-field>
+            </td>
+        </tr>
+
+        <tr>
+            <td colspan="3">
+                <mat-form-field class="full-width">
+                    <mat-label>Pan Number</mat-label>
+                    <input formControlName="panNumber" [disabled]="viewMode" matInput />
+                </mat-form-field>
+            </td>
+        </tr>
+    </table>
+
+    <div class="mt-3">
+        <button *ngIf="!viewMode" mat-stroked-button 
+                (click)="editMode ? onUpdate() : onSave()">
+            {{editMode ? "Update" : "Save"}}
+        </button>
+
+        <button class="m-l-10" mat-flat-button (click)="onCancel()">Cancel</button>
+    </div>
+</div>
