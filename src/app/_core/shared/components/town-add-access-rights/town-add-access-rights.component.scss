@@ -32,3 +32,36 @@
     }
 
 }
+
+.flat-label {
+  font-weight: 500;
+  margin-bottom: 10px;
+  margin-top: 15px;
+  display: block;
+}
+
+.flat-checkbox-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  padding: 10px;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.flat-checkbox {
+  min-width: 150px; // Increased width for "Building - FlatNumber" format
+}
+
+.flat-checkbox-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr); // 5 checkboxes per row
+  gap: 10px; // spacing between checkboxes
+}
+
+.flat-checkbox {
+  display: flex;
+  align-items: center;
+}

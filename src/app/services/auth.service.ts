@@ -454,6 +454,7 @@ postLandOwnerVehicle(payload: any): Observable<any> {
 
   // land owner access rights
   postLandOwnerAccessRights(payload: any): Observable<any> {
+    // console.log('postLandOwnerAccessRights Payload being sent:', payload);
     let url = this.baseUrl + 'UserRegistration/AddUpdateCardAccessRights';
     return this.http.post(url, payload).pipe(map(res => {
       return res;
@@ -462,6 +463,7 @@ postLandOwnerVehicle(payload: any): Observable<any> {
   }
 
   updateLandOwnerAccessRights(payload: any): Observable<any> {
+    //  console.log('updateLandOwnerAccessRights Payload being sent:', payload);
     let url = this.baseUrl + 'UserRegistration/AddUpdateCardAccessRights';
     return this.http.post(url, payload).pipe(map(res => {
       return res;
@@ -1554,6 +1556,9 @@ getAuthorityModules(profileName: string): Observable<any[]> {
 
 
 
+getNRDFlats(): Observable<any[]> {
+  return this.http.get<any[]>(`${this.baseUrl}NRD/NRDFlats`);
+}
 
 
 

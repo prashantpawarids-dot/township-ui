@@ -332,8 +332,15 @@
         <mat-expansion-panel-header>
             <mat-panel-title> Additional Access Rights </mat-panel-title>
         </mat-expansion-panel-header>
-        <app-town-add-access-rights [addAccessRights]="addAccessRights" [dataToDisplayAAR]="dataToDisplayAAR"
-            [dataSourceAAR]="dataSourceAAR" (addAREvent)="updateAARTable($event)"></app-town-add-access-rights>
+        <!-- <app-town-add-access-rights [addAccessRights]="addAccessRights" [dataToDisplayAAR]="dataToDisplayAAR"
+            [dataSourceAAR]="dataSourceAAR" (addAREvent)="updateAARTable($event)"></app-town-add-access-rights> -->
+            <app-town-add-access-rights 
+    [addAccessRights]="addAccessRights" 
+    [dataToDisplayAAR]="dataToDisplayAAR"
+    [dataSourceAAR]="dataSourceAAR" 
+    [isServiceProvider]="true"
+    (addAREvent)="updateAARTable($event)">
+</app-town-add-access-rights>
     </mat-expansion-panel>
 </mat-accordion>
 <div class="container">

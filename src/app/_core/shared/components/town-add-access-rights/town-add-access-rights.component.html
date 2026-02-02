@@ -1,4 +1,4 @@
-<div class="container">
+<!-- <div class="container">
     <h4 *ngIf="isEdit">Edit Record</h4>
     <div class="row">
         <div class="col-md-4 ">
@@ -65,6 +65,195 @@
             </mat-form-field>
         </div>
         <div class="col-md-4 ">
+            
+            <mat-form-field class="full-width">
+                <mat-label>Amenities</mat-label>
+                <mat-select name="amenitiesForm" #amenitiesForm="ngModel"  [(ngModel)]="seletedAccessRights.amenities"
+                    multiple>
+                    <mat-select-trigger >
+                        {{seletedAccessRights.amenities?.[0] || ''}}
+                        @if ((seletedAccessRights.amenities?.length || 0) > 1) {
+                        <span class="additional-selection">
+                            (+{{(seletedAccessRights.amenities?.length || 0) - 1}}
+                            {{seletedAccessRights.amenities?.length === 2 ? 'other' : 'others'}})
+                        </span>
+                        }
+                    </mat-select-trigger>
+                    @for (option of amenitiesOptions; track option) {
+                    <mat-option [value]="option.name">{{option.name}}</mat-option>
+                    }
+                </mat-select>
+            </mat-form-field>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="button-row m-b-10">
+                <button mat-stroked-button (click)="isEdit ? updateAAR() : addAAR()">{{isEdit ? 'Update Record':'Add Record'}}</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <table mat-table *ngIf="dataToDisplayAAR.length > 0" [dataSource]="dataToDisplayAAR" class="mat-elevation-z8">
+
+        <ng-container matColumnDef="srno">
+            <th mat-header-cell *matHeaderCellDef>Sr No </th>
+            <td mat-cell *matCellDef="let element;let i = index"> {{i + 1}} </td>
+        </ng-container>
+
+       
+        <ng-container matColumnDef="validTill">
+            <th mat-header-cell *matHeaderCellDef>Valid Till </th>
+            <td mat-cell *matCellDef="let element">
+                {{element.validTillDate | date}}
+            </td>
+        </ng-container>
+
+        <ng-container matColumnDef="access point">
+            <th mat-header-cell *matHeaderCellDef>Access Point </th>
+            <td mat-cell *matCellDef="let element"> {{element.moduleName || '--'}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="building">
+            <th mat-header-cell *matHeaderCellDef> Building </th>
+            <td mat-cell *matCellDef="let element"> {{element.building || '--'}} </td>
+        </ng-container>
+        <ng-container matColumnDef="amenities">
+            <th mat-header-cell *matHeaderCellDef> Amenities </th>
+            <td mat-cell *matCellDef="let element"> {{element.amenities || '--'}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef> Actions </th>
+            <td mat-cell *matCellDef="let element">
+               
+                <button mat-stroked-button class="m-l-10" (click)="editAAR(element)">Edit</button>
+            </td>
+
+        </ng-container>
+
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumnsAAR"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumnsAAR;"></tr>
+    </table>
+</div> -->
+
+
+
+<div class="container">
+    <h4 *ngIf="isEdit">Edit Record</h4>
+    <div class="row">
+        <div class="col-md-4 ">
+            <mat-form-field class="full-width">
+                <mat-label>Valid Till</mat-label>
+                <input matInput name="validTillForm" #validTillForm="ngModel" [(ngModel)]="seletedAccessRights.validTill"
+                    [matDatepicker]="aarpicker">
+                <mat-hint>DD/MM/YYYY</mat-hint>
+                <mat-datepicker-toggle matIconSuffix [for]="aarpicker"></mat-datepicker-toggle>
+                <mat-datepicker #aarpicker></mat-datepicker>
+            </mat-form-field>
+        </div>
+        <div class="col-md-8 days-of-week">
+            <mat-checkbox [checked]="days.selected" [indeterminate]="someSelected"
+                (change)="selectAllDays($event.checked)">
+                {{days.name}}
+            </mat-checkbox>
+            @for (day of days.weekDays | keyvalue; track day.key) {
+                <span class="text-capitalize {{day.key}}">
+                    <mat-checkbox [checked]="day.value" (change)="updateAllSelected($event.checked,day.key)">
+                        {{day.key}}
+                    </mat-checkbox>
+                </span>
+            }
+        </div>
+        <!-- <div class="col-md-4 ">
+            <mat-form-field class="full-width">
+                <mat-label>Neighbourhood</mat-label>
+                <mat-select name="neighbourhoodForm" #neighbourhoodForm="ngModel"
+                    [(ngModel)]="seletedAccessRights.neighbourhood" multiple>
+                    <mat-select-trigger>
+                        {{seletedAccessRights.neighbourhood?.[0] || ''}}
+                        @if ((seletedAccessRights.neighbourhood?.length || 0) > 1) {
+                        <span class="additional-selection">
+                            (+{{(seletedAccessRights.neighbourhood?.length || 0) - 1}}
+                            {{seletedAccessRights.neighbourhood?.length === 2 ? 'other' : 'others'}})
+                        </span>
+                        }
+                    </mat-select-trigger>
+                    @for (option of neighbourhoodOptions; track option) {
+                    <mat-option [value]="option.name">{{option.name}}</mat-option>
+                    }
+                </mat-select>
+            </mat-form-field>
+        </div> -->
+        <!-- <div class="col-md-4 ">
+            <mat-form-field class="full-width">
+                <mat-label>Building</mat-label>
+                <mat-select name="buildingaarForm" #buildingaarForm="ngModel" [(ngModel)]="seletedAccessRights.building"
+                    multiple>
+                    <mat-select-trigger>
+                        {{seletedAccessRights.building?.[0] || ''}}
+                        @if ((seletedAccessRights.building?.length || 0) > 1) {
+                        <span class="additional-selection">
+                            (+{{(seletedAccessRights.building?.length || 0) - 1}}
+                            {{seletedAccessRights.building?.length === 2 ? 'other' : 'others'}})
+                        </span>
+                        }
+                    </mat-select-trigger>
+                    @for (option of buildingOptions; track option) {
+                    <mat-option [value]="option.name">{{option.name}}</mat-option>
+                    }
+                </mat-select>
+            </mat-form-field>
+        </div> -->
+<div class="col-md-4 ">
+    <mat-form-field class="full-width">
+        <mat-label>Neighbourhood</mat-label>
+        <mat-select name="neighbourhoodForm" #neighbourhoodForm="ngModel"
+            [(ngModel)]="seletedAccessRights.neighbourhood" 
+            (selectionChange)="onBuildingChange()"
+            multiple>
+            <mat-select-trigger>
+                {{seletedAccessRights.neighbourhood?.[0] || ''}}
+                @if ((seletedAccessRights.neighbourhood?.length || 0) > 1) {
+                <span class="additional-selection">
+                    (+{{(seletedAccessRights.neighbourhood?.length || 0) - 1}}
+                    {{seletedAccessRights.neighbourhood?.length === 2 ? 'other' : 'others'}})
+                </span>
+                }
+            </mat-select-trigger>
+            @for (option of neighbourhoodOptions; track option) {
+            <mat-option [value]="option.name">{{option.name}}</mat-option>
+            }
+        </mat-select>
+    </mat-form-field>
+</div>
+        <div class="col-md-4 ">
+    <mat-form-field class="full-width">
+        <mat-label>Building</mat-label>
+        <mat-select name="buildingaarForm" #buildingaarForm="ngModel" 
+                    [(ngModel)]="seletedAccessRights.building"
+                    (selectionChange)="onBuildingChange()"
+                    multiple>
+            <mat-select-trigger>
+                {{seletedAccessRights.building?.[0] || ''}}
+                @if ((seletedAccessRights.building?.length || 0) > 1) {
+                <span class="additional-selection">
+                    (+{{(seletedAccessRights.building?.length || 0) - 1}}
+                    {{seletedAccessRights.building?.length === 2 ? 'other' : 'others'}})
+                </span>
+                }
+            </mat-select-trigger>
+            @for (option of buildingOptions; track option) {
+            <mat-option [value]="option.name">{{option.name}}</mat-option>
+            }
+        </mat-select>
+    </mat-form-field>
+</div>
+
+        <div class="col-md-4 ">
             <!-- <mat-form-field class="full-width">
                 <mat-label>Amenities</mat-label>
                 <input type="text" placeholder="Select Amenities" aria-label="Amenities" matInput name="amenitiesForm"
@@ -94,6 +283,22 @@
                 </mat-select>
             </mat-form-field>
         </div>
+
+<!-- NEW: Flat Number Checkboxes -->
+<div class="flat-checkbox-container" *ngIf="isServiceProvider && flatNumberOptions.length > 0">
+  <label class="flat-label">Flat:</label>
+  <div class="flat-checkbox-grid">
+    @for (flat of flatNumberOptions; track flat.flatNumber) {
+      <mat-checkbox 
+        [checked]="isFlatSelected(flat.flatNumber)" 
+        (change)="updateFlatSelection($event.checked, flat.flatNumber)"
+        class="flat-checkbox">
+        {{flat.buildingName}} - {{flat.flatNumber}}
+      </mat-checkbox>
+    }
+  </div>
+</div>
+
     </div>
     <div class="row">
         <div class="col-md-12">

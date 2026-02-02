@@ -145,6 +145,7 @@ export class AdditionalAccessRightsData {
     validTillDate: string;
     isactive: boolean;
     isdeleted: boolean;
+    flatNumber?: string; // ADD THIS LINE
 }
 
 export type DaysOfWeek = 'sun' | 'mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat';
