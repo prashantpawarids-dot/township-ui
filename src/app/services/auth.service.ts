@@ -1561,8 +1561,26 @@ getNRDFlats(): Observable<any[]> {
 }
 
 
-
-
+//  authservice Add FlatNumber and IDNumber of selected Service Provider
+postServiceProviderReferenceFlats(idNumber: string, flatNumber: string): Observable<any> {
+  let url = this.baseUrl + 'ServiceProviderRefrenceFlats/Add';
+  const payload = {
+    idNumber: idNumber,
+    flatNumber: flatNumber
+  };
+  return this.http.post(url, payload).pipe(
+    map(res => res),
+    catchError(this.handleError)
+  );
+}
+// Get all service provider reference flats
+getServiceProviderReferenceFlatAll(): Observable<any> {
+  let url = this.baseUrl + 'ServiceProviderRefrenceFlats/GetAll';
+  return this.http.get(url).pipe(
+    map(res => res),
+    catchError(this.handleError)
+  );
+}
 
 
 }

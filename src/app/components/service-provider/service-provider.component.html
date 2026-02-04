@@ -1,4 +1,4 @@
-<mat-accordion class="example-headers-align" multi>
+<!-- <mat-accordion class="example-headers-align" multi>
     <mat-expansion-panel [expanded]="true">
         <mat-expansion-panel-header>
             <mat-panel-title> Service Provider </mat-panel-title>
@@ -37,25 +37,7 @@
                     <input value="0" matInput disabled />
                 </mat-form-field>
             </div>
-            <!-- <div class="col-md-3">
-                <div class="container">
-                    <div class="row">
-                        <div class="col-2 text-center">
-                            <div>
-                                <img *ngIf="photoPreview" [src]="photoPreview" alt="Photo Preview" width="150"
-                                    height="100" style="border: 1px solid #ccc; background-color: gray;" />
-                            </div>
-                            <button [disabled]="disableFields" mat-raised-button (click)="onClick($event)">
-                                <mat-icon>add</mat-icon>
-                                Upload Photo
-                            </button>
-                            <input accept="image/*" name="photo" #fileUpload type="file"
-                                class="input_fileupload--hidden" (change)="onFileSelected($event)" />
-                        </div>
-                    </div>
-                </div>
-
-            </div> -->
+          
             <div class="col-md-3">
                 <mat-form-field class="full-width">
                     <mat-label>First Name</mat-label>
@@ -205,7 +187,7 @@
             <div class="col-md-3 d-flex justify-content-center align-items-center" style="height: 50px;">
                 <label style="font-weight: bold; font-size: 25px;">Resident Reference</label>
             </div>
-            <!-- test -->
+           
 
             <div class="col-md-3 ">
                 <mat-form-field class="full-width">
@@ -238,8 +220,7 @@
             <div class="col-md-3">
                 <mat-form-field class="full-width">
                     <mat-label>Flat No</mat-label>
-                    <!-- <input 
-                    [(ngModel)]="searchResident1.flatNumber" -->
+                   
                     <input [(ngModel)]="referenceOwner.flatNumber" (input)="filterResident()" name="flatNo"
                         #flatNo="ngModel" matInput />
                 </mat-form-field>
@@ -272,13 +253,12 @@
             </div>
         </div>
 
-        <!-- test -->
+        
         <div class="container">
             <table mat-table *ngIf="dataSourceReference.length > 0" [dataSource]="dataSourceReference"
                 class="mat-elevation-z8">
 
-                <!--- Note that these columns can be defined in any order.
-                    The actual rendered columns are set as a property on the row definition" -->
+            
 
                 <ng-container matColumnDef="srno">
                     <th mat-header-cell *matHeaderCellDef>Sr No </th>
@@ -310,7 +290,7 @@
                     <th mat-header-cell *matHeaderCellDef> Actions </th>
                     <td mat-cell *matCellDef="let element">
                         <button mat-stroked-button class="" (click)="deleteReferenceData(element)">Delete</button>
-                        <!-- <button mat-stroked-button class="m-l-10" (click)="removeVehicleData(element)">Remove</button> -->
+                        
                     </td>
 
                 </ng-container>
@@ -332,15 +312,336 @@
         <mat-expansion-panel-header>
             <mat-panel-title> Additional Access Rights </mat-panel-title>
         </mat-expansion-panel-header>
-        <!-- <app-town-add-access-rights [addAccessRights]="addAccessRights" [dataToDisplayAAR]="dataToDisplayAAR"
-            [dataSourceAAR]="dataSourceAAR" (addAREvent)="updateAARTable($event)"></app-town-add-access-rights> -->
-            <app-town-add-access-rights 
-    [addAccessRights]="addAccessRights" 
-    [dataToDisplayAAR]="dataToDisplayAAR"
-    [dataSourceAAR]="dataSourceAAR" 
-    [isServiceProvider]="true"
-    (addAREvent)="updateAARTable($event)">
-</app-town-add-access-rights>
+        <app-town-add-access-rights [addAccessRights]="addAccessRights" [dataToDisplayAAR]="dataToDisplayAAR"
+            [dataSourceAAR]="dataSourceAAR" (addAREvent)="updateAARTable($event)"></app-town-add-access-rights>
+         
+    </mat-expansion-panel>
+</mat-accordion>
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="button-row m-t-10 m-b-10">
+                <button class="m-l-10" (click)="cancel()" mat-flat-button>Cancel</button>
+            </div>
+        </div>
+    </div>
+</div> -->
+
+
+
+<mat-accordion class="example-headers-align" multi>
+    <mat-expansion-panel [expanded]="true">
+        <mat-expansion-panel-header>
+            <mat-panel-title> Service Provider </mat-panel-title>
+            <div>
+                <div class="col-md-12">
+                    <div class="button-row m-t-10 m-b-10">
+                        <button style="height: 40;width: 90;" class="m-l-10" (click)="cancel()" mat-flat-button>Back To
+                            Search </button>
+                    </div>
+                </div>
+            </div>
+        </mat-expansion-panel-header>
+        <div class="row">
+            <div class="col-md-3">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-2 text-center">
+                            <div>
+                                <img *ngIf="photoPreview" [src]="photoPreview" alt="Photo Preview" width="150"
+                                    height="100" style="border: 1px solid #ccc; background-color: gray;" />
+                            </div>
+                            <button [disabled]="disableFields" mat-raised-button (click)="onClick($event)">
+                                <mat-icon>add</mat-icon>
+                                Upload Photo
+                            </button>
+                            <input accept="image/*" name="photo" #fileUpload type="file"
+                                class="input_fileupload--hidden" (change)="onFileSelected($event)" />
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="col-md-3">
+                <mat-form-field class="full-width">
+                    <mat-label> ID </mat-label>
+                    <input value="0" matInput disabled />
+                </mat-form-field>
+            </div>
+            <div class="col-md-3">
+                <mat-form-field class="full-width">
+                    <mat-label>First Name</mat-label>
+                    <input [(ngModel)]="serviceProvider.firstName" name="name" #flatNo="ngModel" 
+                    (ngModelChange)="checkLength($event, 'First Name')"
+                    
+                    matInput />
+                </mat-form-field>
+            </div>
+
+            <div class="col-md-3">
+                <mat-form-field class="full-width">
+                    <mat-label>Middle Name</mat-label>
+                    <input [(ngModel)]="serviceProvider.middleName" 
+                    (ngModelChange)="checkLength($event, 'Middle Name')"
+                    matInput />
+                </mat-form-field>
+            </div>
+            <div class="col-md-3">
+                <mat-form-field class="full-width">
+                    <mat-label>Last Name</mat-label>
+                    <input [(ngModel)]="serviceProvider.lastName" 
+                    (ngModelChange)="checkLength($event, 'Last Name')"
+                    matInput />
+                </mat-form-field>
+            </div>
+
+            <div class="col-md-3">
+                <label id="gender-label" class="gender-label">Gender</label>
+                <mat-radio-group [(ngModel)]="serviceProvider.gender" aria-label="Gender">
+                    <mat-radio-button value="Male">Male</mat-radio-button>
+                    <mat-radio-button value="Female">Female</mat-radio-button>
+                </mat-radio-group>
+            </div>
+
+            <div class="col-md-3">
+                <mat-form-field class="full-width">
+                    <mat-label>Service Type</mat-label>
+                    <input type="text" placeholder="Select Service Type" aria-label="serviceTypeId" matInput
+                        name="serviceTypeId" #serviceTypeIdForm="ngModel" [(ngModel)]="serviceProvider.serviceTypeId"
+                        [matAutocomplete]="serviceTypeId">
+                    <mat-autocomplete #serviceTypeId="matAutocomplete" [displayWith]="displayServiceType">
+                        @for (option of serviceTypeOptions; track option) {
+                        <mat-option [value]="option.id">{{option.name}}</mat-option>
+                        }
+                    </mat-autocomplete>
+                </mat-form-field>
+            </div>
+
+            <div class="col-md-3">
+                <mat-form-field class="full-width">
+                    <mat-label>Email</mat-label>
+                    <input [(ngModel)]="serviceProvider.emailID" name="email" matInput />
+                </mat-form-field>
+            </div>
+            <div class="col-md-3">
+                <mat-form-field class="full-width">
+                    <mat-label>Mobile No</mat-label>
+                    <input [(ngModel)]="serviceProvider.mobileNo" name="phone" matInput />
+                </mat-form-field>
+            </div>
+
+            <div class="col-md-3">
+                <mat-form-field class="full-width">
+                    <mat-label>Voter ID</mat-label>
+                    <input [(ngModel)]="serviceProvider.voterID" name="voter" matInput />
+                </mat-form-field>
+            </div>
+            <div class="col-md-3">
+                <mat-form-field class="full-width">
+                    <mat-label>Adhaar</mat-label>
+                    <input [(ngModel)]="serviceProvider.aadharCardId" name="phone" matInput />
+                </mat-form-field>
+            </div>
+            <div class="col-md-3">
+                <mat-form-field class="full-width">
+                    <mat-label>Address</mat-label>
+                    <input [(ngModel)]="serviceProvider.address" name="phone" matInput />
+                </mat-form-field>
+            </div>
+            <div class="col-md-3 ">
+                <mat-form-field class="full-width">
+                    <mat-label>Date of joining</mat-label>
+                    <input [(ngModel)]="serviceProvider.doj" name="doj" #aggreement_From="ngModel" matInput
+                        [matDatepicker]="pickerDojFrom">
+                    <mat-hint>DD/MM/YYYY</mat-hint>
+                    <mat-datepicker-toggle matIconSuffix [for]="pickerDojFrom"></mat-datepicker-toggle>
+                    <mat-datepicker #pickerDojFrom></mat-datepicker>
+                </mat-form-field>
+            </div>
+            <div class="col-md-3 ">
+                <mat-form-field class="full-width">
+                    <mat-label>From Date</mat-label>
+                    <input [(ngModel)]="serviceProvider.validFromDate" name="validFromDate" #aggreement_From="ngModel"
+                        matInput [matDatepicker]="pickerFrom">
+                    <mat-hint>DD/MM/YYYY</mat-hint>
+                    <mat-datepicker-toggle matIconSuffix [for]="pickerFrom"></mat-datepicker-toggle>
+                    <mat-datepicker #pickerFrom></mat-datepicker>
+                </mat-form-field>
+            </div>
+            <div class="col-md-3 ">
+                <mat-form-field class="full-width">
+                    <mat-label>To Date</mat-label>
+                    <input [(ngModel)]="serviceProvider.validToDate" name="validToDate" #aggreement_From="ngModel"
+                        matInput [matDatepicker]="pickerTo">
+                    <mat-hint>DD/MM/YYYY</mat-hint>
+                    <mat-datepicker-toggle matIconSuffix [for]="pickerTo"></mat-datepicker-toggle>
+                    <mat-datepicker #pickerTo></mat-datepicker>
+                </mat-form-field>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3 d-flex justify-content-center align-items-center" style="height: 50px;">
+                <label style="font-weight: bold; font-size: 25px;">Local Reference</label>
+            </div>
+            <div class="col-md-3">
+                <mat-form-field class="full-width">
+                    <mat-label>Local Reference Name</mat-label>
+                    <input [(ngModel)]="serviceProvider.refrence2Name" name="phone" #flatNo="ngModel" matInput />
+                </mat-form-field>
+            </div>
+            <div class="col-md-3">
+                <mat-form-field class="full-width">
+                    <mat-label>Local Reference Phone</mat-label>
+                    <input [(ngModel)]="serviceProvider.refrence2Mobile" name="phone" #flatNo="ngModel" matInput />
+                </mat-form-field>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="button-row m-t-10 m-b-10">
+                        <button mat-stroked-button
+                            (click)="isViewOrEdit? updateServiceProvider(): saveServiceProvider()">{{isViewOrEdit?
+                            'Update' : 'Save'}}</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </mat-expansion-panel>
+    <mat-expansion-panel *ngIf="isViewOrEdit">
+        <mat-expansion-panel-header>
+            <mat-panel-title> Resident Reference </mat-panel-title>
+        </mat-expansion-panel-header>
+        <div class="row">
+            <div class="col-md-3 d-flex justify-content-center align-items-center" style="height: 50px;">
+                <label style="font-weight: bold; font-size: 25px;">Resident Reference</label>
+            </div>
+
+            <div class="col-md-3 ">
+                <mat-form-field class="full-width">
+                    <mat-label>Neighbourhood</mat-label>
+                    <input type="text" (change)="filterResident()" placeholder="Select Neighbourhood"
+                        aria-label="Neighbourhood" matInput name="nrdForm" #neighbourForm="ngModel"
+                        [(ngModel)]="referenceOwner.neighbourhood" (click)="neighbourTrigger.openPanel()"
+                        [matAutocomplete]="autoNeighbour" #neighbourTrigger="matAutocompleteTrigger">
+                    <mat-autocomplete #autoNeighbour="matAutocomplete" [displayWith]="displayNeighbourhood">
+                        @for (option of neighbourhoodOptions; track option) {
+                        <mat-option [value]="option.id">{{option.name}}</mat-option>
+                        }
+                    </mat-autocomplete>
+                </mat-form-field>
+            </div>
+            <div class="col-md-3 ">
+                <mat-form-field class="full-width">
+                    <mat-label>Building</mat-label>
+                    <input type="text" (change)="filterResident()" placeholder="Select building" aria-label="Building"
+                        matInput name="buildingForm" #buildingForm="ngModel" [(ngModel)]="referenceOwner.building"
+                        (click)="buildingTrigger.openPanel()" [matAutocomplete]="autobuilding"
+                        #buildingTrigger="matAutocompleteTrigger">
+                    <mat-autocomplete #autobuilding="matAutocomplete" [displayWith]="displayBuilding">
+                        @for (option of buildingOptions; track option) {
+                        <mat-option [value]="option.id">{{option.name}}</mat-option>
+                        }
+                    </mat-autocomplete>
+                </mat-form-field>
+            </div>
+            <div class="col-md-3">
+                <mat-form-field class="full-width">
+                    <mat-label>Flat No</mat-label>
+                    <input [(ngModel)]="referenceOwner.flatNumber" (input)="filterResident()" name="flatNo"
+                        #flatNo="ngModel" matInput />
+                </mat-form-field>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3">
+
+            </div>
+            <div class="col-md-6">
+                <mat-form-field class="full-width">
+                   <input #reference1Input matInput placeholder="Resident Reference Name"
+       aria-label="Reference 1"
+       [matAutocomplete]="auto"
+       [formControl]="reference1"
+       style="word-wrap:true;"
+       [(ngModel)]="referenceOwner.residentReferenceName">
+  <mat-autocomplete #auto="matAutocomplete">
+
+                    </mat-autocomplete>
+                </mat-form-field>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="button-row m-b-10">
+                    <button mat-stroked-button (click)="saveReference()">
+                        {{isUpdate ? 'Update Reference' : 'Add Reference'}} </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <table mat-table *ngIf="dataSourceReference.length > 0" [dataSource]="dataSourceReference"
+                class="mat-elevation-z8">
+
+                <ng-container matColumnDef="srno">
+                    <th mat-header-cell *matHeaderCellDef>Sr No </th>
+                    <td mat-cell *matCellDef="let element; let i = index"> {{i + 1}} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="ownerName">
+                    <th mat-header-cell *matHeaderCellDef> Reference Name </th>
+                    <td mat-cell *matCellDef="let element"> {{element.residentReferenceName}} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="neighbourhood">
+                    <th mat-header-cell *matHeaderCellDef> Neighbourhood </th>
+                    <td mat-cell *matCellDef="let element"> {{element.neighbourhood}} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="building">
+                    <th mat-header-cell *matHeaderCellDef> Building </th>
+                    <td mat-cell *matCellDef="let element"> {{element.building}} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="flatNumber">
+                    <th mat-header-cell *matHeaderCellDef> FlatNumber </th>
+                    <td mat-cell *matCellDef="let element"> {{element.flatNumber}} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="actions">
+                    <th mat-header-cell *matHeaderCellDef> Actions </th>
+                    <td mat-cell *matCellDef="let element">
+                        <button mat-stroked-button class="" (click)="deleteReferenceData(element)">Delete</button>
+                    </td>
+
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="displayedColumnsReference"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumnsReference;"></tr>
+            </table>
+        </div>
+    </mat-expansion-panel>
+    <mat-expansion-panel *ngIf="isViewOrEdit">
+        <mat-expansion-panel-header>
+            <mat-panel-title> Vehicle </mat-panel-title>
+        </mat-expansion-panel-header>
+        <app-town-vehicle [vehicle]="vehicle" [dataToDisplayVehicle]="vehicleList"
+            [dataSourceVehicle]="dataSourceVehicle" (vehicleEvent)="updateVehicleTable($event)"></app-town-vehicle>
+    </mat-expansion-panel>
+    <mat-expansion-panel *ngIf="isViewOrEdit">
+        <mat-expansion-panel-header>
+            <mat-panel-title> Additional Access Rights </mat-panel-title>
+        </mat-expansion-panel-header>
+        <app-town-add-access-rights 
+            [addAccessRights]="addAccessRights" 
+            [dataToDisplayAAR]="dataToDisplayAAR"
+            [dataSourceAAR]="dataSourceAAR"
+            [serviceProviderId]="serviceProvider.idNumber"
+            (addAREvent)="updateAARTable($event)"
+            (flatAssignmentEvent)="handleFlatAssignment($event)">
+        </app-town-add-access-rights>
     </mat-expansion-panel>
 </mat-accordion>
 <div class="container">

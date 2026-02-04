@@ -245,23 +245,19 @@ if (createdDates.length) {
     doc.text(`Printed On: ${generated}`, pageWidth - 10, 20, { align: 'right' });
 
     // Table body
-    const body = this.filteredData.map((r, i) => [
-      i + 1,
-      r.shortName || 'N/A',
-      r.mobileNo || 'N/A',
-      r.serviceType || 'N/A',
-      r.firstName || 'N/A',
-      r.lastName || 'N/A',
-      r.doj ? new Date(r.doj).toLocaleDateString() : 'N/A',
-      r.validFromDate ? new Date(r.validFromDate).toLocaleDateString() : 'N/A',
-      r.validToDate ? new Date(r.validToDate).toLocaleDateString() : 'N/A',
-      r.emailID || 'N/A',
-      r.createdOn ? new Date(r.createdOn).toLocaleDateString() : 'N/A',
-    ]);
-
+   const body = this.filteredData.map((r, i) => [
+  i + 1,
+  r.shortName || 'N/A',
+  r.serviceType || 'N/A',
+  r.doj ? new Date(r.doj).toLocaleDateString() : 'N/A',
+  r.flatNumber || 'N/A',
+  r.validFromDate ? new Date(r.validFromDate).toLocaleDateString() : 'N/A',
+  r.validToDate ? new Date(r.validToDate).toLocaleDateString() : 'N/A',
+  r.createdOn ? new Date(r.createdOn).toLocaleDateString() : 'N/A',
+]);
     autoTable(doc, {
       startY: 35,
-      head: [['Sr No', 'Short Name', 'Mobile', 'Service Type', 'First Name', 'Last Name', 'Joining Date', 'Valid From', 'Valid To', 'Email','Created']],
+      head: [['Sr No', 'Short Name', 'Service Type', 'Joining Date', 'Flat Number', 'Valid From', 'Valid To', 'Created']],
       body,
       theme: 'grid',
       headStyles: { fillColor: [220, 220, 220], textColor: 0, fontStyle: 'bold' },
@@ -290,7 +286,6 @@ if (createdDates.length) {
       'First Name': r.firstName,
       'Middle Name': r.middleName,
       'Last Name': r.lastName,
-      'Short Name': r.shortName,
       'Mobile': r.mobileNo,
       'Gender': r.gender,
       'Blood Group': r.bloodGroup,
@@ -306,9 +301,11 @@ if (createdDates.length) {
       'Joining Date': r.doj ? new Date(r.doj).toLocaleDateString() : '',
       'Valid From': r.validFromDate ? new Date(r.validFromDate).toLocaleDateString() : '',
       'Valid To': r.validToDate ? new Date(r.validToDate).toLocaleDateString() : '',
-      'Created On': r.createdOn ? new Date(r.createdOn).toLocaleDateString() : '',
+      
       'Neighbourhood': r.nrd,
       'Building': r.building,
+      'FlatNumber': r.flatNumber,
+      'Created On': r.createdOn ? new Date(r.createdOn).toLocaleDateString() : '',
       
       
     }));

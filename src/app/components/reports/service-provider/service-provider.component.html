@@ -71,7 +71,8 @@
 
   <!-- Table -->
   <div class="table-responsive mt-3" >
-    <table class="table table-bordered table-striped">
+ <table class="table table-bordered table-hover table-striped"
+         style="table-layout:auto; white-space:nowrap;">
   <thead class="table-light">
     <tr>
       <th>Sr</th>
@@ -90,6 +91,7 @@
       <th>DOB</th>
       <th>Neighbourhood</th>
       <th>Building</th>
+      <th>FlatNumber</th>
       <th>ValidFrom</th>
       <th>ValidTo</th>
       <th>Created On</th>
@@ -114,6 +116,7 @@
       <td>{{ row.doj | date:'dd-MM-yyyy' }}</td>
       <td>{{row.nrd}}</td>
       <td>{{row.building}}</td>
+      <td>{{row.flatNumber}}</td>
       <td>{{ row.validFromDate | date:'dd-MM-yyyy HH:mm' }}</td>
 <td>{{ row.validToDate | date:'dd-MM-yyyy HH:mm' }}</td>
 <td>{{row.createdOn | date:'dd-MM-yyyy'}}</td>
