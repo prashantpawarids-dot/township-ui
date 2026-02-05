@@ -7,7 +7,7 @@ import { AddonDetailsComponent } from '../../dialogs/addon-details/addon-details
 import { DomSanitizer } from '@angular/platform-browser';
 import { AddonCard } from 'src/app/models/common.model';
 import { AuthService } from 'src/app/services/auth.service';
-
+import Swal from 'sweetalert2';
 @Component({
   selector: 'app-town-add-on-card',
   imports: [CommonModule, MaterialModule, FormsModule],
@@ -175,6 +175,54 @@ export class TownAddOnCardComponent {
   //   // this.dataSource.setData(this.dataToDisplay);
   //   this.addonEventDelete.emit(data);
   // }
+
+  // town-add-on-card.component.ts
+
+removeData(data: any) {
+  // Step 1: Check if already deleted
+  if (data.logicalDeleted === 1 || data.isDeleted === true) {
+    this.showSwal('error', 'This record is already deleted');
+    return;
+  }
+
+  // Step 2: Show confirmation
+  Swal.fire({
+    title: 'Are you sure?',
+    text: 'Do you want to delete this add-on card?',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Yes, delete it!',
+    cancelButtonText: 'No, cancel',
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#3085d6'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      // Step 3: Emit delete event to parent
+      this.addonEventDelete.emit(data);
+      
+      // Step 4: Remove from local display
+      this.dataToDisplay = this.dataToDisplay.filter(x => x.srno !== data.srno);
+      this.dataSource.setData(this.dataToDisplay);
+      
+      // Step 5: Show success
+      this.showSwal('success', 'Add-on card deleted successfully');
+    }
+  });
+}
+
+// Add this helper method if not already present
+private showSwal(icon: 'success' | 'error' | 'warning', title: string) {
+  Swal.fire({
+    icon,
+    title,
+    showConfirmButton: false,
+    timer: 3000,
+    timerProgressBar: true,
+    background: icon === 'success' ? '#d4edda' : '#f8d7da',
+    iconColor: icon === 'success' ? '#28a745' : '#d33',
+    position: 'center'
+  });
+}
 
   editData(data) {
     const addondialogRef = this.addonDialog.open(AddonDetailsComponent, {

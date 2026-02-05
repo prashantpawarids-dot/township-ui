@@ -174,14 +174,14 @@ export class AuthLoginComponent implements OnInit{
   }
 
 // Helper to map roleID → profileName (MATCH SQL EXACTLY)
-getProfileName(roleID: number): string {
-  switch (roleID) {
-    case 1: return 'admin';   // ⚠ must match DB
-    case 2: return 'manager';
-    case 3: return 'user';
-    default: return '';
-  }
-}
+// getProfileName(roleID: number): string {
+//   switch (roleID) {
+//     case 1: return 'admin';   // ⚠ must match DB
+//     case 2: return 'manager';
+//     case 3: return 'user';
+//     default: return '';
+//   }
+// }
 
 onSubmit() {
   // 1️⃣ Check if form is valid
@@ -214,14 +214,15 @@ onSubmit() {
       // console.log('🟢 LOGGED USER:', user);
 
       // 4️⃣ Set profileName from roleID
-      user.profileName = this.getProfileName(user.roleID);
-      // console.log('🟢 PROFILE NAME:', user.profileName);
+      // user.profileName = this.getProfileName(user.roleID);
+      user.Name = user.name;
+      console.log('UserName NAME:', user.Name);
 
-      // 5️⃣ Store basic user info in localStorage
+    
       this.setLocalstorage(user);
 
-      // 6️⃣ Load authorities for this profile
-      this.authService.getAuthorityModules(user.profileName).subscribe({
+      
+      this.authService.getAuthorityModules(user.Name).subscribe({
         next: (authModules: any[]) => {
           // console.log('🔵 AUTH MODULES FROM SQL (RAW):');
           // console.table(authModules);
@@ -276,7 +277,7 @@ onSubmit() {
 
   setLocalstorage(user) {
     localStorage.setItem("id",user.id);
-    localStorage.setItem("name", user.name);
+    localStorage.setItem("Name", user.name);
     localStorage.setItem("companyID", user.companyID);
     localStorage.setItem("companyName", user.company || '');
     localStorage.setItem("email", user.email);

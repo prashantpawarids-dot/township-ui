@@ -25,7 +25,7 @@ export class NavRightComponent {
   }
 
   get getName() {
-    return localStorage.getItem("name") || "";
+    return localStorage.getItem("Name") || "";
   }
 
   get lastLoginTime() {

@@ -300,7 +300,8 @@ ngOnChanges(changes: any): void {
         this.availableFlatsForBuilding = res.filter(item => 
           item.buildingName === this.selectedBuildingForFlat
         );
-        
+        console.log('Selected building:', this.selectedBuildingForFlat);
+      console.log('Flats available for this building:', this.availableFlatsForBuilding);
         // Load already assigned flats and pre-select them
         if (this.serviceProviderId) {
           this.loadAssignedFlats();

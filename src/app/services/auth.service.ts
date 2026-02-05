@@ -68,7 +68,7 @@ get roleId(): string | null {
   return this.http.get<any[]>(url).pipe(
     map(res => {
       // Admin sees all, others see only active buildings
-      return roleid === "1" ? res : res.filter(item => item.isactive === true);
+      return roleid === "100" ? res : res.filter(item => item.isactive === true);
     }),
     catchError(this.handleError)
   );
@@ -118,7 +118,7 @@ get roleId(): string | null {
   return this.http.get<any[]>(url).pipe(
     map(res => {
       // Admin sees all, others see only active
-      return roleid === '1'
+      return roleid === '100'
         ? res
         : res.filter(item => item.isactive === true);
     }),
@@ -169,7 +169,7 @@ get roleId(): string | null {
     return this.http.get<any[]>(url).pipe(
     map(res => {
       // Admin sees all, others see only active
-      return roleid === '1'
+      return roleid === '100'
         ? res
         : res.filter(item => item.isactive === true);
     }),
@@ -231,7 +231,7 @@ get roleId(): string | null {
     map(res => {
       // Filter based on role
       const filteredData =
-        roleid === '1'
+        roleid === '100'
           ? res
           : res.filter(item => item.logicalDeleted === 0);
 
@@ -451,7 +451,16 @@ postLandOwnerVehicle(payload: any): Observable<any> {
     }),
       catchError(this.handleError));
   }
-
+// Delete Vehicle API - auto converts string to number
+deleteVehicle(id: string | number): Observable<any> {
+  let url = this.baseUrl + 'Vehicle/DeleteVehicle/' + id;
+  return this.http.delete(url).pipe(
+    map(res => {
+      return res;
+    }),
+    catchError(this.handleError)
+  );
+}
   // land owner access rights
   postLandOwnerAccessRights(payload: any): Observable<any> {
     // console.log('postLandOwnerAccessRights Payload being sent:', payload);
@@ -489,7 +498,7 @@ postLandOwnerVehicle(payload: any): Observable<any> {
     map(res => {
       // Admin (roleid = 1) sees all
       // Others see only not-deleted guests
-      return roleid === '1'
+      return roleid === '100'
         ? res
         : res.filter(item => item.logicalDeleted === 0);
     }),
@@ -553,7 +562,7 @@ getTenant(): Observable<any[]> {
   return this.http.get<any[]>(url).pipe(
     map(res => {
       // If roleid is 1, return all tenants; otherwise, only active ones
-      return roleid === "1" ? res : res.filter(item => item.logicalDeleted === 0);
+      return roleid === "100" ? res : res.filter(item => item.logicalDeleted === 0);
     }),
     catchError(this.handleError)
   );
@@ -605,7 +614,7 @@ getTenant(): Observable<any[]> {
   return this.http.get<any[]>(url).pipe(
     map(res => {
       // Admin sees all, others see only active companies
-      return roleid === '1'
+      return roleid === '100'
         ? res
         : res.filter(item => item.isActive ===1);
     }),
@@ -720,7 +729,7 @@ getGuest(): Observable<any[]> {
     map(res => {
       // Admin (roleid = 1) sees all
       // Others see only not-deleted guests
-      return roleid === '1'
+      return roleid === '100'
         ? res
         : res.filter(item => item.logicalDeleted === 0);
     }),
@@ -756,7 +765,7 @@ getGuest(): Observable<any[]> {
   return this.http.get<any[]>(url).pipe(
     map(res => {
       // Admin sees all, others see only active companies
-      return roleid === '1'
+      return roleid === '100'
         ? res
         : res.filter(item => item.isactive === true);
     }),
@@ -821,7 +830,7 @@ getGuest(): Observable<any[]> {
   return this.http.get<any[]>(url).pipe(
     map(res => {
       // Admin sees everything, others see only not deleted
-      return roleid === '1'
+      return roleid === '100'
         ? res
         : res.filter(item => !item.isDeleted); 
     }),
@@ -846,7 +855,7 @@ getGuest(): Observable<any[]> {
   return this.http.get<any[]>(url).pipe(
     map(res => {
       // Admin sees all, others see only active companies
-      return roleid === '1'
+      return roleid === '100'
         ? res
         : res.filter(item => item.isactive === true);
     }),
@@ -990,7 +999,7 @@ getReaderLocationById(id: number): Observable<any> {
   return this.http.get<any[]>(url).pipe(
     map(res => {
       
-      return roleid === "1" ? res : res.filter(item => item.logicalDeleted === 0);
+      return roleid === "100" ? res : res.filter(item => item.logicalDeleted === 0);
     }),
     catchError(this.handleError)
   );
@@ -1015,7 +1024,7 @@ getReaderLocationById(id: number): Observable<any> {
   return this.http.get<any[]>(url).pipe(
     map(res => {
       // Admin sees all, others see only active companies
-      return roleid === '1'
+      return roleid === '100'
         ? res
         : res.filter(item => item.isactive === true);
     }),
@@ -1532,8 +1541,8 @@ blockRevokeAccess(payload: {
 
 
 
-getAuthorityModules(profileName: string): Observable<any[]> {
-  const url = `${this.baseUrl}Auth/GetAuthorityModules?ProfileName=${profileName}`;
+getAuthorityModules(Name: string): Observable<any[]> {
+  const url = `${this.baseUrl}Auth/GetAuthorityModules/Name=${Name}`;
 
   return this.http.get<any[]>(url).pipe(
     map(res => res.filter(m => m.viewreadonly === false)),
@@ -1546,8 +1555,8 @@ getAuthorityModules(profileName: string): Observable<any[]> {
   );
 }
 //services/auth.service.ts
- getAllAuthorityModules(profileName: string): Observable<any> {
-   const url = `${this.baseUrl}Auth/GetAuthorityModules?ProfileName=${profileName}`;
+ getAllAuthorityModules(Name: string): Observable<any> {
+   const url = `${this.baseUrl}Auth/GetAuthorityModules/Name=${Name}`;
     return this.http.get(url).pipe(
       map((res: any) => res), // map the response directly
       catchError(this.handleError) // handle errors
@@ -1582,5 +1591,22 @@ getServiceProviderReferenceFlatAll(): Observable<any> {
   );
 }
 
+searchCardHolder(searchValue: string): Observable<any> {
+    const url = `${this.baseUrl}Auth/CardHolderSearch/${searchValue}`;
+    return this.http.get(url).pipe(
+      map((res: any) => res),
+      catchError(this.handleError)
+    );
+  }
 
+  // ✏️ Add / Update Lost Damage
+  addUpdateLostDamage(id: number, payload: any): Observable<any> {
+    const url = `${this.baseUrl}CardLostDamageRegister/AddUpdateCardLostDamageRegister/${id}`;
+    return this.http.post(url, payload).pipe(
+      map((res: any) => res),
+      catchError(this.handleError)
+    );
+  }
+
+  
 }

@@ -1,0 +1,111 @@
+// ================= PAGE LAYOUT =================
+.page-container {
+  padding: 20px;
+  background: #f5f7fa;
+  min-height: 100vh;
+}
+
+.search-card,
+.table-card {
+  background: #fff;
+  padding: 24px;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.section-title {
+  margin-bottom: 20px;
+  font-weight: 600;
+  font-size: 18px;
+  color: #333;
+}
+
+// ================= TABLE STYLING =================
+.table {
+  margin: 0;
+  width: 100%;
+  border-collapse: collapse;
+
+  th,
+  td {
+    padding: 14px 16px; // Increased from default
+    font-size: 15px; // Increased font size
+    vertical-align: middle;
+    border-bottom: 1px solid #e0e0e0;
+  }
+
+  th {
+    background: #f1f3f5;
+    font-weight: 600;
+    color: #444;
+    text-align: left;
+  }
+
+  tbody tr:hover {
+    background: #f9fafb;
+  }
+
+  td {
+    color: #555;
+  }
+}
+
+// ================= MODAL OVERLAY (CRITICAL Z-INDEX) =================
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999; // High z-index to appear above everything
+}
+
+.modal-card {
+  width: 460px;
+  max-width: 90vw;
+  background: #fff;
+  padding: 24px;
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  position: relative;
+  z-index: 10000; // Even higher to ensure form controls work
+}
+
+.modal-title {
+  margin-bottom: 20px;
+  font-weight: 600;
+  font-size: 18px;
+  color: #333;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+// ================= ANGULAR MATERIAL OVERRIDES =================
+// Ensure Material components inside modal have proper z-index
+::ng-deep {
+  // Calendar picker overlay
+  .cdk-overlay-container {
+    z-index: 10001 !important; // Above modal
+  }
+
+  // Select dropdown overlay
+  .cdk-overlay-pane {
+    z-index: 10001 !important; // Above modal
+  }
+
+  // Datepicker panel specifically
+  .mat-datepicker-popup {
+    z-index: 10002 !important;
+  }
+}
+
+/* Ensure SweetAlert appears above your custom modal */
+.swal2-container {
+  z-index: 20000 !important;
+}

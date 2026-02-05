@@ -159,6 +159,7 @@ export class Vehicle {
     vColor: string;
     stickerNo: string;
      isactive?: number;
+     logical_Delete?: number;
 }
 
 // Building

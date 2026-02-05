@@ -12,7 +12,7 @@ import { AlertService } from 'src/app/services/alert.service';
 import { AuthService } from 'src/app/services/auth.service';
 import { ErrorHandlerService } from 'src/app/services/error-handler.service';
 import { TownAddOnCardComponent } from 'src/app/_core/shared/components/town-add-on-card/town-add-on-card.component';
-
+import Swal from 'sweetalert2';
 @Component({
   // AuthorityLevel
   selector: 'app-contractor',
@@ -206,21 +206,84 @@ export class ContractorComponent implements OnInit, OnDestroy  {
     });
   }
 
+  // deleteVehicle(vehicle: Vehicle) {
+  //   vehicle['logicalDeleted'] = '1';
+  //   this.authService.updateLandOwnerVehicle(vehicle).subscribe({
+  //     next: (res) => {
+  //       console.log("Vehicle deleted successfully", res);
+  //       this.alertService.openSuccess('Vehicle deleted successfully');
+  //       this.getContractorById(Number(this.contractor.id));
+  //     },
+  //     error: (err: any) => {
+  //       console.log(err);
+  //       this.errorHandlerService.handleError(err);
+  //       this.cd.detectChanges();
+  //     }
+  //   });
+  // }
+
   deleteVehicle(vehicle: Vehicle) {
-    vehicle['logicalDeleted'] = '1';
-    this.authService.updateLandOwnerVehicle(vehicle).subscribe({
-      next: (res) => {
-        console.log("Vehicle deleted successfully", res);
-        this.alertService.openSuccess('Vehicle deleted successfully');
-        this.getContractorById(Number(this.contractor.id));
-      },
-      error: (err: any) => {
-        console.log(err);
-        this.errorHandlerService.handleError(err);
-        this.cd.detectChanges();
+  // Check if already deleted - offer to restore
+  if (vehicle.logical_Delete === 1) {
+    Swal.fire({
+      title: 'Already Deleted!',
+      text: `Vehicle ${vehicle.regNo} is already deleted. Do you want to restore it?`,
+      icon: 'info',
+      showCancelButton: true,
+      confirmButtonColor: '#28a745',
+      cancelButtonColor: '#6c757d',
+      confirmButtonText: 'Yes, restore it!',
+      cancelButtonText: 'Cancel'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Restore vehicle by setting logical_Delete = 0
+        vehicle.logical_Delete = 0;
+        this.authService.updateLandOwnerVehicle(vehicle).subscribe({
+          next: (res) => {
+            console.log("Vehicle restored successfully", res);
+            this.alertService.openSuccess('Vehicle restored successfully');
+            this.getContractorById(Number(this.contractor.id));
+          },
+          error: (err: any) => {
+            console.log(err);
+            this.errorHandlerService.handleError(err);
+            this.cd.detectChanges();
+          }
+        });
       }
     });
+    return; // Stop deletion process
   }
+
+  // Normal deletion process
+  Swal.fire({
+    title: 'Are you sure?',
+    text: `Do you want to delete vehicle ${vehicle.regNo}?`,
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#3085d6',
+    confirmButtonText: 'Yes, delete it!',
+    cancelButtonText: 'Cancel'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      this.authService.deleteVehicle(vehicle.id).subscribe({
+        next: (res) => {
+          console.log("Vehicle deleted successfully", res);
+          this.alertService.openSuccess('Vehicle deleted successfully');
+          // Remove from local array immediately
+          this.vehicleList = this.vehicleList.filter(v => v.id !== vehicle.id);
+          this.dataSourceVehicle.setData(this.vehicleList);
+        },
+        error: (err: any) => {
+          console.log(err);
+          this.errorHandlerService.handleError(err);
+          this.cd.detectChanges();
+        }
+      });
+    }
+  });
+}
 
   // Additional Access Rights
   updateAARTable(event) {

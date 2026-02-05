@@ -1,4 +1,4 @@
-<form [formGroup]="cardForm">
+<!-- <form [formGroup]="cardForm">
     <div class="container">
         <div class="row mb-3">
             <div class="col-md-12">
@@ -10,7 +10,7 @@
             </div>
           </div>
       <div class="row">
-        <!-- Card Type -->
+       
         <div class="col-md-4">
           <mat-form-field  class="full-width">
             <mat-label>Card Type</mat-label>
@@ -41,11 +41,11 @@
         </div>
       </div>
   
-      <!-- Buttons -->
+      
       <div class="row mt-3">
         <div class="col-md-12">
           <div class="button-row mb-3">
-            <button mat-stroked-button (click)="showAll()">Show All</button>
+            
             <button class="ms-2" mat-flat-button color="primary" (click)="search()">Search</button>
             <button class="ms-2" mat-flat-button color="primary" (click)="update()">Update</button>
           </div>
@@ -53,4 +53,133 @@
       </div>
     </div>
   </form>
-  
+   -->
+
+
+ <!-- ================= SEARCH PANEL ================= -->
+<div class="page-container">
+
+  <form [formGroup]="cardForm" class="search-card">
+
+    <!-- <h4 class="section-title">Card Lost / Damage Search</h4> -->
+
+    <div class="row">
+      <div class="col-md-4">
+        <mat-form-field class="w-100">
+          <mat-label>Card Type</mat-label>
+          <mat-select formControlName="cardType">
+            <mat-option *ngFor="let card of cardTypes" [value]="card.value">
+              {{ card.label }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <div class="col-md-4">
+        <mat-form-field class="w-100">
+          <mat-label>Search By</mat-label>
+          <mat-select formControlName="searchType">
+            <mat-option *ngFor="let opt of searchByOptions" [value]="opt.key">
+              {{ opt.name }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <div class="col-md-4">
+        <mat-form-field class="w-100">
+          <mat-label>Search Value</mat-label>
+          <input matInput formControlName="searchData" />
+        </mat-form-field>
+      </div>
+    </div>
+
+    <div class="text-end mt-3">
+      <button mat-flat-button color="primary" (click)="search()">
+        Search
+      </button>
+    </div>
+
+  </form>
+
+  <!-- ================= TABLE ================= -->
+  <div class="table-card mt-4" >
+    <table class="table">
+      <thead>
+        <tr>
+          <th>ID Number</th>
+          <th>Short Name</th>
+          <th>CSN</th>
+          <th>Building</th>
+          <th>Flat</th>
+          <th class="text-center">Action</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let row of tableData">
+          <td>{{ row.idNumber }}</td>
+          <td>{{ row.shortname }}</td>
+          <td>{{ row.csn }}</td>
+          <td>{{ row.building }}</td>
+          <td>{{ row.flatNumber }}</td>
+          <td class="text-center">
+            <button mat-stroked-button color="accent"
+              (click)="openUpdate(row)">
+              Update
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ================= UPDATE POPUP ================= -->
+<div class="modal-overlay" *ngIf="showUpdatePopup">
+  <div class="modal-card">
+
+    <h5 class="modal-title">Update Lost / Damage</h5>
+
+    <form [formGroup]="updateForm">
+
+      <!-- ID NUMBER (AUTO FETCH) -->
+      <mat-form-field class="w-100">
+        <mat-label>ID Number</mat-label>
+        <input matInput formControlName="idNumber" readonly />
+      </mat-form-field>
+
+      <!-- LOST / DAMAGE TYPE -->
+      <mat-form-field class="w-100">
+        <mat-label>Lost / Damage Type</mat-label>
+        <mat-select formControlName="lostDamageType">
+          <mat-option value="Lost">L</mat-option>
+          <mat-option value="Damage">D</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <!-- REPORTED DATE (CALENDAR) -->
+      <mat-form-field class="w-100">
+        <mat-label>Report Date</mat-label>
+        <input matInput [matDatepicker]="picker" formControlName="reporteddate">
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+      </mat-form-field>
+
+      <!-- DESCRIPTION -->
+      <mat-form-field class="w-100">
+        <mat-label>Description</mat-label>
+        <textarea matInput rows="3" formControlName="description"></textarea>
+      </mat-form-field>
+
+      <div class="modal-actions">
+        <button mat-button color="warn" (click)="closePopup()">Cancel</button>
+        <button mat-flat-button color="primary" (click)="submitUpdate()">
+          Save
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>
+
