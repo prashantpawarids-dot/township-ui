@@ -79,7 +79,22 @@ getModuleKeyForPath(path: string): number {
       this.returnPath = params.get('returnPath');
       this.showDownloadBtn = this.returnPath?.startsWith('/master/') || false; // ✅ Show PDF only for master
       this.MODULE_KEY = this.getModuleKeyForPath(this.returnPath || '');
-// console.log('MODULE_KEY:', this.MODULE_KEY);
+// console.log('MODULE_KEY in Search Component:', this.MODULE_KEY);
+
+// this.route.queryParamMap.subscribe(params => {
+//   this.returnPath = params.get('returnPath');
+//   this.showDownloadBtn = this.returnPath?.startsWith('/master/') || false;
+//   this.MODULE_KEY = this.getModuleKeyForPath(this.returnPath || '');
+  // console.log('📍 Current returnPath:', this.returnPath);
+  // console.log('🔑 MODULE_KEY:', this.MODULE_KEY);
+  
+  // Add this debugging right after MODULE_KEY is set:
+  // console.log('🔍 Checking permissions for MODULE_KEY:', this.MODULE_KEY);
+  // console.log('  - canView:', this.authorityService.canView(this.MODULE_KEY));
+  // console.log('  - canInsert:', this.authorityService.canInsert(this.MODULE_KEY));
+  // console.log('  - canUpdate:', this.authorityService.canUpdate(this.MODULE_KEY));
+  // console.log('  - canDelete:', this.authorityService.canDelete(this.MODULE_KEY));
+  // console.log('  - canBlock:', this.authorityService.canBlock(this.MODULE_KEY));
 
       switch (this.returnPath) {
         case '/land-owner':
@@ -290,15 +305,34 @@ getModuleKeyForPath(path: string): number {
     });
   }
   
-  setProfile() {
-    this.title = 'Profile';
-    this.authService.getProfile().subscribe(res => {
-      this.dataToDisplay = [...res];
-      this.dataSource.data = (this.dataToDisplay);
-      this.searchByOptions = [{ name: "User Id", key: "uid" }, { name: "Profile Name", key: "profileName" }];
-      this.displayedColumns = ['srno', 'profileName', 'actions']
-    });
-  }
+  // setProfile() {
+  //   this.title = 'Profile';
+  //   this.authService.getProfile().subscribe(res => {
+  //     this.dataToDisplay = [...res];
+  //     this.dataSource.data = (this.dataToDisplay);
+  //     this.searchByOptions = [{ name: "User Id", key: "uid" }, { name: "Profile Name", key: "profileName" }];
+  //     this.displayedColumns = ['srno', 'profileName', 'actions']
+  //   });
+  // }
+
+
+ setProfile() {
+  this.title = 'Profile';
+  this.authService.getProfileRegister().subscribe(res => {
+    this.dataToDisplay = [...res];            
+    this.dataSource.data = this.dataToDisplay; 
+
+    this.searchByOptions = [
+      { name: "Profile ID", key: "profileID" },   // Changed from uid
+      { name: "Profile Name", key: "profileName" },
+      { name: "User", key: "user" }               
+    ];
+
+    // Add profileID to columns and update view/edit to use correct ID
+    this.displayedColumns = ['srno', 'profileID', 'profileName', 'user', 'actions'];
+  });
+}
+
 
   setUser() {
     this.title = 'User';
@@ -423,11 +457,19 @@ setReaderRelay() {
 }
 
 
+  // viewData(data: any) {
+  //   if (this.returnPath) {
+  //     this.navigateBack(data.id, true);
+  //   }
+  // }
+
   viewData(data: any) {
-    if (this.returnPath) {
-      this.navigateBack(data.id, true);
-    }
+  if (this.returnPath) {
+    // Use profileID for profile route, otherwise use id
+    const idToPass = this.returnPath === '/master/profile' ? data.profileID : data.id;
+    this.navigateBack(idToPass, true);
   }
+}
 
   viewResident(data) {
     this.navigateBack(data);
@@ -439,6 +481,9 @@ setReaderRelay() {
 
   editData(data: any) {
     switch (this.returnPath) {
+       case '/master/profile':
+      this.navigateBack(data.profileID);  // ✅ Use profileID instead of id
+      break;
       case '/land-owner':
         this.viewLandOwner(data.id);
         break;
@@ -478,17 +523,67 @@ setReaderRelay() {
 
   }
 
+// deleteData(element: any) {
+//   // Check if already deleted
+//   if (element.logicalDeleted === 1 || element.isactive === false || element.isDeleted === true) {
+//   this.showSwal('error', `This ${this.title} is already deleted`);
+//   return;
+// }
+
+//    const deleteMethods: { [key: string]: (id: any) => Observable<any> } = {
+//     '/tenant': this.authService.deleteTenant.bind(this.authService),
+//     '/contractor': this.authService.deleteContractor.bind(this.authService),
+
+//     '/master/amenities': this.authService.deleteAmenities.bind(this.authService),
+//     '/master/building': this.authService.deleteBuilding.bind(this.authService),
+//     '/master/company': this.authService.deleteCompany.bind(this.authService),
+//     '/master/project': this.authService.deleteProject.bind(this.authService),
+//     '/master/neighbourhood': this.authService.deleteNeighbourhood.bind(this.authService),
+//     '/master/service-type': this.authService.deleteServiceType.bind(this.authService),
+//     '/master/reader-location': this.authService.deleteReaderLocation.bind(this.authService),
+//     '/master/reader-relay': this.authService.deleteReaderRelay.bind(this.authService),
+//     '/master/profile': this.authService.deleteProfile.bind(this.authService),
+//     '/master/user': this.authService.deleteUser.bind(this.authService),
+
+//     '/land-owner': this.authService.deleteLandOwner.bind(this.authService),
+//     '/resident': this.authService.deleteResident.bind(this.authService),
+//     '/guest': this.authService.deleteGuest.bind(this.authService),
+//     '/visitor': this.authService.deleteVisitor.bind(this.authService),
+//     '/service-provider': this.authService.deleteServiceProvider.bind(this.authService),
+//     '/employee': this.authService.deleteEmployee.bind(this.authService),
+//   };
+
+//   const deleteFn = deleteMethods[this.returnPath];
+
+//   if (!deleteFn) {
+//     this.showSwal('error', `Delete not implemented for this page`);
+//     return;
+//   }
+
+//   // Call the delete function
+//   deleteFn(element.id).subscribe({
+//     next: () => {
+//       this.showSwal('success', `${this.title} deleted successfully`);
+//       element.logicalDeleted = 1;
+//       this.dataSource.data = [...this.dataToDisplay];
+//     },
+//     error: () => {
+//       this.showSwal('error', `Failed to delete ${this.title}`);
+//     }
+//   });
+// }
+
+
 deleteData(element: any) {
   // Check if already deleted
   if (element.logicalDeleted === 1 || element.isactive === false || element.isDeleted === true) {
-  this.showSwal('error', `This ${this.title} is already deleted`);
-  return;
-}
+    this.showSwal('error', `This ${this.title} is already deleted`);
+    return;
+  }
 
-   const deleteMethods: { [key: string]: (id: any) => Observable<any> } = {
+  const deleteMethods: { [key: string]: (id: any) => Observable<any> } = {
     '/tenant': this.authService.deleteTenant.bind(this.authService),
     '/contractor': this.authService.deleteContractor.bind(this.authService),
-
     '/master/amenities': this.authService.deleteAmenities.bind(this.authService),
     '/master/building': this.authService.deleteBuilding.bind(this.authService),
     '/master/company': this.authService.deleteCompany.bind(this.authService),
@@ -499,7 +594,6 @@ deleteData(element: any) {
     '/master/reader-relay': this.authService.deleteReaderRelay.bind(this.authService),
     '/master/profile': this.authService.deleteProfile.bind(this.authService),
     '/master/user': this.authService.deleteUser.bind(this.authService),
-
     '/land-owner': this.authService.deleteLandOwner.bind(this.authService),
     '/resident': this.authService.deleteResident.bind(this.authService),
     '/guest': this.authService.deleteGuest.bind(this.authService),
@@ -515,8 +609,11 @@ deleteData(element: any) {
     return;
   }
 
+  // ✅ Use profileID for profile route, otherwise use id
+  const idToDelete = this.returnPath === '/master/profile' ? element.profileID : element.id;
+
   // Call the delete function
-  deleteFn(element.id).subscribe({
+  deleteFn(idToDelete).subscribe({
     next: () => {
       this.showSwal('success', `${this.title} deleted successfully`);
       element.logicalDeleted = 1;
@@ -527,7 +624,6 @@ deleteData(element: any) {
     }
   });
 }
-
 // Helper function to show Swal notifications
 private showSwal(icon: 'success' | 'error', title: string) {
   Swal.fire({

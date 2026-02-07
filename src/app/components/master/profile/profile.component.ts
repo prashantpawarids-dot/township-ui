@@ -43,40 +43,98 @@ export class ProfileComponent implements OnInit {
 
   moduleList: any[] = [];
   reportList: any[] = [];
+username: string = '';
 
   profileForm = {
     id: 0,
     profileName: null,
     isActive: true,
     isDeleted: true,
+    userid:0,
     companyid: localStorage.getItem("companyID")
   };
 
   editMode: boolean = false;
   viewMode: boolean = false;
 
-  ngOnInit(): void {
-      this.activatedRoute.queryParams.subscribe(params => {
-      const id = params['id'];
-      if (id) {
-        this.editMode = true;
-        const view = params['view'];
-        if (view === 'true') {
-          this.viewMode = true;
-        }
+//   ngOnInit(): void {
+//       this.activatedRoute.queryParams.subscribe(params => {
+//       const id = params['id'];
+//       if (id) {
+//         this.editMode = true;
+//         const view = params['view'];
+//         if (view === 'true') {
+//           this.viewMode = true;
+//         }
         
-    this.moduleList = null;
-    this.reportList = null; 
-    // this.setInitialModuleCheckboxStatus();
-    // this.setInitialReportCheckboxStatus();
-       // this.getProfileById(Number(id));
-        // this.getProfileDetailsById(Number(id));
-          this.getProfileById(Number(id), () => {
-        this.getAllAuthorityModules(this.profileForm.profileName);
-      });
-      }
+//     this.moduleList = null;
+//     this.reportList = null; 
+//     // this.setInitialModuleCheckboxStatus();
+//     // this.setInitialReportCheckboxStatus();
+//        // this.getProfileById(Number(id));
+//         // this.getProfileDetailsById(Number(id));
+//       //     this.getProfileById(Number(id), () => {
+//       //   this.getAllAuthorityModules(this.profileForm.profileName);
+//       // });
+
+
+//       this.getProfileById(Number(id), () => {
+//   this.authService.getProfileRegister().subscribe({
+//     next: (res: any[]) => {
+//       const profile = res.find(p => p.profileID === Number(id));
+//       if (profile && profile.user) {
+//         this.username = profile.user; // store user
+//         console.log('USERNAME:', this.username); // debug
+//         this.getAllAuthorityModules(this.username); // call here
+//       } else {
+//         console.warn('No user found for profileID', id);
+//       }
+//     },
+//     error: (err) => this.errorHandlerService.handleError(err)
+//   });
+// });
+
+//       }
+//     });
+//   }
+
+
+ngOnInit(): void {
+  this.activatedRoute.queryParams.subscribe(params => {
+    const id = params['id'];
+
+    this.moduleList = [];
+    this.reportList = [];
+
+    // ✅ ADD MODE only when ID is NOT PRESENT
+    if (id === undefined || id === null) {
+      this.editMode = false;
+      this.viewMode = false;
+      this.username = '';
+      return;
+    }
+
+    // ✅ EDIT / VIEW MODE (ID CAN BE 0 OR >0)
+    this.editMode = true;
+    this.viewMode = params['view'] === 'true';
+
+    this.authService.getProfileRegister().subscribe(res => {
+      const profile = res.find(p => p.profileID === Number(id));
+
+      if (!profile) return;
+
+      this.profileForm.id = profile.profileID;
+      this.profileForm.userid = profile.uid ?? 0;
+      this.profileForm.profileName = profile.profileName;
+
+      // ✅ THIS LINE FIXES EVERYTHING
+      this.username = profile.user;
+
+      // ✅ LOAD MODULES
+      this.getAllAuthorityModules(this.username);
     });
-  }
+  });
+}
 
   ngAfterViewInit() {
     this.elems.changes.subscribe((list) => {
@@ -104,17 +162,69 @@ export class ProfileComponent implements OnInit {
   // }
 
 
-  getProfileById(id: number, callback?: () => void) {
-  this.authService.getProfileById(id).subscribe({
-    next: (res) => {
-      this.profileForm = res[0];
-      if (callback) callback(); // call after profileForm is ready
+//   getProfileById(id: number, callback?: () => void) {
+//   this.authService.getProfileById(id).subscribe({
+//     next: (res) => {
+//       this.profileForm = res[0];
+//       if (callback) callback(); // call after profileForm is ready
+//     },
+//     error: (err: any) => {
+//       this.errorHandlerService.handleError(err);
+//     }
+//   });
+// }
+
+// getProfileById(id: number, callback?: () => void) {
+//   this.authService.getProfileById(id).subscribe({
+//     next: (res: any[]) => {
+//       if (res && res.length) {
+//         const profile = res[0];
+//         // Map API properties to your form
+//         this.profileForm.id = profile.profileID; // API: profileID -> form: id
+//         this.profileForm.profileName = profile.profileName;
+//         this.profileForm.isActive = profile.isActive ?? true;
+//         this.profileForm.isDeleted = profile.isDeleted ?? false;
+
+//         if (callback) callback();
+//       }
+//     },
+//     error: (err: any) => {
+//       this.errorHandlerService.handleError(err);
+//     }
+//   });
+// }
+
+
+
+getProfileById(id: number, callback?: () => void) {
+  // Use getProfileRegister instead of getProfileById to get the correct data structure
+  this.authService.getProfileRegister().subscribe({
+    next: (res: any[]) => {
+      if (res && res.length) {
+        // Find the profile with matching profileID
+        const profile = res.find(p => p.profileID === id);
+        
+        if (profile) {
+          // Map API properties to your form
+          this.profileForm.id = profile.profileID;
+          this.profileForm.profileName = profile.profileName;
+          this.profileForm.isActive = profile.isActive ?? true;
+          this.profileForm.isDeleted = profile.isDeleted ?? false;
+
+          console.log('Profile Form after mapping:', this.profileForm); // Debug log
+
+          if (callback) callback();
+        } else {
+          console.warn('Profile not found with ID:', id);
+        }
+      }
     },
     error: (err: any) => {
       this.errorHandlerService.handleError(err);
     }
   });
 }
+
 
 
   getProfileDetailsById(id: number) {
@@ -128,16 +238,31 @@ export class ProfileComponent implements OnInit {
     });
   }
 
-  getAllAuthorityModules(profileName: string) {
-  this.authService.getAllAuthorityModules(profileName).subscribe({
+//   getAllAuthorityModules(profileName: string) {
+//   this.authService.getAllAuthorityModules(profileName).subscribe({
+//     next: (res) => {
+//       this.setModuleAndReportData(res); // reuse your existing logic
+//     },
+//     error: (err: any) => {
+//       this.errorHandlerService.handleError(err);
+//     }
+//   });
+// }
+
+
+getAllAuthorityModules(username: string) {
+  console.log('Fetching modules for user:', username);
+  this.authService.getAllAuthorityModules(username).subscribe({
     next: (res) => {
-      this.setModuleAndReportData(res); // reuse your existing logic
+      console.log('MODULE LIST:', res);
+      this.setModuleAndReportData(res); 
     },
     error: (err: any) => {
       this.errorHandlerService.handleError(err);
     }
   });
 }
+
 
 
 
@@ -303,17 +428,37 @@ setModuleAndReportData(data: any[]) {
   }
 
 
+  // savePermissions() {
+  //   let payload = this.createModulePayload();
+  //   this.authService.postProfileDetails(payload).subscribe({
+  //     next: (res) => {
+  //       this.alertService.openSuccess('Successfully Saved');
+  //     },
+  //     error: (err: any) => {
+  //       this.errorHandlerService.handleError(err);
+  //     }
+  //   });
+  // }
+
+
   savePermissions() {
-    let payload = this.createModulePayload();
-    this.authService.postProfileDetails(payload).subscribe({
-      next: (res) => {
-        this.alertService.openSuccess('Successfully Saved');
-      },
-      error: (err: any) => {
-        this.errorHandlerService.handleError(err);
-      }
-    });
+  // ❌ do not allow permission save without profile ID
+  if (!this.profileForm.id || this.profileForm.id === 0) {
+    return;
   }
+
+  let payload = this.createModulePayload();
+
+  this.authService.postProfileDetails(payload).subscribe({
+    next: () => {
+      this.alertService.openSuccess('Successfully Saved');
+    },
+    error: (err: any) => {
+      this.errorHandlerService.handleError(err);
+    }
+  });
+}
+
 
   createModulePayload() {
     const modulePayload = {};
@@ -349,11 +494,14 @@ setModuleAndReportData(data: any[]) {
       item[1].id = 0;
       item[1].moduleId = Number(item[0]);
       item[1].profileid = this.profileForm.id;
+    item[1].userid = this.profileForm.userid; 
       finalPayload.push(item[1]);
     })
     return finalPayload;
 
   }
+
+  
 
 }
 

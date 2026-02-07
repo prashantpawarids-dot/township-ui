@@ -75,13 +75,22 @@ mockData: any[] = [
     { value: 'Guest', label: 'Guest' }
   ];
 
+  searchOptions = [
+  { value: 'ownerName', label: 'Short Name' },
+  { value: 'id', label: 'ID Number' },
+  { value: 'ownerId', label: 'CSN' }
+];
+
+
   constructor(private fb: FormBuilder, private http: HttpClient, private sortService: TableSortService) {
     let today=new Date();
     this.reportForm = this.fb.group({
       liableType: ['lost'],
        cardType: [''],
       fromDate: [today],
-      toDate: [today]
+      toDate: [today],
+      searchBy: [''],  
+  searchText: ['']
     });
   }
 
@@ -121,67 +130,7 @@ mockData: any[] = [
 }
 
   
-  //   applyFilters(): void {
-  //   const { fromDate, toDate, cardType, searchBy, searchValue } = this.reportForm.value;
-  //   let filtered = [...this.allData];
   
-  //   // 🔹 CARD TYPE FILTER
-  //   if (cardType && cardType.length > 0) {
-  //     let apiTypes: string[] = [];
-  //     if (cardType.includes('all')) {
-  //       apiTypes = this.allData.map(d => d.cardType);
-  //     } 
-  //     apiTypes = [...new Set(apiTypes)];
-  //     filtered = filtered.filter(d => apiTypes.includes(d.cardType));
-  //   }
-  
-  //   // 🔹 DATE FILTER (IGNORE TIME)
-  //   if (fromDate) {
-  //     const from = new Date(fromDate);
-  //     from.setHours(0, 0, 0, 0);
-  
-  //     filtered = filtered.filter(d => {
-  //       if (!d.cardPrintingDate) return false;
-  //       const recordDate = new Date(d.cardPrintingDate);
-  //       recordDate.setHours(0, 0, 0, 0);
-  //       return recordDate >= from;
-  //     });
-  //   }
-  
-  //   if (toDate) {
-  //     const to = new Date(toDate);
-  //     to.setHours(0, 0, 0, 0);
-  
-  //     filtered = filtered.filter(d => {
-  //       if (!d.cardPrintingDate) return false;
-  //       const recordDate = new Date(d.cardPrintingDate);
-  //       recordDate.setHours(0, 0, 0, 0);
-  //       return recordDate <= to;
-  //     });
-  //   }
-  
-  //   // 🔹 SEARCH FILTER
-  //   if (searchValue && searchValue.trim().length > 0) {
-  //     if (!searchBy) {
-  //       alert('Please select a search type');
-  //       this.filteredData = [];
-  //       this.displayedData = [];
-  //       this.paginator.length = 0;
-  //       return;
-  //     }
-  
-  //     const searchLower = searchValue.toLowerCase();
-  //     filtered = filtered.filter(d =>
-  //       d[searchBy]?.toString().toLowerCase().startsWith(searchLower)
-  //     );
-  //   }
-  
-  //   // 🔹 UPDATE TABLE + PAGINATOR
-  //   this.filteredData = filtered;
-  //   this.paginator.length = this.filteredData.length;
-  //   this.paginator.firstPage();
-  //   this.updateDisplayedData(0, this.paginator.pageSize || this.pageSizes[0]);
-  // }
   applyFilters(): void {
   const { fromDate, toDate, cardType, liableType } = this.reportForm.value;
   let filtered = [...this.allData];
@@ -190,6 +139,17 @@ mockData: any[] = [
   // if (liableType && liableType !== 'both') {
   //   filtered = filtered.filter(d => d.status?.toLowerCase() === liableType);
   // }
+
+  // 🔹 SEARCH FILTER (by selected column)
+const searchText = this.reportForm.value.searchText?.toLowerCase();
+const searchBy = this.reportForm.value.searchBy;
+
+if (searchText && searchBy) {
+  filtered = filtered.filter(d => {
+    const fieldValue = d[searchBy];
+    return fieldValue?.toString().toLowerCase().startsWith(searchText);
+  });
+}
 
   // 🔹 LIABLE TYPE FILTER (lost, damage, both)
 if (liableType && liableType !== 'both') {

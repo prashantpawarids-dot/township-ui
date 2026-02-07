@@ -18,6 +18,17 @@
     </mat-form-field>
 </div>
 
+<!-- Username Field -->
+<!-- Username Field -->
+<div class="col-md-4">
+  <mat-form-field class="full-width">
+    <mat-label>Username</mat-label>
+    <input matInput [(ngModel)]="username" [readonly]="editMode || viewMode" />
+  </mat-form-field>
+</div>
+
+
+
 <!-- Save / Cancel Buttons -->
 <div class="col-md-4 d-flex  justify-content-start align-items-center">
   <button mat-stroked-button color="primary" (click)="editMode ? onUpdate() : onSave()">{{editMode ? 'Update' : 'Save'}}</button>

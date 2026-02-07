@@ -42,6 +42,22 @@
           <mat-datepicker #toPicker></mat-datepicker>
         </mat-form-field>
       </div>
+<div class="col-10 col-md-2">
+  <mat-form-field appearance="fill" class="w-100">
+    <mat-label>Search By</mat-label>
+    <mat-select formControlName="searchBy">
+      <mat-option *ngFor="let option of searchOptions" [value]="option.value">
+        {{ option.label }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+</div>
+<div class="col-10 col-md-2">
+  <mat-form-field appearance="fill" class="w-100">
+    <mat-label>Search</mat-label>
+    <input matInput placeholder="Enter search text" formControlName="searchText">
+  </mat-form-field>
+</div>
 
        <!-- Buttons -->
    <div class="col-auto d-flex flex-nowrap gap-2 align-items-center">
@@ -51,6 +67,8 @@
       <button type="button" class="btn" *ngIf="displayedData.length>0" (click)="exportToExcel()">Excel</button>
     </div>
     </div>
+
+
 
     <!-- Table -->
 <div class="table-responsive mt-3">
@@ -73,7 +91,7 @@
         </th>
 
         <th (click)="sortColumn('ownerName')">
-          Sort Name
+          Short Name
           <span *ngIf="getSortColumn() === 'ownerName'">
             {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
           </span>

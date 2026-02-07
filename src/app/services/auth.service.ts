@@ -917,6 +917,20 @@ getReaderLocationById(id: number): Observable<any> {
       catchError(this.handleError));
   }
 
+ getProfileRegister(): Observable<any> {
+  const url = this.baseUrl + 'auth/profileRegister';
+  return this.http.get<any[]>(url).pipe(
+    map(res => {
+      // Keep only unique profiles based on 'profileID'
+      const uniqueProfiles = res.filter((item, index, self) =>
+        index === self.findIndex(t => t.uid === item.uid)
+      );
+      return uniqueProfiles;
+    }),
+    catchError(this.handleError)
+  );
+}
+
   // Master/User
 
   getUser(): Observable<any> {
@@ -1172,13 +1186,23 @@ getReaderLocationById(id: number): Observable<any> {
       catchError(this.handleError));
   }
 
+  // postProfileDetails(payload: any): Observable<any> {
+  //   let url = this.baseUrl + 'Profile/AddUpdateProfileDetails';
+  //   return this.http.post(url, payload).pipe(map(res => {
+  //     return res;
+  //   }),
+  //     catchError(this.handleError));
+  // }
+
+
   postProfileDetails(payload: any): Observable<any> {
-    let url = this.baseUrl + 'Profile/AddUpdateProfileDetails';
-    return this.http.post(url, payload).pipe(map(res => {
-      return res;
-    }),
-      catchError(this.handleError));
-  }
+  const url = this.baseUrl + 'Profile/AddUpdateProfileDetails/' + payload[0]?.userid;
+  return this.http.post(url, payload).pipe(
+    map(res => res),
+    catchError(this.handleError)
+  );
+}
+
 
 
   postGuest(payload: any): Observable<any> {
@@ -1542,7 +1566,7 @@ blockRevokeAccess(payload: {
 
 
 getAuthorityModules(Name: string): Observable<any[]> {
-  const url = `${this.baseUrl}Auth/GetAuthorityModules/Name=${Name}`;
+ const url = `${this.baseUrl}Auth/GetAuthorityModules/${Name}`;
 
   return this.http.get<any[]>(url).pipe(
     map(res => res.filter(m => m.viewreadonly === false)),
@@ -1555,13 +1579,14 @@ getAuthorityModules(Name: string): Observable<any[]> {
   );
 }
 //services/auth.service.ts
- getAllAuthorityModules(Name: string): Observable<any> {
-   const url = `${this.baseUrl}Auth/GetAuthorityModules/Name=${Name}`;
-    return this.http.get(url).pipe(
-      map((res: any) => res), // map the response directly
-      catchError(this.handleError) // handle errors
-    );
-  }
+getAllAuthorityModules(Name: string): Observable<any> {
+ 
+  const url = `${this.baseUrl}Auth/GetAuthorityModules/${Name}`;
+  return this.http.get(url).pipe(
+    map((res: any) => res), // map the response directly
+    catchError(this.handleError) // handle errors
+  );
+}
 
 
 
@@ -1606,6 +1631,16 @@ searchCardHolder(searchValue: string): Observable<any> {
       map((res: any) => res),
       catchError(this.handleError)
     );
+  }
+
+
+  getCardLostDamageRegister(): Observable<any> {
+    const url = `${this.baseUrl}CardLostDamageRegister`;
+    return this.http.get(url).pipe(
+      map((res: any) => res),
+      catchError(this.handleError)
+    );    
+  
   }
 
   

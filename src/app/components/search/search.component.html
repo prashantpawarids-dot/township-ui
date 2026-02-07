@@ -33,16 +33,16 @@
       <button class="btn btn-primary mt-3" (click)="searchData()">
         Search
       </button>
-      <button *ngIf="title" (click)="navigateBack()" class="btn btn-primary m-l-10 mt-3">
+      <!-- <button *ngIf="title" (click)="navigateBack()" class="btn btn-primary m-l-10 mt-3">
         Add New {{ title }}
-      </button>
+      </button> -->
 
-      <!-- <button
+      <button
   *ngIf="title && auth.canInsert(MODULE_KEY)"
   (click)="navigateBack()"
   class="btn btn-primary m-l-10 mt-3 mt-3">
   Add New {{ title }}
-</button> -->
+</button>
 
       <!-- <button mat-raised-button color="btn btn-primary m-l-10 mt-3" *ngIf="showDownloadBtn" (click)="exportReports()">Export PDF</button>
        <button mat-raised-button color="btn btn-primary m-l-10 mt-3" *ngIf="showDownloadBtn" (click)="exportExcel()">Export </button> -->
@@ -58,7 +58,7 @@
           The actual rendered columns are set as a property on the row definition" -->
 
       <ng-container matColumnDef="srno">
-        <th mat-header-cell *matHeaderCellDef>Sr No </th>
+        <th mat-header-cell *matHeaderCellDef>SrNo </th>
         <td mat-cell *matCellDef="let element; let i = index"> {{i + 1 + (paginator.pageIndex * paginator.pageSize)}}
         </td>
       </ng-container>
@@ -201,7 +201,7 @@
 
     
 
-    <button
+    <!-- <button
   mat-stroked-button
   class="m-l-10"
   color="primary"
@@ -217,7 +217,7 @@
   "
 >
   {{ element.isBlocked ? 'Revoke' : 'Block' }}
-</button>
+</button> -->
 
 
   </td>
@@ -286,12 +286,26 @@
 </ng-container>
 
 
+
+
+
+
       <!-- profilename Column -->
       <ng-container matColumnDef="profileName">
         <th mat-header-cell *matHeaderCellDef> Profile Name </th>
         <td mat-cell *matCellDef="let element"> {{element.profileName}} </td>
       </ng-container>
+<!-- User Column (only for Profile) -->
+<ng-container matColumnDef="user">
+  <th mat-header-cell *matHeaderCellDef> User </th>
+  <td mat-cell *matCellDef="let element"> {{ element.user }} </td>
+</ng-container>
 
+<!-- Add this column definition in search.component.html -->
+<ng-container matColumnDef="profileID">
+  <th mat-header-cell *matHeaderCellDef> Profile ID </th>
+  <td mat-cell *matCellDef="let element"> {{element.profileID}} </td>
+</ng-container>
       <!-- Is Resident Column -->
       <ng-container matColumnDef="Is Resident">
         <th mat-header-cell *matHeaderCellDef> Is Resident </th>
