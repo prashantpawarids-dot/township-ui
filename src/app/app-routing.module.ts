@@ -177,8 +177,9 @@ const routes: Routes = [
         path: 'card-lost-damage',
         loadComponent: () => import('./components/card-lost-damage/card-lost-damage.component').then((c) => c.CardLostDamageComponent)
       },
+      
       {
-        path: 'tag-block-revoke',
+        path: 'tag-block-remove',
         loadComponent: () => import('./components/tag-block-revoke/tag-block-revoke.component').then((c) => c.TagBlockRevokeComponent)
       },
       {
@@ -223,6 +224,10 @@ const routes: Routes = [
             path: 'cardLostDamaged',
             loadComponent: () => import('./components/reports/card-lost-damaged/card-lost-damaged.component').then((c) => c.CardLostDamagedComponent)
           },
+          {
+        path: 'card-block-revoke',
+        loadComponent: () => import('./components/reports/card-revoke-block/card-revoke-block.component').then((c) => c.CardRevokeBlockComponent)
+      },
           {
             path: 'vechileList',
             loadComponent: () => import('./components/reports/vechile-list/vechile-list.component').then((c) => c.VechileListComponent)

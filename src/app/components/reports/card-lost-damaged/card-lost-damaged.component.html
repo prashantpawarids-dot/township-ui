@@ -76,9 +76,9 @@
     <thead class="table-light">
       <tr>
         <th>Sr No</th>
-<th (click)="sortColumn('id')">
+<th (click)="sortColumn('iDnumber')">
           IDNumber
-          <span *ngIf="getSortColumn() === 'id'">
+          <span *ngIf="getSortColumn() === 'iDnumber'">
             {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
           </span>
         </th>
@@ -90,32 +90,30 @@
           </span>
         </th>
 
-        <th (click)="sortColumn('ownerName')">
+        <th (click)="sortColumn('shortName')">
           Short Name
-          <span *ngIf="getSortColumn() === 'ownerName'">
+          <span *ngIf="getSortColumn() === 'shortName'">
             {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
           </span>
         </th>
 
-        
-
-        <th (click)="sortColumn('cardEncodedOn')">
-          Card Encoded On
-          <span *ngIf="getSortColumn() === 'cardEncodedOn'">
+        <th (click)="sortColumn('cardCsn')">
+          CSN
+          <span *ngIf="getSortColumn() === 'cardCsn'">
             {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
           </span>
         </th>
 
-        <th (click)="sortColumn('cardPrintedOn')">
-          Card Printed On
-          <span *ngIf="getSortColumn() === 'cardPrintedOn'">
+        <th (click)="sortColumn('reporteddate')">
+          Reported Date
+          <span *ngIf="getSortColumn() === 'reporteddate'">
             {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
           </span>
         </th>
 
-        <th (click)="sortColumn('status')">
+        <th (click)="sortColumn('lostDamageType')">
           Status
-          <span *ngIf="getSortColumn() === 'status'">
+          <span *ngIf="getSortColumn() === 'lostDamageType'">
             {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
           </span>
         </th>
@@ -125,13 +123,12 @@
     <tbody>
       <tr *ngFor="let e of displayedData; let i = index">
         <td>{{ paginator.pageIndex * paginator.pageSize + i + 1 }}</td>
-        <td>{{ e.id }}</td>
+        <td>{{ e.iDnumber }}</td>
         <td>{{ e.cardType }}</td>
-        <td>{{ e.ownerName }}</td>
-      
-        <td>{{ e.cardEncodedOn | date:'dd-MM-yyyy HH:mm:ss' }}</td>
-        <td>{{ e.cardPrintedOn | date:'dd-MM-yyyy HH:mm:ss' }}</td>
-        <td>{{ e.status }}</td> <!-- NEW -->
+        <td>{{ e.shortName }}</td>
+        <td>{{ e.cardCsn }}</td>
+        <td>{{ e.reporteddate | date:'dd-MM-yyyy HH:mm:ss' }}</td>
+        <td>{{ e.lostDamageType === 'L' ? 'Lost' : e.lostDamageType === 'D' ? 'Damaged' : '' }}</td>
         
       </tr>
 

@@ -1565,6 +1565,20 @@ blockRevokeAccess(payload: {
 
 
 
+blockRevokeAccessCard(payload: any) {
+  const url = `${this.baseUrl}AccessRights/AddUpdateAccessBlockRevoke`;
+  
+  return this.http.post(url, payload, {
+    headers: { 'Content-Type': 'application/json' }
+  });
+}
+
+// path auth.service.ts
+getCardBlockRevokeStatus() {
+  const url = `${this.baseUrl}Report/CardAccessBlockInvokeRegister`;
+  return this.http.get<any[]>(url);
+}
+
 getAuthorityModules(Name: string): Observable<any[]> {
  const url = `${this.baseUrl}Auth/GetAuthorityModules/${Name}`;
 
@@ -1643,5 +1657,6 @@ searchCardHolder(searchValue: string): Observable<any> {
   
   }
 
+  
   
 }

@@ -1,0 +1,163 @@
+<form [formGroup]="reportForm">
+  <div class="container">
+
+    <!-- Date Filter Type Radio Buttons -->
+    <div class="row mb-3">
+      <div class="col-md-12">
+        <label class="me-3">Filter By:</label>
+        <mat-radio-group formControlName="dateFilterType">
+          <mat-radio-button value="blockDate" class="me-4">Block Date</mat-radio-button>
+          <mat-radio-button value="revokeDate">Revoke Date</mat-radio-button>
+        </mat-radio-group>
+      </div>
+    </div>
+
+    <!-- Filters + Buttons in One Row -->
+    <div class="row mt-3 g-2">
+      <div class="col-10 col-md-2">
+        <mat-form-field appearance="fill" class="w-100">
+          <mat-label>From Date</mat-label>
+          <input matInput [matDatepicker]="fromPicker" formControlName="fromDate">
+          <mat-datepicker-toggle matSuffix [for]="fromPicker"></mat-datepicker-toggle>
+          <mat-datepicker #fromPicker></mat-datepicker>
+        </mat-form-field>
+      </div>
+
+      <div class="col-10 col-md-2">
+        <mat-form-field appearance="fill" class="w-100">
+          <mat-label>To Date</mat-label>
+          <input matInput [matDatepicker]="toPicker" formControlName="toDate">
+          <mat-datepicker-toggle matSuffix [for]="toPicker"></mat-datepicker-toggle>
+          <mat-datepicker #toPicker></mat-datepicker>
+        </mat-form-field>
+      </div>
+
+      <div class="col-10 col-md-2">
+        <mat-form-field appearance="fill" class="w-100">
+          <mat-label>Search By</mat-label>
+          <mat-select formControlName="searchBy">
+            <mat-option *ngFor="let option of searchOptions" [value]="option.value">
+              {{ option.label }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <div class="col-10 col-md-2">
+        <mat-form-field appearance="fill" class="w-100">
+          <mat-label>Search</mat-label>
+          <input matInput placeholder="Enter search text" formControlName="searchText">
+        </mat-form-field>
+      </div>
+
+      <!-- Buttons -->
+      <div class="col-auto d-flex flex-nowrap gap-2 align-items-center">
+        <button type="button" class="btn" (click)="applyFilters()">Search</button>
+        <button type="button" class="btn" (click)="showAll()">Clear</button>
+        <button type="button" class="btn" *ngIf="displayedData.length>0" (click)="exportReports()">PDF</button>
+        <button type="button" class="btn" *ngIf="displayedData.length>0" (click)="exportToExcel()">Excel</button>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="table-responsive mt-3">
+      <table class="table table-bordered table-hover table-striped">
+        <thead class="table-light">
+          <tr>
+            <th>Sr No</th>
+            <th (click)="sortColumn('iDnumber')">
+              ID Number
+              <span *ngIf="getSortColumn() === 'iDnumber'">
+                {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+              </span>
+            </th>
+
+            <th (click)="sortColumn('csn')">
+              CSN
+              <span *ngIf="getSortColumn() === 'csn'">
+                {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+              </span>
+            </th>
+
+            <th (click)="sortColumn('name')">
+              Name
+              <span *ngIf="getSortColumn() === 'name'">
+                {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+              </span>
+            </th>
+
+            <th (click)="sortColumn('nrd')">
+              NRD
+              <span *ngIf="getSortColumn() === 'nrd'">
+                {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+              </span>
+            </th>
+
+            <th (click)="sortColumn('building')">
+              Building
+              <span *ngIf="getSortColumn() === 'building'">
+                {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+              </span>
+            </th>
+
+            <th (click)="sortColumn('flatNumber')">
+              Flat Number
+              <span *ngIf="getSortColumn() === 'flatNumber'">
+                {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+              </span>
+            </th>
+
+            <th (click)="sortColumn('blockDate')">
+              Block Date
+              <span *ngIf="getSortColumn() === 'blockDate'">
+                {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+              </span>
+            </th>
+
+            <th (click)="sortColumn('revokeDate')">
+              Revoke Date
+              <span *ngIf="getSortColumn() === 'revokeDate'">
+                {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+              </span>
+            </th>
+
+            <th (click)="sortColumn('durationMinutes')">
+              Duration (min)
+              <span *ngIf="getSortColumn() === 'durationMinutes'">
+                {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+              </span>
+            </th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let e of displayedData; let i = index">
+            <td>{{ paginator.pageIndex * paginator.pageSize + i + 1 }}</td>
+            <td>{{ e.iDnumber }}</td>
+            <td>{{ e.csn }}</td>
+            <td>{{ e.name }}</td>
+            <td>{{ e.nrd }}</td>
+            <td>{{ e.building }}</td>
+            <td>{{ e.flatNumber }}</td>
+            <td>{{ e.blockDate | date:'dd-MM-yyyy HH:mm:ss' }}</td>
+            <td>{{ e.revokeDate | date:'dd-MM-yyyy HH:mm:ss' }}</td>
+            <td>{{ e.durationMinutes }}</td>
+          </tr>
+
+          <tr *ngIf="displayedData.length === 0">
+            <td colspan="10" class="text-center">No Data Found</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Paginator -->
+    <mat-paginator
+      [pageSizeOptions]="pageSizes"
+      [pageSize]="10"
+      showFirstLastButtons
+      (page)="onPageChange($event)">
+    </mat-paginator>
+
+  </div>
+</form>
