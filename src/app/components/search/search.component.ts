@@ -74,7 +74,7 @@ getModuleKeyForPath(path: string): number {
     '/master/profile': 2,
     '/master/project': 3,
     '/master/user': 4,
-'/master/contrator-type': 5,
+     '/master/contrator-type': 5,
     '/master/neighbourhood': 6,
     '/master/building': 7,
     '/master/reader-location': 8,
@@ -450,7 +450,7 @@ setContractorType() {
     this.dataToDisplay = [...res];
     this.dataSource.data = this.dataToDisplay;
 
-    // ✅ FIXED: Changed 'name' to 'contractor type' to match HTML column definition
+    
     this.displayedColumns = ['srno', 'Id', 'contractor type', 'actions'];
   });
 }
