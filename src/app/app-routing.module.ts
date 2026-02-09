@@ -71,6 +71,14 @@ const routes: Routes = [
             loadComponent: () => import('./components/master/service-type/service-type.component').then((c) => c.ServiceTypeComponent)
           },
           {
+  path: 'contrator-type',
+  canActivate: [authGuard],
+  loadComponent: () =>
+    import('./components/master/contrator-type/contrator-type.component')
+      .then((c) => c.ContractorTypeComponent)
+}
+,
+          {
             path: 'amenities',
             canActivate: [authGuard],
             loadComponent: () => import('./components/master/amenities/amenities.component').then((c) => c.AmenitiesComponent)

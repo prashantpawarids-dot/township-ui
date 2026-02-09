@@ -44,6 +44,8 @@ export class ProfileComponent implements OnInit {
   moduleList: any[] = [];
   reportList: any[] = [];
 username: string = '';
+actualProfileID: number = 0; // ✅ Store the actual profileID
+
 
   profileForm = {
     id: 0,
@@ -100,41 +102,51 @@ username: string = '';
 
 
 ngOnInit(): void {
-  this.activatedRoute.queryParams.subscribe(params => {
-    const id = params['id'];
+    this.activatedRoute.queryParams.subscribe(params => {
+      const id = params['id'];  // This is uid
 
-    this.moduleList = [];
-    this.reportList = [];
+      this.moduleList = [];
+      this.reportList = [];
 
-    // ✅ ADD MODE only when ID is NOT PRESENT
-    if (id === undefined || id === null) {
-      this.editMode = false;
-      this.viewMode = false;
-      this.username = '';
-      return;
-    }
+      // ✅ ADD MODE
+      if (id === undefined || id === null) {
+        this.editMode = false;
+        this.viewMode = false;
+        this.username = '';
+        this.actualProfileID = 0;
+        return;
+      }
 
-    // ✅ EDIT / VIEW MODE (ID CAN BE 0 OR >0)
-    this.editMode = true;
-    this.viewMode = params['view'] === 'true';
+      // ✅ EDIT / VIEW MODE
+      this.editMode = true;
+      this.viewMode = params['view'] === 'true';
 
-    this.authService.getProfileRegister().subscribe(res => {
-      const profile = res.find(p => p.profileID === Number(id));
+      this.authService.getProfileRegister().subscribe(res => {
+        const profile = res.find(p => p.uid === Number(id));
 
-      if (!profile) return;
+        if (!profile) {
+          console.warn('Profile not found with uid:', id);
+          return;
+        }
 
-      this.profileForm.id = profile.profileID;
-      this.profileForm.userid = profile.uid ?? 0;
-      this.profileForm.profileName = profile.profileName;
+        // ✅ Store both uid and profileID
+        this.profileForm.id = profile.uid;           // uid for display
+        this.profileForm.userid = profile.uid;       // uid for routing
+        this.actualProfileID = profile.profileID;    // ✅ Actual profileID for backend
+        this.profileForm.profileName = profile.profileName;
+        this.username = profile.user;
 
-      // ✅ THIS LINE FIXES EVERYTHING
-      this.username = profile.user;
+        console.log('Loaded profile - uid:', id, 'profileID:', this.actualProfileID, 'username:', this.username);
 
-      // ✅ LOAD MODULES
-      this.getAllAuthorityModules(this.username);
+        // ✅ Load modules/permissions
+        this.getAllAuthorityModules(this.username);
+      });
     });
-  });
-}
+  }
+
+
+// Update getProfileById if still being used elsewhere
+
 
   ngAfterViewInit() {
     this.elems.changes.subscribe((list) => {
@@ -196,26 +208,26 @@ ngOnInit(): void {
 
 
 
-getProfileById(id: number, callback?: () => void) {
-  // Use getProfileRegister instead of getProfileById to get the correct data structure
+getProfileById(uid: number, callback?: () => void) {
   this.authService.getProfileRegister().subscribe({
     next: (res: any[]) => {
       if (res && res.length) {
-        // Find the profile with matching profileID
-        const profile = res.find(p => p.profileID === id);
+        // ✅ Find the profile with matching uid
+        const profile = res.find(p => p.uid === uid);
         
         if (profile) {
-          // Map API properties to your form
-          this.profileForm.id = profile.profileID;
+          this.profileForm.id = profile.uid;
+          this.profileForm.userid = profile.uid;
           this.profileForm.profileName = profile.profileName;
           this.profileForm.isActive = profile.isActive ?? true;
           this.profileForm.isDeleted = profile.isDeleted ?? false;
+          this.username = profile.user;
 
-          console.log('Profile Form after mapping:', this.profileForm); // Debug log
+          console.log('Profile Form after mapping:', this.profileForm);
 
           if (callback) callback();
         } else {
-          console.warn('Profile not found with ID:', id);
+          console.warn('Profile not found with uid:', uid);
         }
       }
     },
@@ -442,16 +454,17 @@ setModuleAndReportData(data: any[]) {
 
 
   savePermissions() {
-  // ❌ do not allow permission save without profile ID
-  if (!this.profileForm.id || this.profileForm.id === 0) {
+  if (!this.profileForm.userid || this.profileForm.userid === 0) {
+    this.alertService.openSuccess('Please save the profile first before assigning permissions');
     return;
   }
 
   let payload = this.createModulePayload();
 
-  this.authService.postProfileDetails(payload).subscribe({
+  // ✅ Pass uid and payload separately
+  this.authService.postProfileDetails(this.profileForm.userid, payload).subscribe({
     next: () => {
-      this.alertService.openSuccess('Successfully Saved');
+      this.alertService.openSuccess('Permissions saved successfully');
     },
     error: (err: any) => {
       this.errorHandlerService.handleError(err);
@@ -460,48 +473,154 @@ setModuleAndReportData(data: any[]) {
 }
 
 
+  // createModulePayload() {
+  //   const modulePayload = {};
+  //   const finalPayload = [];
+  //   const moduleCheckboxes = document.querySelectorAll('input[data-permission-type=moduleList]') as NodeListOf<HTMLInputElement>;
+  //   moduleCheckboxes.forEach((element) => {
+  //     let moduleId: string | number = element.getAttribute("data-parent-id");
+  //     moduleId = Number(moduleId.replace("module", ''));
+  //     if (modulePayload[moduleId]) {
+  //         modulePayload[moduleId][element.value] = element.checked
+  //     } else {
+  //       modulePayload[moduleId] = { 
+  //         [element.value]: element.checked
+  //       }
+  //     }
+  //   })
+
+  //   const reportCheckboxes = document.querySelectorAll('input[data-permission-type=reportList]') as NodeListOf<HTMLInputElement>;
+  //   reportCheckboxes.forEach((element) => {
+  //     let moduleId: string | number = element.value;
+  //     moduleId = Number(moduleId);
+  //     if (modulePayload[moduleId]) {
+  //         modulePayload[moduleId]['canView'] = element.checked
+  //     } else {
+  //       modulePayload[moduleId] = { 
+  //         ['canView']: element.checked
+  //       }
+  //     }
+  //   })
+
+
+  //   Object.entries(modulePayload).forEach((item: any) => {
+  //     item[1].id = 0;
+  //     item[1].moduleId = Number(item[0]);
+  //     item[1].profileid = this.profileForm.id;
+  //   item[1].userid = this.profileForm.userid; 
+  //     finalPayload.push(item[1]);
+  //   })
+  //   console.log('Final Payload:', finalPayload); // debug 
+  //   return finalPayload;
+
+    
+
+  // }
+
+  // createModulePayload() {
+  //   const modulePayload = {};
+  //   const finalPayload = [];
+    
+  //   const moduleCheckboxes = document.querySelectorAll('input[data-permission-type=moduleList]') as NodeListOf<HTMLInputElement>;
+  //   moduleCheckboxes.forEach((element) => {
+  //     let moduleId: string | number = element.getAttribute("data-parent-id");
+  //     moduleId = Number(moduleId.replace("module", ''));
+  //     if (modulePayload[moduleId]) {
+  //       modulePayload[moduleId][element.value] = element.checked
+  //     } else {
+  //       modulePayload[moduleId] = { 
+  //         [element.value]: element.checked
+  //       }
+  //     }
+  //   })
+
+  //   const reportCheckboxes = document.querySelectorAll('input[data-permission-type=reportList]') as NodeListOf<HTMLInputElement>;
+  //   reportCheckboxes.forEach((element) => {
+  //     let moduleId: string | number = element.value;
+  //     moduleId = Number(moduleId);
+  //     if (modulePayload[moduleId]) {
+  //       modulePayload[moduleId]['canView'] = element.checked
+  //     } else {
+  //       modulePayload[moduleId] = { 
+  //         ['canView']: element.checked
+  //       }
+  //     }
+  //   })
+
+  //   Object.entries(modulePayload).forEach((item: any) => {
+  //     item[1].id = 0;
+  //     item[1].moduleId = Number(item[0]);
+  //     item[1].profileid = this.actualProfileID;  // ✅ Use actual profileID, not uid
+  //     item[1].userid = this.profileForm.userid;  // ✅ Include userid (uid)
+  //     finalPayload.push(item[1]);
+  //   })
+    
+  //   console.log('Final Payload:', finalPayload);
+  //   console.log('UID for route:', this.profileForm.userid);
+  //   console.log('ProfileID in payload:', this.actualProfileID);
+    
+  //   return finalPayload;
+  // }
+
+
+
   createModulePayload() {
-    const modulePayload = {};
-    const finalPayload = [];
-    const moduleCheckboxes = document.querySelectorAll('input[data-permission-type=moduleList]') as NodeListOf<HTMLInputElement>;
-    moduleCheckboxes.forEach((element) => {
-      let moduleId: string | number = element.getAttribute("data-parent-id");
-      moduleId = Number(moduleId.replace("module", ''));
-      if (modulePayload[moduleId]) {
-          modulePayload[moduleId][element.value] = element.checked
-      } else {
-        modulePayload[moduleId] = { 
-          [element.value]: element.checked
-        }
+  const modulePayload = {};
+  const finalPayload = [];
+  
+  const moduleCheckboxes = document.querySelectorAll('input[data-permission-type=moduleList]') as NodeListOf<HTMLInputElement>;
+  moduleCheckboxes.forEach((element) => {
+    let moduleId: string | number = element.getAttribute("data-parent-id");
+    moduleId = Number(moduleId.replace("module", ''));
+    if (modulePayload[moduleId]) {
+      modulePayload[moduleId][element.value] = element.checked
+    } else {
+      modulePayload[moduleId] = { 
+        [element.value]: element.checked
       }
-    })
+    }
+  })
 
-    const reportCheckboxes = document.querySelectorAll('input[data-permission-type=reportList]') as NodeListOf<HTMLInputElement>;
-    reportCheckboxes.forEach((element) => {
-      let moduleId: string | number = element.value;
-      moduleId = Number(moduleId);
-      if (modulePayload[moduleId]) {
-          modulePayload[moduleId]['canView'] = element.checked
-      } else {
-        modulePayload[moduleId] = { 
-          ['canView']: element.checked
-        }
+  const reportCheckboxes = document.querySelectorAll('input[data-permission-type=reportList]') as NodeListOf<HTMLInputElement>;
+  reportCheckboxes.forEach((element) => {
+    let moduleId: string | number = element.value;
+    moduleId = Number(moduleId);
+    if (modulePayload[moduleId]) {
+      modulePayload[moduleId]['canView'] = element.checked
+    } else {
+      modulePayload[moduleId] = { 
+        ['canView']: element.checked
       }
-    })
+    }
+  })
 
-
-    Object.entries(modulePayload).forEach((item: any) => {
+  Object.entries(modulePayload).forEach((item: any) => {
+    const permissions = item[1];
+    
+    // ✅ Only include if at least one permission is true
+    const hasAnyPermission = 
+      permissions.canView === true || 
+      permissions.canInsert === true || 
+      permissions.canUpdate === true || 
+      permissions.canDelete === true;
+    
+    if (hasAnyPermission) {
       item[1].id = 0;
       item[1].moduleId = Number(item[0]);
-      item[1].profileid = this.profileForm.id;
-    item[1].userid = this.profileForm.userid; 
+      item[1].profileid = this.actualProfileID;
+      item[1].userid = this.profileForm.userid;
       finalPayload.push(item[1]);
-    })
-    return finalPayload;
-
-  }
-
+    }
+  })
   
+  console.log('Final Payload (filtered):', finalPayload);
+  console.log('UID for route:', this.profileForm.userid);
+  console.log('ProfileID in payload:', this.actualProfileID);
+  console.log('Total modules with permissions:', finalPayload.length);
+  
+  return finalPayload;
+}
+
 
 }
 

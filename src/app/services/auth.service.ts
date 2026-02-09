@@ -995,16 +995,46 @@ getReaderLocationById(id: number): Observable<any> {
     }),
       catchError(this.handleError));
   }
+  // Master/ContractorType
+  getContractorType(): Observable<any> {
+    let url = this.baseUrl + 'ContractorType';
+    return this.http.get(url).pipe(map(res => {
+      return res;
+    }),
+      catchError(this.handleError));
+  }
+
+getContractorTypeById(id: number): Observable<any> {
+  return this.http.get(`${this.baseUrl}ContractorType/ContractorType/${id}`).pipe(
+    map(res => res),
+    catchError(this.handleError)
+  );
+}
+
+postContractorType(payload: any): Observable<any> {
+  return this.http.post(`${this.baseUrl}ContractorType/AddContractorType`, payload).pipe(
+    map(res => res),
+    catchError(this.handleError)
+  );
+}
+
+updateContractorType(payload: any): Observable<any> {
+  return this.http.post(
+    `${this.baseUrl}ContractorType/UpdateContractorType/${payload.id}`,
+    payload
+  ).pipe(
+    map(res => res),
+    catchError(this.handleError)
+  );
+}
+
+
+
+
 
   // Master/Contractor  
 
-  // getContractor(): Observable<any> {
-  //   let url = this.baseUrl + 'Contractor'
-  //   return this.http.get(url).pipe(map(res => {
-  //     return res;
-  //   }),
-  //     catchError(this.handleError));
-  // }
+
 
  getContractor(): Observable<any[]> {
   const url = this.baseUrl + 'Contractor';
@@ -1097,13 +1127,7 @@ getReaderLocationById(id: number): Observable<any> {
       catchError(this.handleError));
   }
 
-  getContractorType(): Observable<any> {
-    let url = this.baseUrl + 'ContractorType';
-    return this.http.get(url).pipe(map(res => {
-      return res;
-    }),
-      catchError(this.handleError));
-  }
+ 
 
   postContractorAddonCard(payload: any): Observable<any> {
     payload.id = payload.id == undefined ? "0" : payload.id
@@ -1195,12 +1219,19 @@ getReaderLocationById(id: number): Observable<any> {
   // }
 
 
-  postProfileDetails(payload: any): Observable<any> {
-  const url = this.baseUrl + 'Profile/AddUpdateProfileDetails/' + payload[0]?.userid;
-  return this.http.post(url, payload).pipe(
-    map(res => res),
-    catchError(this.handleError)
-  );
+//   postProfileDetails(payload: any): Observable<any> {
+//   const url = this.baseUrl + 'Profile/AddUpdateProfileDetails/' + payload[0]?.userid;
+//   return this.http.post(url, payload).pipe(
+//     map(res => res),
+//     catchError(this.handleError)
+//   );
+// }
+
+// ✅ Update the method signature to accept uid parameter
+// ✅ Updated method in auth.service.ts
+postProfileDetails(uid: number, payload: any): Observable<any> {
+  const url = this.baseUrl + 'Profile/AddUpdateProfileDetails/' + uid;
+  return this.http.post(url, payload);
 }
 
 
@@ -1657,6 +1688,18 @@ searchCardHolder(searchValue: string): Observable<any> {
   
   }
 
-  
+
+
+
+
+  // Get Module Names here we getting both filter true and false //aut.service.ts
+  getModuleNameReport(): Observable<any> {
+    const url = `${this.baseUrl}Profile/GetModuleNames/true`;
+    return this.http.get(url).pipe(
+      map((res: any) => res),
+      catchError(this.handleError)
+    );
+
+  }
   
 }

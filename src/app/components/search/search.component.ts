@@ -50,24 +50,47 @@ getModuleKeyForPath(path: string): number {
   const cleanPath = path.split('?')[0];
 
   const map: { [key: string]: number } = {
+    // '/master/company': 1,
+    // '/master/profile': 2,
+    // '/master/project': 3,
+    // '/master/user': 4,
+    // '/master/river-view-city': 5,
+    // '/master/neighbourhood': 6,
+    // '/master/building': 7,
+    // '/master/reader-location': 8,
+    // '/master/service-provider': 9,
+    // '/master/amenities': 10,
+    // '/master/reader-relay': 11,
+    //  '/land-owner': 12,
+    // '/resident': 13,
+    // '/employee': 14, 
+    // '/card-lost-damage': 15,
+    // '/tag-block-revoke': 16,
+    // '/guest': 17,
+    // '/visitor': 18
+
+    // ===== MASTER =====
     '/master/company': 1,
     '/master/profile': 2,
     '/master/project': 3,
     '/master/user': 4,
-    '/master/river-view-city': 5,
+'/master/contrator-type': 5,
     '/master/neighbourhood': 6,
     '/master/building': 7,
     '/master/reader-location': 8,
-    '/master/service-provider': 9,
+    '/master/service-type': 9,
     '/master/amenities': 10,
     '/master/reader-relay': 11,
-     '/land-owner': 12,
+    '/land-owner': 12,
     '/resident': 13,
-    '/employee': 14, 
-    '/card-lost-damage': 15,
+    '/employee': 14,
+     '/card-lost-damage': 15,
     '/tag-block-revoke': 16,
-    '/guest': 17,
-    '/visitor': 18
+     '/guest': 17,
+    '/visitor': 18,
+     '/service-provider': 19,
+    '/contractor': 20,
+    '/tenant': 21,
   };
 
   return map[cleanPath] ?? 0; // 0 = no authority
@@ -153,6 +176,10 @@ getModuleKeyForPath(path: string): number {
           this.resetFields();
           this.setServiceType();
           break;
+          case '/master/contrator-type':
+  this.resetFields();
+  this.setContractorType();
+  break;
           case '/master/amenities':
             this.resetFields();
             this.setAmenities();
@@ -323,13 +350,14 @@ getModuleKeyForPath(path: string): number {
     this.dataSource.data = this.dataToDisplay; 
 
     this.searchByOptions = [
-      { name: "Profile ID", key: "profileID" },   // Changed from uid
+      // { name: "Profile ID", key: "profileID" },
+      {name:"User ID",key:"uid"},   // Changed from uid
       { name: "Profile Name", key: "profileName" },
       { name: "User", key: "user" }               
     ];
 
     // Add profileID to columns and update view/edit to use correct ID
-    this.displayedColumns = ['srno', 'profileID', 'profileName', 'user', 'actions'];
+    this.displayedColumns = ['srno', 'uid', 'profileName', 'user', 'actions'];
   });
 }
 
@@ -415,6 +443,19 @@ getModuleKeyForPath(path: string): number {
     });
   }
 
+setContractorType() {
+  this.title = 'Contractor Type';
+
+  this.authService.getContractorType().subscribe(res => {
+    this.dataToDisplay = [...res];
+    this.dataSource.data = this.dataToDisplay;
+
+    // ✅ FIXED: Changed 'name' to 'contractor type' to match HTML column definition
+    this.displayedColumns = ['srno', 'Id', 'contractor type', 'actions'];
+  });
+}
+
+
   setContractor() {
     this.title = 'Contractor';
     this.searchByOptions = [{ name: "Id", key: "id" }, { name: "Name", key: "fullname" }, { name: "Contactor Type", key: "contractorTypeName" }];
@@ -463,10 +504,10 @@ setReaderRelay() {
   //   }
   // }
 
-  viewData(data: any) {
+viewData(data: any) {
   if (this.returnPath) {
-    // Use profileID for profile route, otherwise use id
-    const idToPass = this.returnPath === '/master/profile' ? data.profileID : data.id;
+    // Use uid for profile route (unique), otherwise use id
+    const idToPass = this.returnPath === '/master/profile' ? data.uid : data.id;
     this.navigateBack(idToPass, true);
   }
 }
@@ -482,7 +523,7 @@ setReaderRelay() {
   editData(data: any) {
     switch (this.returnPath) {
        case '/master/profile':
-      this.navigateBack(data.profileID);  // ✅ Use profileID instead of id
+      this.navigateBack(data.uid);
       break;
       case '/land-owner':
         this.viewLandOwner(data.id);
@@ -590,6 +631,7 @@ deleteData(element: any) {
     '/master/project': this.authService.deleteProject.bind(this.authService),
     '/master/neighbourhood': this.authService.deleteNeighbourhood.bind(this.authService),
     '/master/service-type': this.authService.deleteServiceType.bind(this.authService),
+     '/master/contrator-type': this.authService.deleteContractorType.bind(this.authService),
     '/master/reader-location': this.authService.deleteReaderLocation.bind(this.authService),
     '/master/reader-relay': this.authService.deleteReaderRelay.bind(this.authService),
     '/master/profile': this.authService.deleteProfile.bind(this.authService),
@@ -610,7 +652,7 @@ deleteData(element: any) {
   }
 
   // ✅ Use profileID for profile route, otherwise use id
-  const idToDelete = this.returnPath === '/master/profile' ? element.profileID : element.id;
+  const idToDelete = this.returnPath === '/master/profile' ? element.uid : element.id;
 
   // Call the delete function
   deleteFn(idToDelete).subscribe({

@@ -82,17 +82,31 @@ export class ContractorComponent implements OnInit, OnDestroy  {
     });
   }
 
+  // getContractorType() {
+  //   this.authService.getContractorType().subscribe({
+  //     next: (res) => {
+  //       this.contractorOptions = res;
+  //     },
+  //     error: (err: any) => {
+  //       this.errorHandlerService.handleError(err);
+  //       this.cd.detectChanges();
+  //     }
+  //   });
+  // }
+
   getContractorType() {
-    this.authService.getContractorType().subscribe({
-      next: (res) => {
-        this.contractorOptions = res;
-      },
-      error: (err: any) => {
-        this.errorHandlerService.handleError(err);
-        this.cd.detectChanges();
-      }
-    });
-  }
+  this.authService.getContractorType().subscribe({
+    next: (res: any[]) => {
+      // Filter out items where isactive is false
+      this.contractorOptions = res.filter(item => item.isactive !== false);
+    },
+    error: (err: any) => {
+      this.errorHandlerService.handleError(err);
+      this.cd.detectChanges();
+    }
+  });
+}
+
   // contractor
   getContractorById(id: number) {
     this.authService.getContractorById(id).subscribe({

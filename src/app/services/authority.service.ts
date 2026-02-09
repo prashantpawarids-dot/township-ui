@@ -118,6 +118,11 @@ export class AuthorityService {
 
     // console.log('🟢 FULL AUTHORITY MAP:', Array.from(this.authorityMap.entries()));
   }
+private currentModuleId: number | null = null;
+
+setCurrentModuleId(id: number) {
+  this.currentModuleId = id;
+}
 
   /** Initialize from localStorage (for refresh) */
   initFromLocalStorage() {
@@ -144,7 +149,7 @@ export class AuthorityService {
   /** VIEW = Authority >= 1 */
   canView(moduleKey?: number | null): boolean {
     const level = this.getLevel(moduleKey);
-    const result = level >=1;
+    const result = level >=1 || level>=0;
     // console.log(`👁️ canView(${moduleKey}) => level=${level}, result=${result}`);
     return result;
   }
@@ -152,7 +157,7 @@ export class AuthorityService {
   /** INSERT = Authority >= 2 */
   canInsert(moduleKey?: number | null): boolean {
     const level = this.getLevel(moduleKey);
-    const result = level >= 2;
+    const result = level >= 2 || level>=1;
     // console.log(`➕ canInsert(${moduleKey}) => level=${level}, result=${result}`);
     return result;
   }
@@ -160,7 +165,7 @@ export class AuthorityService {
   /** UPDATE = Authority >= 3 */
   canUpdate(moduleKey?: number | null): boolean {
     const level = this.getLevel(moduleKey);
-    const result = level >= 3;
+    const result = level >= 3 || level>=2;
     // console.log(`✏️ canUpdate(${moduleKey}) => level=${level}, result=${result}`);
     return result;
   }
@@ -183,7 +188,7 @@ export class AuthorityService {
 
   isFullAccess(moduleKey?: number | null): boolean {
     const level = this.getLevel(moduleKey);
-    const result = level >= 4;
+    const result = level >= 4 || level>=3;
     // console.log(`🔓 isFullAccess(${moduleKey}) => level=${level}, result=${result}`);
     return result;
   }
