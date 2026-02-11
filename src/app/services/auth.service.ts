@@ -639,6 +639,7 @@ getTenant(): Observable<any[]> {
       catchError(this.handleError));
   }
 
+
   updateServiceProvider(payload: any): Observable<any> {
     let url = this.baseUrl + 'Service_Provider/UpdateServiceProvider';
     return this.http.post(url, payload).pipe(map(res => {
@@ -1536,7 +1537,7 @@ deleteUser(id: number): Observable<any> {
  * Delete Contractor Type
  */
 deleteContractorType(id: number): Observable<any> {
-  return this.http.delete(`${this.baseUrl}ContractorType/${id}`).pipe(
+  return this.http.delete(`${this.baseUrl}ContractorType/DeleteID/${id}`).pipe(
     map(res => res),
     catchError(this.handleError)
   );
