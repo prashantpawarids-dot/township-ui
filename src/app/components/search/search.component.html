@@ -337,6 +337,8 @@
         <td mat-cell *matCellDef="let element"> {{element.buildingName}} </td>
       </ng-container>
 
+      
+
       <ng-container matColumnDef="nrdName">
         <th mat-header-cell *matHeaderCellDef> Neighbourhood </th>
         <td mat-cell *matCellDef="let element"> {{element.nrdName}} </td>
@@ -351,6 +353,11 @@
         <th mat-header-cell *matHeaderCellDef> Company Code </th>
         <td mat-cell *matCellDef="let element"> {{element.comanyCode}} </td>
       </ng-container>
+      <!-- Company (parent) Column -->
+<ng-container matColumnDef="parent">
+  <th mat-header-cell *matHeaderCellDef> Company </th>
+  <td mat-cell *matCellDef="let element"> {{element.parent}} </td>
+</ng-container>
       <ng-container matColumnDef="address">
         <th mat-header-cell *matHeaderCellDef> Address </th>
         <td mat-cell *matCellDef="let element">{{element.address}}</td>

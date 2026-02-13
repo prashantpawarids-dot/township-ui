@@ -34,7 +34,10 @@ export class CompanyComponent implements OnInit {
 
   companyForm: FormGroup = new FormGroup({
       id: new FormControl(0, Validators.required),
-      comanyCode: new FormControl(""),
+      // comanyCode: new FormControl(""),
+     comanyCode: new FormControl("", Validators.required),
+
+      
       companyName: new FormControl("", Validators.required),
       city: new FormControl(""),
       address: new FormControl(""),
