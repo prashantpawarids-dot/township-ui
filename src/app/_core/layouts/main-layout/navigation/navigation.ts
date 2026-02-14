@@ -116,14 +116,14 @@ export const NavigationItems: NavigationItem[] = [
             url: '/master/service-type',
             icon: 'ant-design'
           },
-           {
-            id: 'contractorType',
-            title: 'Contractor Type',
-            type: 'item',
-            classes: 'nav-item',
-            url: '/master/contrator-type',
-            icon: 'ant-design'
-          },
+          //  {
+          //   id: 'contractorType',
+          //   title: 'Contractor Type',
+          //   type: 'item',
+          //   classes: 'nav-item',
+          //   url: '/master/contrator-type',
+          //   icon: 'ant-design'
+          // },
           {
             id: 'amenities',
             title: 'Amenities',

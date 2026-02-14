@@ -998,7 +998,7 @@ getReaderLocationById(id: number): Observable<any> {
   }
   // Master/ContractorType
   getContractorType(): Observable<any> {
-    let url = this.baseUrl + 'ContractorType';
+    let url = this.baseUrl + 'ServiceType';
     return this.http.get(url).pipe(map(res => {
       return res;
     }),

@@ -51,15 +51,8 @@
                     <mat-radio-button value="Female">Female</mat-radio-button>
                 </mat-radio-group>
             </div> -->
-            <div class="col-3">
-    <label id="gender-label" class="gender-label">Gender</label>
-    <mat-radio-group [disabled]="disableFields" [(ngModel)]="landOwner.gender" name="gender" #gender="ngModel"
-        aria-label="Gender" style="display: flex; gap: 10px;">
-        <mat-radio-button value="Male">Male</mat-radio-button>
-        <mat-radio-button value="Female">Female</mat-radio-button>
-    </mat-radio-group>
-</div>
-            <div class="col-3 ms-3">
+
+             <div class="col-3 ms-3">
                 <mat-form-field class="full-width">
                     <mat-label>Blood Group</mat-label>
                     <input [disabled]="disableFields" type="text" placeholder="Select Blood Group" aria-label="blood Group"
@@ -75,6 +68,15 @@
                     </mat-autocomplete>
                 </mat-form-field>
             </div>
+            <div class="col-3">
+    <label id="gender-label" class="gender-label">Gender</label>
+    <mat-radio-group [disabled]="disableFields" [(ngModel)]="landOwner.gender" name="gender" #gender="ngModel"
+        aria-label="Gender" style="display: flex; gap: 10px;">
+        <mat-radio-button value="Male">Male</mat-radio-button>
+        <mat-radio-button value="Female">Female</mat-radio-button>
+    </mat-radio-group>
+</div>
+           
             <div class="col-3" *ngIf="isEmployee">
                 <mat-form-field class="full-width">
                     <mat-label>ID</mat-label>
@@ -424,7 +426,7 @@
 
 
     <div *ngIf="isContractor" class="row">
-    <div class="col-md-3">
+    <!-- <div class="col-md-3">
     <mat-form-field class="full-width">
         <mat-label>Select Neighbourhood</mat-label>
         <mat-select [disabled]="disableFields" 
@@ -445,7 +447,7 @@
             }
         </mat-select>
     </mat-form-field>
-</div>
+</div> -->
     
     <div class="col-md-3">
         <mat-form-field class="full-width">
@@ -466,8 +468,8 @@
     
     <div class="col-md-3">
         <mat-form-field class="full-width">
-            <mat-label>Contractor type</mat-label>
-            <input [disabled]="disableFields" type="text" placeholder="Select Contractor type"
+            <mat-label>Service type</mat-label>
+            <input [disabled]="disableFields" type="text" placeholder="Select Service type"
                 aria-label="Contractor type" matInput name="contactorType" #neighbourForm="ngModel"
                 [(ngModel)]="landOwner.contactorType"
                 readonly
