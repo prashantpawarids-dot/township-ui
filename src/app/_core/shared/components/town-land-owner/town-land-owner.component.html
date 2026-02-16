@@ -426,7 +426,7 @@
 
 
     <div *ngIf="isContractor" class="row">
-    <!-- <div class="col-md-3">
+    <div class="col-md-3">
     <mat-form-field class="full-width">
         <mat-label>Select Neighbourhood</mat-label>
         <mat-select [disabled]="disableFields" 
@@ -447,7 +447,7 @@
             }
         </mat-select>
     </mat-form-field>
-</div> -->
+</div>
     
     <div class="col-md-3">
         <mat-form-field class="full-width">
@@ -466,7 +466,7 @@
         </mat-form-field>
     </div>
     
-    <div class="col-md-3">
+    <!-- <div class="col-md-3">
         <mat-form-field class="full-width">
             <mat-label>Service type</mat-label>
             <input [disabled]="disableFields" type="text" placeholder="Select Service type"
@@ -482,7 +482,27 @@
                 }
             </mat-autocomplete>
         </mat-form-field>
-    </div>
+    </div> -->
+
+    <div class="col-md-3">
+    <mat-form-field class="full-width">
+        <mat-label>Service type</mat-label>
+        <input [disabled]="disableFields" type="text" placeholder="Select Service type"
+            aria-label="Contractor type" matInput name="contactorType" #neighbourForm="ngModel"
+            [(ngModel)]="landOwner.contactorType"
+            readonly
+            (click)="contractorTypeTrigger.openPanel()"
+            [matAutocomplete]="autoContractorType"
+            #contractorTypeTrigger="matAutocompleteTrigger">
+        <mat-autocomplete #autoContractorType="matAutocomplete" 
+            [displayWith]="displayContractor"
+            (optionSelected)="onServiceTypeChange($event)">
+            @for (option of contractorOptions; track option) {
+            <mat-option [value]="option.id">{{option.name}}</mat-option>
+            }
+        </mat-autocomplete>
+    </mat-form-field>
+</div>
     
     <div class="col-md-3">
         <mat-form-field class="full-width">

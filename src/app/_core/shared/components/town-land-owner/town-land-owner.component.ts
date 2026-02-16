@@ -103,7 +103,7 @@ return;
     });
   }
 
-  //aakash code
+  
   ngOnInit(): void {
   this.landOwner.idNumber = this.landOwner.idNumber || "0";
   if (this.isContractor && !this.landOwner.neighbourhood) {
@@ -180,11 +180,42 @@ return;
     })
   }
 
-  getNeighbourhood() {
-    this.authService.getNeighbourhood().subscribe(res => {
-      this.neighbourhoodOptions = res;
-    })
+  // getNeighbourhood() {
+  //   this.authService.getNeighbourhood().subscribe(res => {
+  //     this.neighbourhoodOptions = res;
+  //   })
+  // }
+onServiceTypeChange(event: any): void {
+  if (this.isContractor) {
+    const selectedOption = this.contractorOptions?.find((opt: any) => opt.id === event.option.value);
+    if (selectedOption) {
+      this.landOwner.contactorType = selectedOption.id;
+      this.landOwner.contractorTypeName = selectedOption.name;
+    }
   }
+}
+
+  getNeighbourhood() {
+  this.authService.getNeighbourhood().subscribe(res => {
+    this.neighbourhoodOptions = res || [];
+
+    // make sure it's always an array
+    if (!Array.isArray(this.landOwner.neighbourhood)) {
+      this.landOwner.neighbourhood = [];
+    }
+
+    // ✅ set default if nothing saved
+    if (
+      this.isContractor &&
+      this.landOwner.neighbourhood.length === 0 &&
+      this.neighbourhoodOptions.length > 0
+    ) {
+      this.landOwner.neighbourhood = [
+        this.neighbourhoodOptions[0].name
+      ];
+    }
+  });
+}
 
 
 

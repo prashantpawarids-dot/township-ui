@@ -368,7 +368,7 @@ getModuleKeyForPath(path: string): number {
     this.authService.getUser().subscribe(res => {
       this.dataToDisplay = [...res];
       this.dataSource.data = (this.dataToDisplay);
-      this.displayedColumns = ['srno', 'Name', 'uid', 'Email','Phone', 'actions']
+      this.displayedColumns = ['srno','uid', 'Name','Email','Phone', 'actions']
     });
   }
 

@@ -246,30 +246,66 @@ get roleId(): string | null {
 }
 
 
-  getLandOwnerById(id: any): Observable<any> {
-    let url = this.baseUrl + 'Landowner/' + id;
-    return this.http.get(url).pipe(map((res: any[]) => {
+  // getLandOwnerById(id: any): Observable<any> {
+  //   let url = this.baseUrl + 'Landowner/' + id;
+  //   return this.http.get(url).pipe(map((res: any[]) => {
+  //     return res;
+  //   }),
+  //     catchError(this.handleError));
+  // }
+
+getLandOwnerById(id: any): Observable<any> {
+  let url = this.baseUrl + 'Landowner/' + id;
+  return this.http.get(url).pipe(
+    map((res: any) => {
+      // Filter vehicles with logical_Delete === 0
+      if (res.vehicles) {
+        res.vehicles = res.vehicles.filter((v: any) => v.logical_Delete === 0);
+      }
       return res;
     }),
-      catchError(this.handleError));
-  }
+    catchError(this.handleError)
+  );
+}
+
+  // getResidentById(id: any): Observable<any> {
+  //   let url = this.baseUrl + 'Resident/' + id;
+  //   return this.http.get(url).pipe(map((res: any[]) => {
+  //     return res;
+  //   }),
+  //     catchError(this.handleError));
+  // }
 
   getResidentById(id: any): Observable<any> {
-    let url = this.baseUrl + 'Resident/' + id;
-    return this.http.get(url).pipe(map((res: any[]) => {
+  let url = this.baseUrl + 'Resident/' + id;
+  return this.http.get(url).pipe(
+    map((res: any) => {
+      // Filter vehicles where logical_Delete is 0
+      if (res.vehicles) {
+        res.vehicles = res.vehicles.filter((v: any) => v.logical_Delete === 0);
+      }
       return res;
     }),
-      catchError(this.handleError));
-  }
+    catchError(this.handleError)
+  );
+}
 
 
-  getTenantById(id: any): Observable<any> {
-    let url = this.baseUrl + 'Tenent/' + id;
-    return this.http.get(url).pipe(map((res: any[]) => {
+
+getTenantById(id: any): Observable<any> {
+  let url = this.baseUrl + 'Tenent/' + id;
+  return this.http.get(url).pipe(
+    map((res: any) => {
+      // Keep only vehicles where logical_Delete === 0
+      if (res.vehicles) {
+        res.vehicles = res.vehicles.filter((v: any) => v.logical_Delete === 0);
+      }
       return res;
     }),
-      catchError(this.handleError));
-  }
+    catchError(this.handleError)
+  );
+}
+
 
 
   uploadPhoto(formData: FormData, photoPath, newLandOwnerId: number): Observable<any> {
@@ -622,13 +658,29 @@ getTenant(): Observable<any[]> {
   );
   }
 
+  // getServiceProviderById(id: any): Observable<any> {
+  //   let url = this.baseUrl + 'Service_Provider/' + id;
+  //   return this.http.get(url).pipe(map((res: any[]) => {
+  //     return res;
+  //   }),
+  //     catchError(this.handleError));
+  // }
+
+
   getServiceProviderById(id: any): Observable<any> {
-    let url = this.baseUrl + 'Service_Provider/' + id;
-    return this.http.get(url).pipe(map((res: any[]) => {
+  let url = this.baseUrl + 'Service_Provider/' + id;
+  return this.http.get(url).pipe(
+    map((res: any) => {
+      // Keep only vehicles where logical_Delete === 0
+      if (res.vehicles) {
+        res.vehicles = res.vehicles.filter((v: any) => v.logical_Delete === 0);
+      }
       return res;
     }),
-      catchError(this.handleError));
-  }
+    catchError(this.handleError)
+  );
+}
+
 
   postServiceProvider(payload: any): Observable<any> {
     let url = this.baseUrl + 'Service_Provider/AddServiceProvider';
@@ -688,13 +740,28 @@ getTenant(): Observable<any[]> {
       catchError(this.handleError));
   }
 
+  // getEmployeeById(id: number): Observable<any> {
+  //   let url = this.baseUrl + 'Employee/GetEmployeeAccessDetails/' + id;
+  //   return this.http.get(url).pipe(map((res: any[]) => {
+  //     return res;
+  //   }),
+  //     catchError(this.handleError));
+  // }
+
   getEmployeeById(id: number): Observable<any> {
-    let url = this.baseUrl + 'Employee/GetEmployeeAccessDetails/' + id;
-    return this.http.get(url).pipe(map((res: any[]) => {
+  let url = this.baseUrl + 'Employee/GetEmployeeAccessDetails/' + id;
+  return this.http.get(url).pipe(
+    map((res: any) => {
+      // Keep only vehicles where logical_Delete === 0
+      if (res.vehicles) {
+        res.vehicles = res.vehicles.filter((v: any) => v.logical_Delete === 0);
+      }
       return res;
     }),
-      catchError(this.handleError));
-  }
+    catchError(this.handleError)
+  );
+}
+
 
   postEmployee(payload: any): Observable<any> {
     let url = this.baseUrl + 'Employee/AddEmployee';
@@ -1104,13 +1171,29 @@ updateContractorType(payload: any): Observable<any> {
       catchError(this.handleError));
   }
 
+  // getContractorById(id: number): Observable<any> {
+  //   let url = this.baseUrl + 'Contractor/GetContractorDetails/' + id;
+  //   return this.http.get(url).pipe(map(res => {
+  //     return res;
+  //   }),
+  //     catchError(this.handleError));
+  // }
+
+
   getContractorById(id: number): Observable<any> {
-    let url = this.baseUrl + 'Contractor/GetContractorDetails/' + id;
-    return this.http.get(url).pipe(map(res => {
+  let url = this.baseUrl + 'Contractor/GetContractorDetails/' + id;
+  return this.http.get(url).pipe(
+    map((res: any) => {
+      // Filter vehicles if the response contains a vehicles array
+      if (res.vehicles) {
+        res.vehicles = res.vehicles.filter((v: any) => v.logical_Delete === 0);
+      }
       return res;
     }),
-      catchError(this.handleError));
-  }
+    catchError(this.handleError)
+  );
+}
+
 
   postContractor(payload: any): Observable<any> {
     let url = this.baseUrl + 'Contractor/AddContractor';
@@ -1245,13 +1328,28 @@ postProfileDetails(uid: number, payload: any): Observable<any> {
       catchError(this.handleError));
   }
 
+  // getGuestById(id: number): Observable<any> {
+  //   let url = this.baseUrl + 'Guest/' + id;
+  //   return this.http.get(url).pipe(map(res => {
+  //     return res;
+  //   }),
+  //     catchError(this.handleError));
+  // }
+
   getGuestById(id: number): Observable<any> {
-    let url = this.baseUrl + 'Guest/' + id;
-    return this.http.get(url).pipe(map(res => {
+  let url = this.baseUrl + 'Guest/' + id;
+  return this.http.get(url).pipe(
+    map((res: any) => {
+      // Keep only vehicles where logical_Delete === 0
+      if (res.vehicles) {
+        res.vehicles = res.vehicles.filter((v: any) => v.logical_Delete === 0);
+      }
       return res;
     }),
-      catchError(this.handleError));
-  }
+    catchError(this.handleError)
+  );
+}
+
 
   updateGuest(payload: any): Observable<any> {
     let url = this.baseUrl + 'Guest/UpdateGuest/' + payload.id;
