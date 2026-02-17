@@ -1,28 +1,6 @@
 <form [formGroup]="guestLogForm" class="container-fluid">
   <div class="row mt-3 g-2">
 
-    
-
-    <!-- Building Multi-select -->
-    <div class="col-12 col-md-3">
-      <mat-form-field appearance="outline" class="w-100">
-        <mat-label>Building</mat-label>
-        <mat-select formControlName="buildingName" multiple>
-          <mat-option [value]="b.value" *ngFor="let b of buildings">{{ b.label }}</mat-option>
-        </mat-select>
-      </mat-form-field>
-    </div>
-
-    <!-- Neighbourhood Multi-select -->
-    <div class="col-12 col-md-3">
-      <mat-form-field appearance="outline" class="w-100">
-        <mat-label>Neighbourhood</mat-label>
-        <mat-select formControlName="nrdName" multiple>
-          <mat-option [value]="n.value" *ngFor="let n of neighbourhoods">{{ n.label }}</mat-option>
-        </mat-select>
-      </mat-form-field>
-    </div>
-
     <!-- From Date -->
     <div class="col-12 col-md-2">
       <mat-form-field appearance="outline" class="w-100">
@@ -42,6 +20,30 @@
         <mat-datepicker #picker2></mat-datepicker>
       </mat-form-field>
     </div>
+
+    <!-- Building Multi-select -->
+    <div class="col-12 col-md-3">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>Building</mat-label>
+        <mat-select formControlName="buildingName" multiple (selectionChange)="onBuildingChange()">
+  <mat-option value="ALL">All</mat-option>
+  <mat-option [value]="b.value" *ngFor="let b of buildings">{{ b.label }}</mat-option>
+</mat-select>
+      </mat-form-field>
+    </div>
+
+    <!-- Neighbourhood Multi-select -->
+    <div class="col-12 col-md-3">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>Neighbourhood</mat-label>
+        <mat-select formControlName="nrdName" multiple (selectionChange)="onNrdChange()">
+  <mat-option value="ALL">All</mat-option>
+  <mat-option [value]="n.value" *ngFor="let n of neighbourhoods">{{ n.label }}</mat-option>
+</mat-select>
+      </mat-form-field>
+    </div>
+
+    
 
 
     <!-- Search By -->

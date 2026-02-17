@@ -64,23 +64,26 @@ buildings: any[] = [];
 filteredData: any[] = [];
 
   vehicleTypes = [
-    { value: 'Two Wheeler', label: 'Two Wheeler' },
-    { value: 'Four Wheeler', label: 'Four Wheeler' }
-  ];
+  { value: 'ALL', label: 'ALL' },
+  { value: 'Two Wheeler', label: 'Two Wheeler' },
+  { value: 'Four Wheeler', label: 'Four Wheeler' },
+  { value: 'Three Wheeler', label: 'Three Wheeler' }
+];
 
-  inOutOptions = [
-    { value: 'IN', label: 'IN' },
-    { value: 'OUT', label: 'OUT' }
-  ];
+inOutOptions = [
+  { value: 'ALL', label: 'ALL' },
+  { value: 'IN', label: 'IN' },
+  { value: 'OUT', label: 'OUT' }
+];
 
 
   constructor(private fb: FormBuilder, private http: HttpClient ,private sortService: TableSortService) {
     let today=new Date();
    this.reportForm = this.fb.group({
   fromDate: [today],
-  fromTime: [''],     // ⬅ ADD
+  fromTime: [''],     
   toDate: [today],
-  toTime: [''],       // ⬅ ADD
+  toTime: [''],       
   vehicleType: [[]],
   inOut: [[]],
   searchBy: [''],
@@ -235,6 +238,22 @@ onBuildingChange() {
   }
 }
 
+onVehicleTypeChange() {
+  let selected: string[] = this.reportForm.get('vehicleType')?.value || [];
+  if (selected.includes('ALL')) {
+    const allValues = this.vehicleTypes.filter(v => v.value !== 'ALL').map(v => v.value);
+    this.reportForm.get('vehicleType')?.setValue(allValues);
+  }
+}
+
+onInOutChange() {
+  let selected: string[] = this.reportForm.get('inOut')?.value || [];
+  if (selected.includes('ALL')) {
+    const allValues = this.inOutOptions.filter(v => v.value !== 'ALL').map(v => v.value);
+    this.reportForm.get('inOut')?.setValue(allValues);
+  }
+}
+
 
 
 // ✅ Add selectAll here
@@ -303,8 +322,14 @@ onBuildingChange() {
   // -------- REST OF YOUR CODE (UNCHANGED) --------
   if (project?.length) filtered = filtered.filter(x => project.includes(x.nrdName));
   if (building?.length) filtered = filtered.filter(x => building.includes(x.building));
-  if (vehicleType?.length) filtered = filtered.filter(x => vehicleType.includes((x.vehicleCategory || '').trim()));
-  if (inOut?.length) filtered = filtered.filter(x => inOut.includes((x.inoutFlag || '').toUpperCase()));
+  // if (vehicleType?.length) filtered = filtered.filter(x => vehicleType.includes((x.vehicleCategory || '').trim()));
+  // if (inOut?.length) filtered = filtered.filter(x => inOut.includes((x.inoutFlag || '').toUpperCase()));
+
+  if (vehicleType?.length && !vehicleType.includes('ALL')) 
+  filtered = filtered.filter(x => vehicleType.includes((x.vehicleCategory || '').trim()));
+
+if (inOut?.length && !inOut.includes('ALL')) 
+  filtered = filtered.filter(x => inOut.includes((x.inoutFlag || '').toUpperCase()));
 
   if (searchValue?.trim() && !searchBy) {
     alert('Please select a search type');

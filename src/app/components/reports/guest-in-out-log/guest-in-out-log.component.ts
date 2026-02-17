@@ -107,16 +107,27 @@ filteredData:any[]=[];
   let filtered = [...this.allData];
 
   // --- Multi-select filters ---
-  if (f.buildingName?.length) {
-    filtered = filtered.filter(x =>
-      f.buildingName.some(b => b.toLowerCase() === (x.buildingName || '').toLowerCase())
-    );
-  }
-  if (f.nrdName?.length) {
-    filtered = filtered.filter(x =>
-      f.nrdName.some(n => n.toLowerCase() === (x.nrdName || '').toLowerCase())
-    );
-  }
+  // if (f.buildingName?.length) {
+  //   filtered = filtered.filter(x =>
+  //     f.buildingName.some(b => b.toLowerCase() === (x.buildingName || '').toLowerCase())
+  //   );
+  // }
+  // if (f.nrdName?.length) {
+  //   filtered = filtered.filter(x =>
+  //     f.nrdName.some(n => n.toLowerCase() === (x.nrdName || '').toLowerCase())
+  //   );
+  // }
+
+  if (f.buildingName?.length && !f.buildingName.includes('ALL')) {
+  filtered = filtered.filter(x =>
+    f.buildingName.some(b => b.toLowerCase() === (x.buildingName || '').toLowerCase())
+  );
+}
+if (f.nrdName?.length && !f.nrdName.includes('ALL')) {
+  filtered = filtered.filter(x =>
+    f.nrdName.some(n => n.toLowerCase() === (x.nrdName || '').toLowerCase())
+  );
+}
 
   // --- Date filters ---
   const from = f.fromDate ? new Date(f.fromDate) : null;
@@ -161,7 +172,21 @@ if (f.searchText?.trim() !== '') {
 
 
 
+onBuildingChange() {
+  let selected: string[] = this.guestLogForm.get('buildingName')?.value || [];
+  if (selected.includes('ALL')) {
+    const allValues = this.buildings.map(b => b.value);
+    this.guestLogForm.get('buildingName')?.setValue(allValues);
+  }
+}
 
+onNrdChange() {
+  let selected: string[] = this.guestLogForm.get('nrdName')?.value || [];
+  if (selected.includes('ALL')) {
+    const allValues = this.neighbourhoods.map(n => n.value);
+    this.guestLogForm.get('nrdName')?.setValue(allValues);
+  }
+}
   
 
 public sortColumn(column: string) {

@@ -106,9 +106,9 @@ return;
   
   ngOnInit(): void {
   this.landOwner.idNumber = this.landOwner.idNumber || "0";
-  if (this.isContractor && !this.landOwner.neighbourhood) {
-    this.landOwner.neighbourhood = [];
-  }
+  // if (this.isContractor && !this.landOwner.neighbourhood) {
+  //   this.landOwner.neighbourhood = [];
+  // }
   if (this.isViewOrEdit) {
     this.disableFields = this.landOwner.isView;
   }
@@ -195,24 +195,39 @@ onServiceTypeChange(event: any): void {
   }
 }
 
-  getNeighbourhood() {
+//   getNeighbourhood() {
+//   this.authService.getNeighbourhood().subscribe(res => {
+//     this.neighbourhoodOptions = res || [];
+
+//     // make sure it's always an array
+//     if (!Array.isArray(this.landOwner.neighbourhood)) {
+//       this.landOwner.neighbourhood = [];
+//     }
+
+//     // ✅ set default if nothing saved
+//     if (
+//       this.isContractor &&
+//       this.landOwner.neighbourhood.length === 0 &&
+//       this.neighbourhoodOptions.length > 0
+//     ) {
+//       this.landOwner.neighbourhood = [
+//         this.neighbourhoodOptions[0].name
+//       ];
+//     }
+//   });
+// }
+
+
+getNeighbourhood() {
   this.authService.getNeighbourhood().subscribe(res => {
     this.neighbourhoodOptions = res || [];
 
-    // make sure it's always an array
-    if (!Array.isArray(this.landOwner.neighbourhood)) {
-      this.landOwner.neighbourhood = [];
-    }
-
-    // ✅ set default if nothing saved
     if (
       this.isContractor &&
-      this.landOwner.neighbourhood.length === 0 &&
+      !this.landOwner.neighbourhood &&   // null/undefined = new record
       this.neighbourhoodOptions.length > 0
     ) {
-      this.landOwner.neighbourhood = [
-        this.neighbourhoodOptions[0].name
-      ];
+      this.landOwner.neighbourhood = this.neighbourhoodOptions[0].id; // ✅ set default
     }
   });
 }

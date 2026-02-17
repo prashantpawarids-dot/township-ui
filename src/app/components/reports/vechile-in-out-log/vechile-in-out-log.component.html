@@ -70,7 +70,7 @@
     <div class="col-12 col-md-2">
       <mat-form-field appearance="outline" class="w-100">
         <mat-label>Vehicle Type</mat-label>
-        <mat-select multiple formControlName="vehicleType">
+        <mat-select formControlName="vehicleType" multiple (selectionChange)="onVehicleTypeChange()">
           <mat-option *ngFor="let v of vehicleTypes" [value]="v.value">
             {{ v.label }}
           </mat-option>
@@ -82,7 +82,7 @@
     <div class="col-12 col-md-2">
       <mat-form-field appearance="outline" class="w-100">
         <mat-label>IN / OUT</mat-label>
-        <mat-select multiple formControlName="inOut">
+      <mat-select formControlName="inOut" multiple (selectionChange)="onInOutChange()">
           <mat-option *ngFor="let io of inOutOptions" [value]="io.value">
             {{ io.label }}
           </mat-option>
