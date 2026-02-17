@@ -350,14 +350,14 @@ getModuleKeyForPath(path: string): number {
     this.dataSource.data = this.dataToDisplay; 
 
     this.searchByOptions = [
-      // { name: "Profile ID", key: "profileID" },
-      {name:"User ID",key:"uid"},   // Changed from uid
+      { name: "Profile ID", key: "profileID" },
+      // {name:"User ID",key:"uid"},   // Changed from uid
       { name: "Profile Name", key: "profileName" },
       { name: "User", key: "user" }               
     ];
 
     // Add profileID to columns and update view/edit to use correct ID
-    this.displayedColumns = ['srno', 'uid', 'profileName', 'user', 'actions'];
+    this.displayedColumns = ['srno', 'profileID', 'profileName', 'user', 'actions'];
   });
 }
 
