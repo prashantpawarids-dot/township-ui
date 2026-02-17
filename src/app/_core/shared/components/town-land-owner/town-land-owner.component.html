@@ -426,7 +426,7 @@
 
 
     <div *ngIf="isContractor" class="row">
-    <div class="col-md-3">
+    <!-- <div class="col-md-3">
     <mat-form-field class="full-width">
         <mat-label>Select Neighbourhood</mat-label>
         <mat-select [disabled]="disableFields" 
@@ -444,6 +444,19 @@
             </mat-select-trigger>
             @for (option of neighbourhoodOptions; track option) {
             <mat-option [value]="option.name">{{option.name}}</mat-option>
+            }
+        </mat-select>
+    </mat-form-field>
+</div> -->
+
+<div class="col-md-3">
+    <mat-form-field class="full-width">
+        <mat-label>Select Neighbourhood</mat-label>
+        <mat-select [disabled]="disableFields" 
+                    name="contractorNeighbourhood" 
+                    [(ngModel)]="landOwner.neighbourhood">
+            @for (option of neighbourhoodOptions; track option) {
+            <mat-option [value]="option.id">{{option.name}}</mat-option>
             }
         </mat-select>
     </mat-form-field>

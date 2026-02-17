@@ -613,10 +613,10 @@ setModuleAndReportData(data: any[]) {
     }
   })
   
-  console.log('Final Payload (filtered):', finalPayload);
-  console.log('UID for route:', this.profileForm.userid);
-  console.log('ProfileID in payload:', this.actualProfileID);
-  console.log('Total modules with permissions:', finalPayload.length);
+  // console.log('Final Payload (filtered):', finalPayload);
+  // console.log('UID for route:', this.profileForm.userid);
+  // console.log('ProfileID in payload:', this.actualProfileID);
+  // console.log('Total modules with permissions:', finalPayload.length);
   
   return finalPayload;
 }
@@ -624,3 +624,354 @@ setModuleAndReportData(data: any[]) {
 
 }
 
+
+
+
+
+
+// export class ProfileComponent implements OnInit {
+
+//   @ViewChildren('ModuleList') elems: QueryList<ElementRef>;
+//   @ViewChildren('ReportList') elems2: QueryList<ElementRef>;
+
+//   constructor(private router: Router,
+//     private authService: AuthService,
+//     private errorHandlerService: ErrorHandlerService,
+//     private alertService: AlertService,
+//     private activatedRoute: ActivatedRoute,
+//   ) { }
+
+//   moduleList: any[] = [];
+//   reportList: any[] = [];
+  
+//   // ✅ NEW: Available users list for dropdown
+//   availableUsers: any[] = [];
+//   selectedUser: any = null;
+
+//   profileForm = {
+//     id: 0,
+//     profileName: null,
+//     isActive: true,
+//     isDeleted: false,
+//     userid: 0,
+//     companyid: localStorage.getItem("companyID")
+//   };
+
+//   editMode: boolean = false;
+//   viewMode: boolean = false;
+
+//   ngOnInit(): void {
+//     // ✅ Load available users for dropdown
+//     this.loadAvailableUsers();
+
+//     this.activatedRoute.queryParams.subscribe(params => {
+//       const id = params['id'];  // This is uid
+
+//       this.moduleList = [];
+//       this.reportList = [];
+
+//       // ✅ ADD MODE
+//       if (id === undefined || id === null) {
+//         this.editMode = false;
+//         this.viewMode = false;
+//         this.selectedUser = null;
+//         this.profileForm.profileName = null;
+//         return;
+//       }
+
+//       // ✅ EDIT / VIEW MODE
+//       this.editMode = true;
+//       this.viewMode = params['view'] === 'true';
+
+//       this.authService.getProfileRegister().subscribe(res => {
+//         const profile = res.find(p => p.uid === Number(id));
+
+//         if (!profile) {
+//           console.warn('Profile not found with uid:', id);
+//           return;
+//         }
+
+//         // ✅ Set form values
+//         this.profileForm.id = profile.uid;
+//         this.profileForm.userid = profile.uid;
+//         this.profileForm.profileName = profile.profileName;
+        
+//         // ✅ Set selected user for dropdown
+//         this.selectedUser = this.availableUsers.find(u => u.user === profile.user);
+
+//         console.log('Loaded profile - uid:', id, 'user:', profile.user);
+
+//         // ✅ Load modules/permissions
+//         this.getAllAuthorityModules(profile.user);
+//       });
+//     });
+//   }
+
+//   // ✅ NEW: Load available users for dropdown
+//   loadAvailableUsers() {
+//     this.authService.getProfileRegister().subscribe({
+//       next: (res) => {
+//         // Get unique users
+//         const uniqueUsers = res.filter((item, index, self) =>
+//           index === self.findIndex(t => t.user === item.user)
+//         );
+//         this.availableUsers = uniqueUsers;
+//       },
+//       error: (err) => {
+//         this.errorHandlerService.handleError(err);
+//       }
+//     });
+//   }
+
+//  // ✅ Updated: Handle user selection and load their modules
+// onUserSelected(selectedUserObj: any) {
+//   if (selectedUserObj) {
+//     this.selectedUser = selectedUserObj;
+    
+//     // Auto-populate profile name based on selected user
+//     this.profileForm.profileName = selectedUserObj.profileName || selectedUserObj.user;
+//     this.profileForm.userid = selectedUserObj.uid;
+    
+//     console.log('User selected:', selectedUserObj);
+    
+//     // ✅ Load modules for the selected user
+//     if (selectedUserObj.user) {
+//       this.getAllAuthorityModules(selectedUserObj.user);
+//     }
+//   }
+// }
+
+//   ngAfterViewInit() {
+//     this.elems.changes.subscribe((list) => {
+//       if (list.length) {
+//         this.setInitialModuleCheckboxStatus();
+//       }
+//     });
+
+//     this.elems2.changes.subscribe((list) => {
+//       if (list.length) {
+//         this.setInitialReportCheckboxStatus();
+//       }
+//     });
+//   }
+
+//   getAllAuthorityModules(username: string) {
+//     console.log('Fetching modules for user:', username);
+//     this.authService.getAllAuthorityModules(username).subscribe({
+//       next: (res) => {
+//         console.log('MODULE LIST:', res);
+//         this.setModuleAndReportData(res);
+//       },
+//       error: (err: any) => {
+//         this.errorHandlerService.handleError(err);
+//       }
+//     });
+//   }
+
+//   setModuleAndReportData(data: any[]) {
+//     const moduleList = [];
+//     const reportList = [];
+
+//     if (data) {
+//       data.forEach(item => {
+//         const temPlateObj = {
+//           moduleId: item.moduleId,
+//           name: this.formatName(item.moduleName),
+//           canView: item.canview ?? false,
+//           canInsert: item.canInsert ?? false,
+//           canUpdate: item.canUpdate ?? false,
+//           canDelete: item.canDelete ?? false
+//         };
+
+//         if (item.viewreadonly) {
+//           reportList.push(temPlateObj);
+//         } else {
+//           moduleList.push(temPlateObj);
+//         }
+//       });
+//     }
+
+//     this.moduleList = moduleList;
+//     this.reportList = reportList;
+
+//     this.setInitialModuleCheckboxStatus();
+//     this.setInitialReportCheckboxStatus();
+//   }
+
+//   formatName(name) {
+//     return name
+//       .replace(/-/g, ' ')
+//       .replace(/([a-z])([A-Z])/g, '$1 $2')
+//       .toLowerCase()
+//       .split(' ')
+//       .filter(Boolean)
+//       .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+//       .join(' ');
+//   }
+
+//   setInitialModuleCheckboxStatus() {
+//     this.moduleList.forEach(element => {
+//       this.checkUncheckParent('module' + element.moduleId)
+//     })
+//   }
+
+//   setInitialReportCheckboxStatus() {
+//     this.checkUncheckParent('selectAllReport');
+//   }
+
+//   checkboxRecursion(event: Event) {
+//     let element = event.target as HTMLInputElement;
+//     let parentID = element.getAttribute('data-parent-id');
+
+//     if (element.id) this.checkUncheckChild(element.id)
+//     if (parentID) this.checkUncheckParent(parentID);
+//   }
+
+//   checkUncheckChild(elementID: string) {
+//     if (elementID) {
+//       const parentCheckbox = document.getElementById(elementID) as HTMLInputElement;
+//       const allChildCheckboxes = document.querySelectorAll(`input[data-parent-id=${elementID}]`) as NodeListOf<HTMLInputElement>;
+//       allChildCheckboxes.forEach((childCheckbox: HTMLInputElement) => {
+//         childCheckbox.checked = parentCheckbox.checked;
+//         childCheckbox.indeterminate = false;
+//         if (childCheckbox.id) this.checkUncheckChild(childCheckbox.id)
+//       })
+//     }
+//   }
+
+//   checkUncheckParent(parentID: string | null) {
+//     if (parentID) {
+//       const parentCheckbox = document.getElementById(parentID) as HTMLInputElement;
+//       if (parentCheckbox) {
+//         const allChildCheckboxes = document.querySelectorAll(`input[data-parent-id=${parentID}]`) as NodeListOf<HTMLInputElement>;
+//         const checkedChildCheckboxes = document.querySelectorAll(`input[data-parent-id=${parentID}]:checked`) as NodeListOf<HTMLInputElement>;
+//         const inddeterminateChildCheckboxes = document.querySelectorAll(`input[data-parent-id=${parentID}]:indeterminate`) as NodeListOf<HTMLInputElement>;
+//         this.setCheckboxStatus(parentCheckbox, checkedChildCheckboxes.length, inddeterminateChildCheckboxes.length, allChildCheckboxes.length);
+//         parentID = parentCheckbox.getAttribute('data-parent-id');
+//         if (parentID) this.checkUncheckParent(parentID);
+//       }
+//     }
+//   }
+
+//   setCheckboxStatus(parentNode: HTMLInputElement, checkedLength: number, indeterminateLength: number, totalLength: number) {
+//     if (parentNode) {
+//       if (checkedLength === 0 && indeterminateLength === 0) {
+//         parentNode.checked = false;
+//         parentNode.indeterminate = false;
+//       } else if (checkedLength === totalLength) {
+//         parentNode.indeterminate = false;
+//         parentNode.checked = true;
+//       } else {
+//         parentNode.checked = false;
+//         parentNode.indeterminate = true;
+//       }
+//     }
+//   }
+
+//   onSave() {
+//     if (!this.selectedUser) {
+//       this.alertService.openSuccess('Please select a user');
+//       return;
+//     }
+
+//     this.profileForm.companyid = "1";
+//     this.authService.postProfile(this.profileForm).subscribe({
+//       next: (res) => {
+//         this.alertService.openSuccess('Successfully Saved');
+//         this.onCancel();
+//       },
+//       error: (err: any) => {
+//         this.errorHandlerService.handleError(err);
+//       }
+//     });
+//   }
+
+//   onUpdate() {
+//     this.authService.postProfile(this.profileForm).subscribe({
+//       next: (res) => {
+//         this.alertService.openSuccess('Successfully Updated');
+//         this.onCancel();
+//       },
+//       error: (err: any) => {
+//         this.errorHandlerService.handleError(err);
+//       }
+//     });
+//   }
+
+//   onCancel() {
+//     this.router.navigate(['/search'], {
+//       queryParams: { returnPath: '/master/profile' }
+//     });
+//   }
+
+//   savePermissions() {
+//     if (!this.profileForm.userid || this.profileForm.userid === 0) {
+//       this.alertService.openSuccess('Please save the profile first before assigning permissions');
+//       return;
+//     }
+
+//     let payload = this.createModulePayload();
+
+//     this.authService.postProfileDetails(this.profileForm.userid, payload).subscribe({
+//       next: () => {
+//         this.alertService.openSuccess('Permissions saved successfully');
+//       },
+//       error: (err: any) => {
+//         this.errorHandlerService.handleError(err);
+//       }
+//     });
+//   }
+
+//   createModulePayload() {
+//     const modulePayload = {};
+//     const finalPayload = [];
+
+//     const moduleCheckboxes = document.querySelectorAll('input[data-permission-type=moduleList]') as NodeListOf<HTMLInputElement>;
+//     moduleCheckboxes.forEach((element) => {
+//       let moduleId: string | number = element.getAttribute("data-parent-id");
+//       moduleId = Number(moduleId.replace("module", ''));
+//       if (modulePayload[moduleId]) {
+//         modulePayload[moduleId][element.value] = element.checked
+//       } else {
+//         modulePayload[moduleId] = {
+//           [element.value]: element.checked
+//         }
+//       }
+//     })
+
+//     const reportCheckboxes = document.querySelectorAll('input[data-permission-type=reportList]') as NodeListOf<HTMLInputElement>;
+//     reportCheckboxes.forEach((element) => {
+//       let moduleId: string | number = element.value;
+//       moduleId = Number(moduleId);
+//       if (modulePayload[moduleId]) {
+//         modulePayload[moduleId]['canView'] = element.checked
+//       } else {
+//         modulePayload[moduleId] = {
+//           ['canView']: element.checked
+//         }
+//       }
+//     })
+
+//     Object.entries(modulePayload).forEach((item: any) => {
+//       const permissions = item[1];
+
+//       const hasAnyPermission =
+//         permissions.canView === true ||
+//         permissions.canInsert === true ||
+//         permissions.canUpdate === true ||
+//         permissions.canDelete === true;
+
+//       if (hasAnyPermission) {
+//         item[1].id = 0;
+//         item[1].moduleId = Number(item[0]);
+//         item[1].profileid = this.profileForm.userid; // Using uid as profileid
+//         item[1].userid = this.profileForm.userid;
+//         finalPayload.push(item[1]);
+//       }
+//     })
+
+//     console.log('Final Payload (filtered):', finalPayload);
+
+//     return finalPayload;
+//   }
+// }

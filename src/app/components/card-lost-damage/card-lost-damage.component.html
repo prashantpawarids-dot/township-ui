@@ -80,7 +80,7 @@
   </div>
 </div>
 
-<!-- ================= UPDATE POPUP ================= -->
+
 <div class="modal-overlay" *ngIf="showUpdatePopup">
   <div class="modal-card">
 
@@ -88,13 +88,13 @@
 
     <form [formGroup]="updateForm">
 
-      <!-- ID NUMBER (AUTO FETCH) -->
+   
       <mat-form-field class="w-100">
         <mat-label>ID Number</mat-label>
         <input matInput formControlName="idNumber" readonly />
       </mat-form-field>
 
-      <!-- LOST / DAMAGE TYPE -->
+   
       <mat-form-field class="w-100">
         <mat-label>Lost / Damage Type</mat-label>
         <mat-select formControlName="lostDamageType">
@@ -103,7 +103,7 @@
         </mat-select>
       </mat-form-field>
 
-      <!-- REPORTED DATE (CALENDAR) -->
+     
       <mat-form-field class="w-100">
         <mat-label>Report Date</mat-label>
         <input matInput [matDatepicker]="picker" formControlName="reporteddate">
@@ -111,7 +111,7 @@
         <mat-datepicker #picker></mat-datepicker>
       </mat-form-field>
 
-      <!-- DESCRIPTION -->
+      
       <mat-form-field class="w-100">
         <mat-label>Description</mat-label>
         <textarea matInput rows="3" formControlName="description"></textarea>
