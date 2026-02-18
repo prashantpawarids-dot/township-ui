@@ -68,7 +68,7 @@ export class CompanyComponent {
     this.http.get<any[]>(apiUrl).subscribe({
       next: (data) => {
         this.companyData = data.map((c) => ({
-          companyCode: c.comanyCode || '',
+          companyCode: c.companyCode || '',
           companyName: c.companyName || '',
           city: c.city || '',
           address: c.address || '',

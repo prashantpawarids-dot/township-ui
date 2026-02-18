@@ -18,14 +18,25 @@
     </mat-form-field>
 </div>
 
-<!-- Username Field -->
-<!-- Username Field -->
-<div class="col-md-4">
+<!-- Role Field (replaces Username) -->
+<div class="col-md-4" *ngIf="!editMode">
+  <mat-form-field class="full-width">
+    <mat-label>Role</mat-label>
+    <mat-select [(ngModel)]="profileForm.roleId">
+      <mat-option [value]="1">Admin</mat-option>
+      <mat-option [value]="2">Manager</mat-option>
+      <mat-option [value]="3">User</mat-option>
+    </mat-select>
+  </mat-form-field>
+</div>
+<!-- Username Field - Hidden -->
+<div class="col-md-4" *ngIf="false">
   <mat-form-field class="full-width">
     <mat-label>Username</mat-label>
     <input matInput [(ngModel)]="username" [readonly]="editMode || viewMode" />
   </mat-form-field>
 </div>
+
 
 
 
@@ -114,7 +125,7 @@
   </div>
   
 
-
+<!-- //new code -->
 
   <!-- <div class="container">
 

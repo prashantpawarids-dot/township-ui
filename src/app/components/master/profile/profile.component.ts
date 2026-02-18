@@ -53,6 +53,7 @@ actualProfileID: number = 0; // ✅ Store the actual profileID
     isActive: true,
     isDeleted: true,
     userid:0,
+    roleId: null,
     companyid: localStorage.getItem("companyID")
   };
 
@@ -407,19 +408,33 @@ setModuleAndReportData(data: any[]) {
     }
   }
 
-  onSave() {
-    this.profileForm.companyid="1";
-    this.authService.postProfile(this.profileForm).subscribe({
-      next: (res) => {
-        this.alertService.openSuccess('Successfully Saved');
-        this.onCancel();
-      },
-      error: (err: any) => {
-        this.errorHandlerService.handleError(err);
-      }
-    });
-  } 
+  // onSave() {
+  //   this.profileForm.companyid="1";
+  //   this.authService.postProfile(this.profileForm).subscribe({
+  //     next: (res) => {
+  //       this.alertService.openSuccess('Successfully Saved');
+  //       this.onCancel();
+  //     },
+  //     error: (err: any) => {
+  //       this.errorHandlerService.handleError(err);
+  //     }
+  //   });
+  // } 
    
+
+  onSave() {
+  this.profileForm.companyid = "1";
+  // roleId is already part of profileForm, it will be sent automatically
+  this.authService.postProfile(this.profileForm).subscribe({
+    next: (res) => {
+      this.alertService.openSuccess('Successfully Saved');
+      this.onCancel();
+    },
+    error: (err: any) => {
+      this.errorHandlerService.handleError(err);
+    }
+  });
+}
 
   onUpdate() {
     this.authService.postProfile(this.profileForm).subscribe({
@@ -628,6 +643,7 @@ setModuleAndReportData(data: any[]) {
 
 
 
+//new code
 
 // export class ProfileComponent implements OnInit {
 

@@ -991,7 +991,21 @@ getReaderLocationById(id: number): Observable<any> {
     map(res => {
       // Keep only unique profiles based on 'profileID'
       const uniqueProfiles = res.filter((item, index, self) =>
-        index === self.findIndex(t => t.uid === item.uid)
+        index === self.findIndex(t => t.profileName === item.profileName)
+      );
+      return uniqueProfiles;
+    }),
+    catchError(this.handleError)
+  );
+}
+
+
+getProfileName(): Observable<any> {
+  const url = this.baseUrl + 'Profile';
+  return this.http.get<any[]>(url).pipe(
+    map(res => {
+      const uniqueProfiles = res.filter((item, index, self) =>
+        index === self.findIndex(t => t.profileName === item.profileName)
       );
       return uniqueProfiles;
     }),
@@ -1149,6 +1163,7 @@ updateContractorType(payload: any): Observable<any> {
   addUser(payload: any): Observable<any> {
     let url = this.baseUrl + 'UserRegistration/AddUser'
     return this.http.post(url, payload).pipe(map(res => {
+      console.log("add user response", res);
       return res;
     }),
       catchError(this.handleError));

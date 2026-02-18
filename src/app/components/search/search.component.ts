@@ -294,11 +294,11 @@ getModuleKeyForPath(path: string): number {
 
   setCompany(){
     this.title = 'Company';
-    this.searchByOptions = [{ name: "Id", key: "id" }, { name: "Company Name", key: "companyName" }, { name: "Company Code", key: "comanyCode" }];
+    this.searchByOptions = [{ name: "Id", key: "id" }, { name: "Company Name", key: "companyName" }, { name: "Company Code", key: "companyCode" }];
     this.authService.getCompany().subscribe(res => {
       this.dataToDisplay = [...res];
       this.dataSource.data = this.dataToDisplay;
-      this.displayedColumns = ['srno', 'Id', 'comanyCode', 'companyName', 'address', 'actions']
+      this.displayedColumns = ['srno', 'Id', 'companyCode', 'companyName', 'address', 'actions']
     });
   }
 

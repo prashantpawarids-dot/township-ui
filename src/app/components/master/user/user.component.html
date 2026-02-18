@@ -27,12 +27,29 @@
                 <input formControlName="password" matInput />
             </mat-form-field>
         </div>
+
         <div class="col-md-4">
             <mat-form-field class="full-width">
                 <mat-label>Profile Name</mat-label>
                 <input formControlName="name" matInput />
             </mat-form-field>
         </div>
+
+       
+<!-- <div class="col-md-4">
+    <mat-form-field class="full-width">
+        <mat-label>Profile Name</mat-label>
+        <input type="text" placeholder="Select Profile"
+            aria-label="Profile" matInput
+            formControlName="roleID" [matAutocomplete]="autoProfile">
+        <mat-autocomplete #autoProfile="matAutocomplete" [displayWith]="displayProfileName">
+            @for (option of profilenameOptions; track option) {
+                <mat-option [value]="option.id">{{option.profileName}}</mat-option>
+            }
+        </mat-autocomplete>
+    </mat-form-field>
+</div> -->
+        
         <div class="col-md-4">
             <mat-form-field class="full-width">
                 <mat-label>Phone</mat-label>
@@ -56,3 +73,223 @@
         </div>
     </div>
 </div>
+
+
+<!-- new code start here -->
+<!-- <div class="container">
+  <div class="row" [formGroup]="userForm">
+
+    <ng-container *ngIf="companyOptions.length">
+      <div class="col-md-4">
+        <mat-form-field class="full-width">
+          <mat-label>Company</mat-label>
+          <input type="text" placeholder="Select Company" aria-label="Company"
+            matInput formControlName="companyID" [matAutocomplete]="autoCompany">
+          <mat-autocomplete #autoCompany="matAutocomplete" [displayWith]="displayCompanyName">
+            @for (option of companyOptions; track option) {
+              <mat-option [value]="option.id">{{option.companyName}}</mat-option>
+            }
+          </mat-autocomplete>
+        </mat-form-field>
+      </div>
+    </ng-container>
+
+    <div class="col-md-4">
+      <mat-form-field class="full-width">
+        <mat-label>User ID</mat-label>
+        <input formControlName="uid" matInput />
+      </mat-form-field>
+    </div>
+
+    <div class="col-md-4">
+      <mat-form-field class="full-width">
+        <mat-label>User Password</mat-label>
+        <input formControlName="password" matInput />
+      </mat-form-field>
+    </div>
+
+    <div class="col-md-4">
+      <mat-form-field class="full-width">
+        <mat-label>Profile Name</mat-label>
+        <input formControlName="name" matInput />
+      </mat-form-field>
+    </div>
+
+    <div class="col-md-4">
+      <mat-form-field class="full-width">
+        <mat-label>Phone</mat-label>
+        <input formControlName="phone" matInput />
+      </mat-form-field>
+    </div>
+
+    <div class="col-md-4">
+      <mat-form-field class="full-width">
+        <mat-label>User Email</mat-label>
+        <input formControlName="email" matInput />
+      </mat-form-field>
+    </div>
+
+  </div>
+
+
+  <div class="row">
+    <div class="col-md-12">
+      <div class="button-row m-b-10">
+
+        <button *ngIf="!viewMode" mat-stroked-button
+          (click)="editMode ? onUpdate() : onSave()">
+          {{ editMode ? 'Update' : 'Save' }}
+        </button>
+
+        <button class="m-l-10" mat-flat-button (click)="onCancel()">Cancel</button>
+
+        
+        <a *ngIf="editMode"
+   href="javascript:void(0)"
+   class="m-l-10"
+   style="
+     display:inline-block;
+     padding:6px 14px;
+     background-color:#1976d2;
+     color:#ffffff;
+     border:1px solid #1976d2;
+     border-radius:4px;
+     font-size:14px;
+     line-height:20px;
+     vertical-align:middle;
+     text-decoration:none;
+     cursor:pointer;"
+   (click)="toggleProfileDetails()">
+  {{ showProfileDetails ? 'Hide Profile Details' : 'Profile Details' }}
+</a>
+
+
+      </div>
+    </div>
+  </div>
+
+  
+  <div *ngIf="showProfileDetails && editMode" class="row mt-3">
+
+   
+    <div class="col-md-6">
+      <mat-card>
+        <mat-card-title>
+          <input class="checkbox-size me-3"
+                 (change)="checkboxRecursion($event)"
+                 type="checkbox"
+                 id="selectAllModule" />
+          <label for="selectAllModule">Module List View</label>
+        </mat-card-title>
+
+        <table class="table">
+          <thead>
+            <tr>
+              <th></th>
+              <th>Add</th>
+              <th>Delete</th>
+              <th>Edit</th>
+              <th>View</th>
+            </tr>
+          </thead>
+          <tbody>
+            
+            <tr *ngFor="let module of moduleList" #ModuleList>
+              <td>
+                <input data-parent-id="selectAllModule"
+                       (change)="checkboxRecursion($event)"
+                       value="{{module.name}}"
+                       id="{{'module' + module.moduleId}}"
+                       class="checkbox-size me-3"
+                       type="checkbox" />
+                <label for="{{'module' + module.moduleId}}">{{module.name}}</label>
+              </td>
+              <td>
+                <input data-permission-type="moduleList"
+                       attr.data-parent-id="{{'module' + module.moduleId}}"
+                       (change)="checkboxRecursion($event)"
+                       value="canInsert"
+                       [checked]="module.canInsert"
+                       class="checkbox-size"
+                       type="checkbox" />
+              </td>
+              <td>
+                <input data-permission-type="moduleList"
+                       attr.data-parent-id="{{'module' + module.moduleId}}"
+                       (change)="checkboxRecursion($event)"
+                       value="canDelete"
+                       [checked]="module.canDelete"
+                       class="checkbox-size"
+                       type="checkbox" />
+              </td>
+              <td>
+                <input data-permission-type="moduleList"
+                       attr.data-parent-id="{{'module' + module.moduleId}}"
+                       (change)="checkboxRecursion($event)"
+                       value="canUpdate"
+                       [checked]="module.canUpdate"
+                       class="checkbox-size"
+                       type="checkbox" />
+              </td>
+              <td>
+                <input data-permission-type="moduleList"
+                       attr.data-parent-id="{{'module' + module.moduleId}}"
+                       (change)="checkboxRecursion($event)"
+                       value="canView"
+                       [checked]="module.canView"
+                       class="checkbox-size"
+                       type="checkbox" />
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+       
+        <p *ngIf="moduleList.length === 0" class="text-muted p-3">Loading modules...</p>
+      </mat-card>
+    </div>
+
+ 
+    <div class="col-md-6">
+      <mat-card>
+        <mat-card-title>
+          <input class="checkbox-size me-3"
+                 (change)="checkboxRecursion($event)"
+                 type="checkbox"
+                 id="selectAllReport" />
+          <label for="selectAllReport">Report</label>
+        </mat-card-title>
+
+        <table class="table">
+          <thead>
+            <tr>
+              <th></th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let report of reportList" #ReportList>
+              <td>
+                <label>{{report.name}}</label>
+              </td>
+              <td>
+                <input data-permission-type="reportList"
+                       data-parent-id="selectAllReport"
+                       (change)="checkboxRecursion($event)"
+                       [checked]="report.canView"
+                       value="{{report.moduleId}}"
+                       class="checkbox-size"
+                       type="checkbox" />
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <p *ngIf="reportList.length === 0" class="text-muted p-3">No reports available.</p>
+      </mat-card>
+    </div>
+
+  
+
+  </div>
+</div> -->
