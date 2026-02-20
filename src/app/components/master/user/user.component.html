@@ -1,4 +1,4 @@
-<div class="container">
+<!-- <div class="container">
     <div class="row" [formGroup]="userForm">
         <ng-container *ngIf="companyOptions.length">
             <div class="col-md-4">
@@ -28,15 +28,9 @@
             </mat-form-field>
         </div>
 
-        <div class="col-md-4">
-            <mat-form-field class="full-width">
-                <mat-label>Profile Name</mat-label>
-                <input formControlName="name" matInput />
-            </mat-form-field>
-        </div>
-
        
-<!-- <div class="col-md-4">
+       
+<div class="col-md-4">
     <mat-form-field class="full-width">
         <mat-label>Profile Name</mat-label>
         <input type="text" placeholder="Select Profile"
@@ -48,7 +42,7 @@
             }
         </mat-autocomplete>
     </mat-form-field>
-</div> -->
+</div>
         
         <div class="col-md-4">
             <mat-form-field class="full-width">
@@ -72,11 +66,19 @@
             </div>
         </div>
     </div>
-</div>
+</div> -->
+
+<!-- profile input box -->
+ <!-- <div class="col-md-4">
+            <mat-form-field class="full-width">
+                <mat-label>Profile Name</mat-label>
+                <input formControlName="name" matInput />
+            </mat-form-field>
+        </div> -->
 
 
 <!-- new code start here -->
-<!-- <div class="container">
+<div class="container">
   <div class="row" [formGroup]="userForm">
 
     <ng-container *ngIf="companyOptions.length">
@@ -108,12 +110,19 @@
       </mat-form-field>
     </div>
 
-    <div class="col-md-4">
-      <mat-form-field class="full-width">
+   <div class="col-md-4">
+    <mat-form-field class="full-width">
         <mat-label>Profile Name</mat-label>
-        <input formControlName="name" matInput />
-      </mat-form-field>
-    </div>
+        <input type="text" placeholder="Select Profile"
+            aria-label="Profile" matInput
+            formControlName="roleID" [matAutocomplete]="autoProfile">
+        <mat-autocomplete #autoProfile="matAutocomplete" [displayWith]="displayProfileName">
+            @for (option of profilenameOptions; track option) {
+                <mat-option [value]="option.id">{{option.profileName}}</mat-option>
+            }
+        </mat-autocomplete>
+    </mat-form-field>
+</div>
 
     <div class="col-md-4">
       <mat-form-field class="full-width">
@@ -292,4 +301,4 @@
   
 
   </div>
-</div> -->
+</div>

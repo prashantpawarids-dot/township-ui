@@ -356,7 +356,7 @@ getModuleKeyForPath(path: string): number {
       { name: "User", key: "user" }               
     ];
 
-    // Add profileID to columns and update view/edit to use correct ID
+    
     this.displayedColumns = ['srno', 'profileID', 'profileName', 'user', 'actions'];
   });
 }
@@ -368,7 +368,7 @@ getModuleKeyForPath(path: string): number {
     this.authService.getUser().subscribe(res => {
       this.dataToDisplay = [...res];
       this.dataSource.data = (this.dataToDisplay);
-      this.displayedColumns = ['srno','uid', 'Name','Email','Phone', 'actions']
+      this.displayedColumns = ['srno','uid', 'profileName','Email','Phone', 'actions']
     });
   }
 
@@ -594,75 +594,6 @@ viewData(data: any) {
     this.navigateBack(data);
 
   }
-
-
-
-
-// deleteData(element: any) {
-//   // Check if already deleted
-//   if (element.logicalDeleted === 1 || element.isactive === false || element.isDeleted === true) {
-//     this.showSwal('error', `This ${this.title} is already deleted`);
-//     return;
-//   }
-
-//   const deleteMethods: { [key: string]: (id: any) => Observable<any> } = {
-//     '/tenant': this.authService.deleteTenant.bind(this.authService),
-//     '/contractor': this.authService.deleteContractor.bind(this.authService),
-//     '/master/amenities': this.authService.deleteAmenities.bind(this.authService),
-//     '/master/building': this.authService.deleteBuilding.bind(this.authService),
-//     '/master/company': this.authService.deleteCompany.bind(this.authService),
-//     '/master/project': this.authService.deleteProject.bind(this.authService),
-//     '/master/neighbourhood': this.authService.deleteNeighbourhood.bind(this.authService),
-//     '/master/service-type': this.authService.deleteServiceType.bind(this.authService),
-//      '/master/contrator-type': this.authService.deleteContractorType.bind(this.authService),
-//     '/master/reader-location': this.authService.deleteReaderLocation.bind(this.authService),
-//     '/master/reader-relay': this.authService.deleteReaderRelay.bind(this.authService),
-//     '/master/profile': this.authService.deleteProfile.bind(this.authService),
-//     '/master/user': this.authService.deleteUser.bind(this.authService),
-//     '/land-owner': this.authService.deleteLandOwner.bind(this.authService),
-//     '/resident': this.authService.deleteResident.bind(this.authService),
-//     '/guest': this.authService.deleteGuest.bind(this.authService),
-//     '/visitor': this.authService.deleteVisitor.bind(this.authService),
-//     '/service-provider': this.authService.deleteServiceProvider.bind(this.authService),
-//     '/employee': this.authService.deleteEmployee.bind(this.authService),
-//   };
-
-//   const deleteFn = deleteMethods[this.returnPath];
-
-//   if (!deleteFn) {
-//     this.showSwal('error', `Delete not implemented for this page`);
-//     return;
-//   }
-
-//   // ✅ Use profileID for profile route, otherwise use id
-//   const idToDelete = this.returnPath === '/master/profile' ? element.uid : element.id;
-
-//   // Call the delete function
-//   deleteFn(idToDelete).subscribe({
-//     next: () => {
-//       this.showSwal('success', `${this.title} deleted successfully`);
-//       element.logicalDeleted = 1;
-//       this.dataSource.data = [...this.dataToDisplay];
-//     },
-//     error: () => {
-//       this.showSwal('error', `Failed to delete ${this.title}`);
-//     }
-//   });
-// }
-// // Helper function to show Swal notifications
-// private showSwal(icon: 'success' | 'error', title: string) {
-//   Swal.fire({
-//     icon,
-//     title,
-//     showConfirmButton: false,
-//     timer: 3000,
-//     timerProgressBar: true,
-//     background: icon === 'success' ? '#d4edda' : '#f8d7da',
-//     iconColor: icon === 'success' ? '#28a745' : '#d33',
-//     position: 'center'
-//   });
-// }
-
 
 deleteData(element: any) {
   // Check if already deleted

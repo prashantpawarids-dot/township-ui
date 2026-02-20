@@ -985,19 +985,21 @@ getReaderLocationById(id: number): Observable<any> {
       catchError(this.handleError));
   }
 
- getProfileRegister(): Observable<any> {
+getProfileRegister(): Observable<any> {
   const url = this.baseUrl + 'auth/profileRegister';
+
   return this.http.get<any[]>(url).pipe(
     map(res => {
       // Keep only unique profiles based on 'profileID'
       const uniqueProfiles = res.filter((item, index, self) =>
-        index === self.findIndex(t => t.profileName === item.profileName)
+        index === self.findIndex(t => t.profileID === item.profileID)
       );
       return uniqueProfiles;
     }),
     catchError(this.handleError)
   );
 }
+
 
 
 getProfileName(): Observable<any> {
