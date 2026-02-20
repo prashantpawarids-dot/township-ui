@@ -537,8 +537,7 @@ setReaderRelay() {
 
 viewData(data: any) {
   if (this.returnPath) {
-    // Use uid for profile route (unique), otherwise use id
-    const idToPass = this.returnPath === '/master/profile' ? data.uid : data.id;
+    const idToPass = (this.returnPath || '').includes('/master/profile') ? data.profileID : data.id;
     this.navigateBack(idToPass, true);
   }
 }
@@ -597,6 +596,7 @@ viewData(data: any) {
 
 deleteData(element: any) {
   // Check if already deleted
+  console.log('Checking delete status for element:', element);
   if (element.logicalDeleted === 1 || element.isactive === false || element.isDeleted === true) {
     this.showSwal('error', `This ${this.title} is already deleted`);
     return;
@@ -643,7 +643,7 @@ deleteData(element: any) {
       }
 
       // ✅ Use profileID for profile route, otherwise use id
-      const idToDelete = this.returnPath === '/master/profile' ? element.uid : element.id;
+     const idToDelete = (this.returnPath || '').includes('/master/profile') ? element.profileID : element.id;
 
       // Call the delete function
       deleteFn(idToDelete).subscribe({

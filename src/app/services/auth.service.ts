@@ -990,8 +990,9 @@ getProfileRegister(): Observable<any> {
 
   return this.http.get<any[]>(url).pipe(
     map(res => {
-      // Keep only unique profiles based on 'profileID'
+      
       const uniqueProfiles = res.filter((item, index, self) =>
+        item.profileID !== null &&
         index === self.findIndex(t => t.profileID === item.profileID)
       );
       return uniqueProfiles;
