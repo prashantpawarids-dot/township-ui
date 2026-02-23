@@ -116,7 +116,7 @@ export class LandOwnerComponent implements OnInit, OnDestroy {
     // this.dataToDisplay = event; 
     addonCard.mobileNo = addonCard.mobileNo.toString();
     addonCard['logicalDeleted'] = '1';
-    this.authService.updateLandOwnerAddonCard(addonCard).subscribe({
+    this.authService.deleteDependentLandOwner(addonCard.id).subscribe({
       next: (res) => {
         this.alertService.openSuccess('Successfully Deleted');
         this.getLandownerById(Number(this.landowner.id));

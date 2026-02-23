@@ -335,21 +335,19 @@ deleteVehicle(vehicle: Vehicle) {
     });
   }
 
-  deleteAddOnTable(addonCard: any) {
-    addonCard.mobileNo = addonCard.mobileNo.toString();
-    addonCard['logicalDeleted'] = '1';
-    this.authService.updateTenentAddonCard(addonCard).subscribe({
-      next: (res) => {
-        this.alertService.openSuccess('Successfully Deleted');
-        this.getTenantById(Number(this.tenant.id));
-      },
-      error: (err: any) => {
-        this.errorHandlerService.handleError(err);
-        this.cd.detectChanges();
-      }
-    });
-  }
   
+  deleteAddOnTable(addonCard: any) {
+  this.authService.deleteTenentAddonCard(addonCard.id).subscribe({
+    next: (res) => {
+      this.alertService.openSuccess('Successfully Deleted');
+      this.getTenantById(Number(this.tenant.id));
+    },
+    error: (err: any) => {
+      this.errorHandlerService.handleError(err);
+      this.cd.detectChanges();
+    }
+  });
+}
   // Save Form
 
   saveTenant() {

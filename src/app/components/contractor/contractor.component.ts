@@ -152,7 +152,7 @@ export class ContractorComponent implements OnInit, OnDestroy  {
     // this.dataToDisplay = event; 
     addonCard.mobileNo = addonCard.mobileNo.toString();
     addonCard['logicalDeleted'] = '1';
-    this.authService.updateContractorAddonCard(addonCard).subscribe({
+    this.authService.deleteDependentContractor(addonCard.id).subscribe({
       next: (res) => {
         this.alertService.openSuccess('Successfully Deleted');
         this.getContractorById(Number(this.contractor.id));

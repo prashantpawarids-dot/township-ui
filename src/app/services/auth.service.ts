@@ -246,13 +246,20 @@ get roleId(): string | null {
 }
 
 
-  // getLandOwnerById(id: any): Observable<any> {
-  //   let url = this.baseUrl + 'Landowner/' + id;
-  //   return this.http.get(url).pipe(map((res: any[]) => {
-  //     return res;
-  //   }),
-  //     catchError(this.handleError));
-  // }
+  
+// getLandOwnerById(id: any): Observable<any> {
+//   let url = this.baseUrl + 'Landowner/' + id;
+//   return this.http.get(url).pipe(
+//     map((res: any) => {
+//       // Filter vehicles with logical_Delete === 0
+//       if (res.vehicles) {
+//         res.vehicles = res.vehicles.filter((v: any) => v.logical_Delete === 0);
+//       }
+//       return res;
+//     }),
+//     catchError(this.handleError)
+//   );
+// }
 
 getLandOwnerById(id: any): Observable<any> {
   let url = this.baseUrl + 'Landowner/' + id;
@@ -261,6 +268,10 @@ getLandOwnerById(id: any): Observable<any> {
       // Filter vehicles with logical_Delete === 0
       if (res.vehicles) {
         res.vehicles = res.vehicles.filter((v: any) => v.logical_Delete === 0);
+      }
+      // Filter out logically deleted dependent owners
+      if (res.dependentOwners) {
+        res.dependentOwners = res.dependentOwners.filter((d: any) => d.logicalDeleted !== 1);
       }
       return res;
     }),
@@ -276,7 +287,21 @@ getLandOwnerById(id: any): Observable<any> {
   //     catchError(this.handleError));
   // }
 
-  getResidentById(id: any): Observable<any> {
+//   getResidentById(id: any): Observable<any> {
+//   let url = this.baseUrl + 'Resident/' + id;
+//   return this.http.get(url).pipe(
+//     map((res: any) => {
+//       // Filter vehicles where logical_Delete is 0
+//       if (res.vehicles) {
+//         res.vehicles = res.vehicles.filter((v: any) => v.logical_Delete === 0);
+//       }
+//       return res;
+//     }),
+//     catchError(this.handleError)
+//   );
+// }
+
+getResidentById(id: any): Observable<any> {
   let url = this.baseUrl + 'Resident/' + id;
   return this.http.get(url).pipe(
     map((res: any) => {
@@ -284,21 +309,9 @@ getLandOwnerById(id: any): Observable<any> {
       if (res.vehicles) {
         res.vehicles = res.vehicles.filter((v: any) => v.logical_Delete === 0);
       }
-      return res;
-    }),
-    catchError(this.handleError)
-  );
-}
-
-
-
-getTenantById(id: any): Observable<any> {
-  let url = this.baseUrl + 'Tenent/' + id;
-  return this.http.get(url).pipe(
-    map((res: any) => {
-      // Keep only vehicles where logical_Delete === 0
-      if (res.vehicles) {
-        res.vehicles = res.vehicles.filter((v: any) => v.logical_Delete === 0);
+      // Filter out logically deleted dependent owners
+      if (res.dependentOwners) {
+        res.dependentOwners = res.dependentOwners.filter((d: any) => d.logicalDeleted !== 1);
       }
       return res;
     }),
@@ -306,6 +319,39 @@ getTenantById(id: any): Observable<any> {
   );
 }
 
+
+
+// getTenantById(id: any): Observable<any> {
+//   let url = this.baseUrl + 'Tenent/' + id;
+//   return this.http.get(url).pipe(
+//     map((res: any) => {
+//       // Keep only vehicles where logical_Delete === 0
+//       if (res.vehicles) {
+//         res.vehicles = res.vehicles.filter((v: any) => v.logical_Delete === 0);
+//       }
+//       return res;
+//     }),
+//     catchError(this.handleError)
+//   );
+// }
+
+getTenantById(id: any): Observable<any> {
+  let url = this.baseUrl + 'Tenent/' + id;
+  return this.http.get(url).pipe(
+    map((res: any) => {
+      // Filter out logically deleted vehicles
+      if (res.vehicles) {
+        res.vehicles = res.vehicles.filter((v: any) => v.logical_Delete === 0);
+      }
+      // Filter out logically deleted dependent owners
+      if (res.dependentOwners) {
+        res.dependentOwners = res.dependentOwners.filter((d: any) => d.logicalDeleted !== 1);
+      }
+      return res;
+    }),
+    catchError(this.handleError)
+  );
+}
 
 
   uploadPhoto(formData: FormData, photoPath, newLandOwnerId: number): Observable<any> {
@@ -455,6 +501,37 @@ getTenantById(id: any): Observable<any> {
     }),
       catchError(this.handleError));
   }
+
+
+  deleteTenentAddonCard(id: any): Observable<any> {
+  let url = this.baseUrl + 'DependentTenent/' + id;
+  return this.http.delete(url).pipe(
+    map(res => res),
+    catchError(this.handleError)
+  );
+}
+
+deleteDependentContractor(id: any): Observable<any> {
+  let url = this.baseUrl + 'DependentContractor/' + id;
+  return this.http.delete(url).pipe(
+    map(res => res),
+    catchError(this.handleError)
+  );
+}
+
+deleteDependentLandOwner(id: any): Observable<any> {
+  const url = this.baseUrl + 'DependentLandOwner/' + id;
+  return this.http.delete(url).pipe(
+    catchError(this.handleError)
+  );
+}
+
+deleteDependentResident(id: any): Observable<any> {
+  const url = this.baseUrl + 'DependentResident/' + id;
+  return this.http.delete(url).pipe(
+    catchError(this.handleError)
+  );
+}
 
   // land owner vehicle card
 
@@ -1198,7 +1275,21 @@ updateContractorType(payload: any): Observable<any> {
   // }
 
 
-  getContractorById(id: number): Observable<any> {
+//   getContractorById(id: number): Observable<any> {
+//   let url = this.baseUrl + 'Contractor/GetContractorDetails/' + id;
+//   return this.http.get(url).pipe(
+//     map((res: any) => {
+//       // Filter vehicles if the response contains a vehicles array
+//       if (res.vehicles) {
+//         res.vehicles = res.vehicles.filter((v: any) => v.logical_Delete === 0);
+//       }
+//       return res;
+//     }),
+//     catchError(this.handleError)
+//   );
+// }
+
+getContractorById(id: number): Observable<any> {
   let url = this.baseUrl + 'Contractor/GetContractorDetails/' + id;
   return this.http.get(url).pipe(
     map((res: any) => {
@@ -1206,12 +1297,15 @@ updateContractorType(payload: any): Observable<any> {
       if (res.vehicles) {
         res.vehicles = res.vehicles.filter((v: any) => v.logical_Delete === 0);
       }
+      // Filter out logically deleted dependent owners
+      if (res.dependentOwners) {
+        res.dependentOwners = res.dependentOwners.filter((d: any) => d.logicalDeleted !== 1);
+      }
       return res;
     }),
     catchError(this.handleError)
   );
 }
-
 
   postContractor(payload: any): Observable<any> {
     let url = this.baseUrl + 'Contractor/AddContractor';

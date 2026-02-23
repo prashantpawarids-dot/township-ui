@@ -136,7 +136,7 @@ export class ResidentComponent {
   deleteAddOnTable(addonCard: any) {
     addonCard.mobileNo = addonCard.mobileNo.toString();
     addonCard['logicalDeleted'] = 1;
-    this.authService.updateResidentAddonCard(addonCard).subscribe({
+    this.authService.deleteDependentResident(addonCard.id).subscribe({
       next: (res) => {
         this.alertService.openSuccess('Successfully Deleted');
         this.getResidentById(Number(this.resident.id));
