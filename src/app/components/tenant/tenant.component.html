@@ -10,7 +10,9 @@
         </div>
     </div>
         </mat-expansion-panel-header>
+        
         <app-town-land-owner [isTenant]="true" (changeTenantType)="setTenantType($event)" [landOwner]="tenant"></app-town-land-owner>
+
         <div class="container">
             <div class="row">
                 <div class="col-md-12">
@@ -23,6 +25,8 @@
             </div>
         </div>
     </mat-expansion-panel>
+
+
     <mat-expansion-panel *ngIf="isViewOrEdit">
         <mat-expansion-panel-header>
             <mat-panel-title> Add-on-Card </mat-panel-title>
@@ -31,6 +35,7 @@
             (addonEvent)="addAddOnTable($event)" (addonEventUpdate)="updateAddOnTable($event)"
             (addonEventDelete)="deleteAddOnTable($event)"></app-town-add-on-card>
     </mat-expansion-panel>
+
     <mat-expansion-panel *ngIf="isViewOrEdit">
         <mat-expansion-panel-header>
             <mat-panel-title> Vehicle </mat-panel-title>
@@ -38,6 +43,9 @@
         <app-town-vehicle [vehicle]="vehicle" [dataToDisplayVehicle]="vehicleList"
             [dataSourceVehicle]="dataSourceVehicle" (vehicleEvent)="updateVehicleTable($event)"></app-town-vehicle>
     </mat-expansion-panel>
+
+
+
     <mat-expansion-panel *ngIf="isViewOrEdit">
         <mat-expansion-panel-header>
             <mat-panel-title> Additional Access Rights </mat-panel-title>
@@ -45,7 +53,12 @@
         <app-town-add-access-rights [addAccessRights]="addAccessRights" [dataToDisplayAAR]="dataToDisplayAAR"
             [dataSourceAAR]="dataSourceAAR" (addAREvent)="updateAARTable($event)"></app-town-add-access-rights>
     </mat-expansion-panel>
+
+
+
 </mat-accordion>
+
+
 <div class="container">
     <div class="row">
         <div class="col-md-12">
