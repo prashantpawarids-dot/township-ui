@@ -1560,9 +1560,16 @@ postProfileDetails(uid: number, payload: any): Observable<any> {
 /**
  * Delete Tenant by ID
  */
+// deleteTenant(id: number): Observable<any> {
+//   return this.http.delete(`${this.baseUrl}Tenent/${id}`).pipe(
+//     map(res => res),
+//     catchError(this.handleError)
+//   );
+// }
+
+//on server delete method is post so changing to post and name is DeletePTenent on localhost DeleteTenent
 deleteTenant(id: number): Observable<any> {
-  return this.http.delete(`${this.baseUrl}Tenent/${id}`).pipe(
-    map(res => res),
+  return this.http.post(`${this.baseUrl}Tenent/DeletePTenent/${id}`, {}).pipe(
     catchError(this.handleError)
   );
 }
