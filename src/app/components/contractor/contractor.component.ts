@@ -127,7 +127,49 @@ export class ContractorComponent implements OnInit, OnDestroy  {
 
   // Add on card
 
+  // addAddOnTable(addonCard: any) {
+  //   // this.dataToDisplay = event;
+  //   addonCard.pid = Number(this.contractor.id);
+  //   addonCard.mobileNo = addonCard.mobileNo.toString();
+  //    let photo = this.contractor.photo; 
+  //    delete this.contractor.photo;
+  //   this.authService.postContractorAddonCard(addonCard).subscribe({
+  //     next: (res) => {
+  //        if (photo ) {
+  //            this.authService.uploadImage(photo, res.idnumber)
+  //            this.alertService.openSuccess('Successfully Saved');
+  //            this.getContractorById(Number(this.contractor.id));
+  //        }
+  //     },
+  //     error: (err: any) => {
+  //       this.errorHandlerService.handleError(err);
+  //       this.cd.detectChanges();
+  //     }
+  //   });
+  // }
+
   addAddOnTable(addonCard: any) {
+  // ✅ NEW: Check duplicate name only
+  const isDuplicate = this.addonCardList.some((d: any) => {
+    return (
+      d.firstName?.trim().toLowerCase() === addonCard.firstName?.trim().toLowerCase() &&
+      d.middleName?.trim().toLowerCase() === addonCard.middleName?.trim().toLowerCase() &&
+      d.lastName?.trim().toLowerCase() === addonCard.lastName?.trim().toLowerCase()
+    );
+  });
+
+  if (isDuplicate) {
+    Swal.fire({
+      title: 'Already Exists!',
+      text: `"${addonCard.firstName} ${addonCard.middleName} ${addonCard.lastName}" is already added as a dependent.`,
+      icon: 'warning',
+      confirmButtonColor: '#d33',
+      confirmButtonText: 'OK'
+    });
+    return;
+  }
+  // ✅ END
+
     // this.dataToDisplay = event;
     addonCard.pid = Number(this.contractor.id);
     addonCard.mobileNo = addonCard.mobileNo.toString();

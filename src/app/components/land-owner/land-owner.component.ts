@@ -90,13 +90,54 @@ export class LandOwnerComponent implements OnInit, OnDestroy {
 
   // Add on card
 
+  // addAddOnTable(addonCard: any) {
+  //   // this.dataToDisplay = event;
+  //   addonCard.pid = Number(this.landowner.id);
+  //   addonCard.mobileNo = addonCard.mobileNo.toString();
+  //    let photo = this.addonCard.photo ; 
+  //   //  delete this.addonCard.photo;
+  //   //  this.uploadImage(photo, addonCard.idNumber)
+  //   this.authService.postLandOwnerAddonCard(addonCard).subscribe({
+  //     next: (res) => {
+  //        if (photo ) {
+  //            this.authService.uploadImage(photo, res.idnumber)
+  //        }
+  //       this.alertService.openSuccess('Successfully Saved');
+  //       this.getLandownerById(Number(this.landowner.id));
+  //     },
+  //     error: (err: any) => {
+  //       this.errorHandlerService.handleError(err);
+  //       this.cd.detectChanges();
+  //     }
+  //   });
+  // }
+
   addAddOnTable(addonCard: any) {
+  // ✅ NEW: Check duplicate name only
+  const isDuplicate = this.addonCardList.some((d: any) => {
+    return (
+      d.firstName?.trim().toLowerCase() === addonCard.firstName?.trim().toLowerCase() &&
+      d.middleName?.trim().toLowerCase() === addonCard.middleName?.trim().toLowerCase() &&
+      d.lastName?.trim().toLowerCase() === addonCard.lastName?.trim().toLowerCase()
+    );
+  });
+
+  if (isDuplicate) {
+    Swal.fire({
+      title: 'Already Exists!',
+      text: `"${addonCard.firstName} ${addonCard.middleName} ${addonCard.lastName}" is already added as a dependent.`,
+      icon: 'warning',
+      confirmButtonColor: '#d33',
+      confirmButtonText: 'OK'
+    });
+    return;
+  }
+  // ✅ END
+
     // this.dataToDisplay = event;
     addonCard.pid = Number(this.landowner.id);
     addonCard.mobileNo = addonCard.mobileNo.toString();
      let photo = this.addonCard.photo ; 
-    //  delete this.addonCard.photo;
-    //  this.uploadImage(photo, addonCard.idNumber)
     this.authService.postLandOwnerAddonCard(addonCard).subscribe({
       next: (res) => {
          if (photo ) {
@@ -111,7 +152,6 @@ export class LandOwnerComponent implements OnInit, OnDestroy {
       }
     });
   }
-
   deleteAddOnTable(addonCard: any) {
     // this.dataToDisplay = event; 
     addonCard.mobileNo = addonCard.mobileNo.toString();

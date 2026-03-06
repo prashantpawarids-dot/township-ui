@@ -119,19 +119,56 @@ export class ResidentComponent {
 
   // Add on card
 
+  // addAddOnTable(addonCard: any) {
+  //   this.setRequiredFields(addonCard)
+  //   this.authService.postResidentAddonCard(addonCard).subscribe({
+  //     next: (res) => {
+  //       this.alertService.openSuccess('Successfully Saved');
+  //       this.getResidentById(Number(this.resident.id));
+  //     },
+  //     error: (err: any) => {
+  //       this.errorHandlerService.handleError(err);
+  //       this.cd.detectChanges();
+  //     }
+  //   });
+  // }
+
+
   addAddOnTable(addonCard: any) {
-    this.setRequiredFields(addonCard)
-    this.authService.postResidentAddonCard(addonCard).subscribe({
-      next: (res) => {
-        this.alertService.openSuccess('Successfully Saved');
-        this.getResidentById(Number(this.resident.id));
-      },
-      error: (err: any) => {
-        this.errorHandlerService.handleError(err);
-        this.cd.detectChanges();
-      }
+  this.setRequiredFields(addonCard);
+
+  // Check duplicate: firstName + middleName + lastName
+  const isDuplicate = this.addonCardList.some((d: any) => {
+    return (
+      d.firstName?.trim().toLowerCase() === addonCard.firstName?.trim().toLowerCase() &&
+      d.middleName?.trim().toLowerCase() === addonCard.middleName?.trim().toLowerCase() &&
+      d.lastName?.trim().toLowerCase() === addonCard.lastName?.trim().toLowerCase()
+    );
+  });
+
+  if (isDuplicate) {
+    Swal.fire({
+      title: 'Already Exists!',
+      text: `"${addonCard.firstName} ${addonCard.middleName} ${addonCard.lastName}" is already added as a dependent.`,
+      icon: 'warning',
+      confirmButtonColor: '#d33',
+      confirmButtonText: 'OK'
     });
+    return; // Stop — do NOT save
   }
+
+  // No duplicate — proceed to save
+  this.authService.postResidentAddonCard(addonCard).subscribe({
+    next: (res) => {
+      this.alertService.openSuccess('Successfully Saved');
+      this.getResidentById(Number(this.resident.id));
+    },
+    error: (err: any) => {
+      this.errorHandlerService.handleError(err);
+      this.cd.detectChanges();
+    }
+  });
+}
 
   deleteAddOnTable(addonCard: any) {
     addonCard.mobileNo = addonCard.mobileNo.toString();
@@ -344,6 +381,13 @@ export class ResidentComponent {
   saveResident() {
     this.resident.shortName = this.resident.firstName + " " + this.resident.lastName;
     let photo = this.resident.photo; 
+
+    // console.log("Resident to be saved:", this.resident);
+    // Check if resident with same flat number already exists only Number check number ex :B101,101B or A-101 .check only numeric part of flat number
+    if(this.resident.flatNumber){
+      alert("Already exists.");
+      return;
+    }
     this.authService.postResident(this.resident).subscribe({
       next: (res) => {  
         if (photo ) {
@@ -361,6 +405,66 @@ export class ResidentComponent {
     });
   }
 
+// saveResident() {
+//   this.resident.shortName = this.resident.firstName + " " + this.resident.lastName;
+//   let photo = this.resident.photo;
+
+//   const enteredNumeric = this.resident.flatNumber?.replace(/\D/g, '');
+
+//   if (!enteredNumeric) {
+//     Swal.fire({
+//       title: 'Invalid Flat Number!',
+//       text: 'Flat number must contain at least one digit.',
+//       icon: 'warning',
+//       confirmButtonColor: '#d33',
+//       confirmButtonText: 'OK'
+//     });
+//     return;
+//   }
+
+//   // Use existing getResident() to check for duplicates
+//   this.authService.getResident().subscribe({
+//     next: (residents: Resident[]) => {
+//       const duplicate = residents.find((r: Resident) => {
+//         const existingNumeric = r.flatNumber?.replace(/\D/g, '');
+//         return existingNumeric === enteredNumeric;
+//       });
+
+//       if (duplicate) {
+//         Swal.fire({
+//           title: 'Already Exists!',
+//           text: `Flat number "${this.resident.flatNumber}" already exists as "${duplicate.flatNumber}".`,
+//           icon: 'error',
+//           confirmButtonColor: '#d33',
+//           confirmButtonText: 'OK'
+//         });
+//         return; // Stop — do NOT save
+//       }
+
+//       // No duplicate — proceed to save
+//       delete this.resident.photo;
+//       this.authService.postResident(this.resident).subscribe({
+//         next: (res) => {
+//           if (photo) {
+//             this.uploadImage(photo, res.idNumber);
+//           }
+//           this.alertService.openSuccess('Successfully Saved');
+//           setTimeout(() => {
+//             this.cancel();
+//           }, 2000);
+//         },
+//         error: (err: any) => {
+//           this.errorHandlerService.handleError(err);
+//           this.cd.detectChanges();
+//         }
+//       });
+//     },
+//     error: (err: any) => {
+//       this.errorHandlerService.handleError(err);
+//       this.cd.detectChanges();
+//     }
+//   });
+// }
   cancel() {
     this.resident = new Resident();
     this.authService.setLandOwnerData(this.resident, false);

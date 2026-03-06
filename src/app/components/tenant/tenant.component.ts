@@ -118,17 +118,69 @@ export class TenantComponent {
 
   // Add on card
 
+  // addAddOnTable(addonCard: any) {
+  //   // this.dataToDisplay = event;
+  //   this.setRequiredFields(addonCard)
+  //    let photo = this.addonCard.photo; 
+  //    delete this.addonCard.photo;
+  //   this.authService.postTenentAddonCard(addonCard).subscribe({
+  //     next: (res) => {
+  //       if (photo ) {
+  //            this.authService.uploadImage(photo, res.idnumber)
+  //        }
+  //       this.alertService.openSuccess('Successfully Saved');
+  //       this.getTenantById(Number(this.tenant.id));
+  //     },
+  //     error: (err: any) => {
+  //       // console.log(err);
+  //       this.errorHandlerService.handleError(err);
+  //       this.cd.detectChanges();
+  //     }
+  //   });
+  // }
+
+
   addAddOnTable(addonCard: any) {
+  // ✅ NEW: Check duplicate name only
+  const isDuplicate = this.addonCardList.some((d: any) => {
+    return (
+      d.firstName?.trim().toLowerCase() === addonCard.firstName?.trim().toLowerCase() &&
+      d.middleName?.trim().toLowerCase() === addonCard.middleName?.trim().toLowerCase() &&
+      d.lastName?.trim().toLowerCase() === addonCard.lastName?.trim().toLowerCase()
+    );
+  });
+
+  if (isDuplicate) {
+    Swal.fire({
+      title: 'Already Exists!',
+      text: `"${addonCard.firstName} ${addonCard.middleName} ${addonCard.lastName}" is already added as a dependent.`,
+      icon: 'warning',
+      confirmButtonColor: '#d33',
+      confirmButtonText: 'OK'
+    });
+    return;
+  }
+  // ✅ END
+
     // this.dataToDisplay = event;
     this.setRequiredFields(addonCard)
      let photo = this.addonCard.photo; 
      delete this.addonCard.photo;
     this.authService.postTenentAddonCard(addonCard).subscribe({
       next: (res) => {
-        if (photo ) {
+        if (photo) {
              this.authService.uploadImage(photo, res.idnumber)
-         }
-        this.alertService.openSuccess('Successfully Saved');
+        }
+        // ✅ NEW: Swal success alert so user clearly knows it's saved
+      Swal.fire({
+  title: 'Saved!',
+  text: 'Saved successfully.',
+  icon: 'success',
+  showConfirmButton: false,
+  timer: 2000,
+  timerProgressBar: true
+});
+        // ✅ END
         this.getTenantById(Number(this.tenant.id));
       },
       error: (err: any) => {
@@ -138,7 +190,6 @@ export class TenantComponent {
       }
     });
   }
-
   // Additional Access Rights
   updateAARTable(event) {
     if (event.action === 'delete') {

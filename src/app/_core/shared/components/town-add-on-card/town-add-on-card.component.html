@@ -1,6 +1,17 @@
 <div class="container">
     <div class="row">
-        <div class="col-md-3">
+        <!-- <div class="col-md-3">
+  <mat-form-field class="full-width">
+    <mat-label>ID </mat-label>
+    <input
+      [(ngModel)]="addonCard.idNumber"
+      name="addonid"
+      #addonid="ngModel"
+      matInput
+    />
+  </mat-form-field>
+</div> -->
+<div class="col-md-3" style="display:none">
   <mat-form-field class="full-width">
     <mat-label>ID</mat-label>
     <input
@@ -8,6 +19,8 @@
       name="addonid"
       #addonid="ngModel"
       matInput
+      readonly
+      placeholder="0"
     />
   </mat-form-field>
 </div>

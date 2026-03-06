@@ -503,32 +503,33 @@ getTenantById(id: any): Observable<any> {
   }
 
 
+  // Delete APIs for dependent cards
   deleteTenentAddonCard(id: any): Observable<any> {
-  let url = this.baseUrl + 'DependentTenent/' + id;
-  return this.http.delete(url).pipe(
+  let url = this.baseUrl + 'DependentTenent/DeleteDependentTenent/' + id;
+  return this.http.post(url,{}).pipe(
     map(res => res),
     catchError(this.handleError)
   );
 }
 
 deleteDependentContractor(id: any): Observable<any> {
-  let url = this.baseUrl + 'DependentContractor/' + id;
-  return this.http.delete(url).pipe(
+  let url = this.baseUrl + 'DependentContractor/DeleteDependentContractor/' + id;
+  return this.http.post(url,{}).pipe(
     map(res => res),
     catchError(this.handleError)
   );
 }
 
 deleteDependentLandOwner(id: any): Observable<any> {
-  const url = this.baseUrl + 'DependentLandOwner/' + id;
-  return this.http.delete(url).pipe(
+  const url = this.baseUrl + 'DependentLandOwner/DeleteDependentLandOwner/' + id;
+  return this.http.post(url,{}).pipe(
     catchError(this.handleError)
   );
 }
 
 deleteDependentResident(id: any): Observable<any> {
-  const url = this.baseUrl + 'DependentResident/' + id;
-  return this.http.delete(url).pipe(
+  const url = this.baseUrl + 'DependentResident/DeleteDependentResident/' + id;
+  return this.http.post(url,{}).pipe(
     catchError(this.handleError)
   );
 }
@@ -883,13 +884,25 @@ getGuest(): Observable<any[]> {
 }
 
   // Visitor
+  // getVisitor(): Observable<any> {
+  //   let url = this.baseUrl + 'Visitor'
+  //   return this.http.get(url).pipe(map(res => {
+  //     return res;
+  //   }),
+  //     catchError(this.handleError));
+  // }
   getVisitor(): Observable<any> {
-    let url = this.baseUrl + 'Visitor'
-    return this.http.get(url).pipe(map(res => {
-      return res;
+  const url = this.baseUrl + 'Visitor';
+  const roleid = localStorage.getItem('roleid');
+  return this.http.get<any[]>(url).pipe(
+    map(res => {
+      return roleid === '100'
+        ? res
+        : (res as any[]).filter(item => item.logicalDeleted === 0);
     }),
-      catchError(this.handleError));
-  }
+    catchError(this.handleError)
+  );
+}
 
 
   //Company
@@ -1577,28 +1590,42 @@ deleteTenant(id: number): Observable<any> {
 /**
  * Delete Contractor by ID
  */
+// deleteContractor(id: number): Observable<any> {
+//   return this.http.post(`${this.baseUrl}Contractor/DeletePContractor/${id}`, {}).pipe(
+//     map(res => res),
+//     catchError(this.handleError)
+//   );
+// }
+
+
 deleteContractor(id: number): Observable<any> {
-  return this.http.delete(`${this.baseUrl}Contractor/${id}`).pipe(
+  return this.http.patch(`${this.baseUrl}Contractor/DeletePContractor/${id}`, {}).pipe(
     map(res => res),
     catchError(this.handleError)
   );
 }
-
 /**
  * Delete Employee by ID
  */
+// deleteEmployee(id: number): Observable<any> {
+//   return this.http.delete(`${this.baseUrl}Employee/DeleteEmployee/${id}`).pipe(
+//     map(res => res),
+//     catchError(this.handleError)
+//   );
+// }
+
+
 deleteEmployee(id: number): Observable<any> {
-  return this.http.delete(`${this.baseUrl}Employee/DeleteEmployee/${id}`).pipe(
+  return this.http.post(`${this.baseUrl}Employee/${id}`, {}).pipe(
     map(res => res),
     catchError(this.handleError)
   );
 }
-
 /**
- * Delete Building by ID
+ * Delete Building by ID Building/DeleteID/
  */
 deleteBuilding(id: number): Observable<any> {
-  return this.http.delete(`${this.baseUrl}Building/DeleteID/${id}`).pipe(
+  return this.http.post(`${this.baseUrl}Building/DeleteID/${id}`, {}).pipe(
     map(res => res),
     catchError(this.handleError)
   );
@@ -1648,8 +1675,7 @@ deleteProject(id: number): Observable<any> {
  * Delete Service Provider Owner by ID
  */
 deleteServiceProviderOwner(id: number): Observable<any> {
-  return this.http.delete(
-    `${this.baseUrl}ServiceProviderOwners/DeleteServiceProviderOwner/${id}`
+  return this.http.delete(`${this.baseUrl}ServiceProviderOwners/DeleteServiceProviderOwner/${id}`
   ).pipe(
     map(res => res),
     catchError(this.handleError)
@@ -1664,7 +1690,7 @@ deleteServiceProviderOwner(id: number): Observable<any> {
  * Delete Land Owner
  */
 deleteLandOwner(id: number): Observable<any> {
-  return this.http.delete(`${this.baseUrl}Landowner/${id}`).pipe(
+  return this.http.post(`${this.baseUrl}Landowner/DeletePLandowner/${id}`, {}).pipe(
     map(res => res),
     catchError(this.handleError)
   );
@@ -1674,7 +1700,7 @@ deleteLandOwner(id: number): Observable<any> {
  * Delete Resident
  */
 deleteResident(id: number): Observable<any> {
-  return this.http.delete(`${this.baseUrl}Resident/${id}`).pipe(
+  return this.http.post(`${this.baseUrl}Resident/DeletePResident/${id}`, {}).pipe(
     map(res => res),
     catchError(this.handleError)
   );
@@ -1684,7 +1710,7 @@ deleteResident(id: number): Observable<any> {
  * Delete Guest
  */
 deleteGuest(id: number): Observable<any> {
-  return this.http.delete(`${this.baseUrl}Guest/${id}`).pipe(
+  return this.http.post(`${this.baseUrl}Guest/DeleteGuest/${id}`, {}).pipe(
     map(res => res),
     catchError(this.handleError)
   );
@@ -1694,7 +1720,7 @@ deleteGuest(id: number): Observable<any> {
  * Delete Visitor
  */
 deleteVisitor(id: number): Observable<any> {
-  return this.http.delete(`${this.baseUrl}Visitor/${id}`).pipe(
+  return this.http.post(`${this.baseUrl}Visitor/${id}`, {}).pipe(
     map(res => res),
     catchError(this.handleError)
   );
@@ -1704,7 +1730,7 @@ deleteVisitor(id: number): Observable<any> {
  * Delete Service Provider
  */
 deleteServiceProvider(id: number): Observable<any> {
-  return this.http.delete(`${this.baseUrl}Service_Provider/${id}`).pipe(
+  return this.http.post(`${this.baseUrl}Service_Provider/DeleteServiceProvider/${id}`, {}).pipe(
     map(res => res),
     catchError(this.handleError)
   );
@@ -1759,6 +1785,7 @@ deleteContractorType(id: number): Observable<any> {
     catchError(this.handleError)
   );
 }
+
 
 /**
  * Delete Service Type

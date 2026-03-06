@@ -109,7 +109,8 @@ export class AddonCard {
     pid: number;
     id: number;
     csn: string;
-    idNumber: string;
+    // idNumber: string;
+    idNumber: string = '0'; // default value of "0" for idNumber
     tagNumber: string;
     paNnumber: string;
     passportNo: string;
