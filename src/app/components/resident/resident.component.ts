@@ -380,15 +380,9 @@ export class ResidentComponent {
 
   saveResident() {
     this.resident.shortName = this.resident.firstName + " " + this.resident.lastName;
+    
     let photo = this.resident.photo; 
-
-    // console.log("Resident to be saved:", this.resident);
-    // Check if resident with same flat number already exists only Number check number ex :B101,101B or A-101 .check only numeric part of flat number
-    if(this.resident.flatNumber){
-      alert("Already exists.");
-      return;
-    }
-    this.authService.postResident(this.resident).subscribe({
+this.authService.postResident(this.resident).subscribe({
       next: (res) => {  
         if (photo ) {
           this.uploadImage(photo, res.idNumber)

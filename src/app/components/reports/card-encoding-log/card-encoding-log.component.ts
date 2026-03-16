@@ -94,17 +94,30 @@ this.reportForm = this.fb.group({
       }
     });
   }
+
+// onCardTypeChange(event: any) {
+//   const selected = event.value;
+
+//   // If "All" is selected, select all real card types
+//   if (selected.includes('all')) {
+//     this.reportForm.get('cardType')?.setValue(
+//       this.cardTypes.map(ct => ct.value),
+//       { emitEvent: false }
+//     );
+//   } else {
+//     // Keep selected values, remove "all" if deselected
+//     this.reportForm.get('cardType')?.setValue(selected, { emitEvent: false });
+//   }
+// }
+
 onCardTypeChange(event: any) {
   const selected = event.value;
-
-  // If "All" is selected, select all real card types
-  if (selected.includes('all')) {
+  if (selected.includes('ALL')) {
     this.reportForm.get('cardType')?.setValue(
-      this.cardTypes.map(ct => ct.value),
+      ['ALL', ...this.cardTypes.map(ct => ct.value)],
       { emitEvent: false }
     );
   } else {
-    // Keep selected values, remove "all" if deselected
     this.reportForm.get('cardType')?.setValue(selected, { emitEvent: false });
   }
 }

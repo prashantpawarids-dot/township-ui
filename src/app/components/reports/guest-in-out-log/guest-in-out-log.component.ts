@@ -172,19 +172,38 @@ if (f.searchText?.trim() !== '') {
 
 
 
+// onBuildingChange() {
+//   let selected: string[] = this.guestLogForm.get('buildingName')?.value || [];
+//   if (selected.includes('ALL')) {
+//     const allValues = this.buildings.map(b => b.value);
+//     this.guestLogForm.get('buildingName')?.setValue(allValues);
+//   }
+// }
+
+// onNrdChange() {
+//   let selected: string[] = this.guestLogForm.get('nrdName')?.value || [];
+//   if (selected.includes('ALL')) {
+//     const allValues = this.neighbourhoods.map(n => n.value);
+//     this.guestLogForm.get('nrdName')?.setValue(allValues);
+//   }
+// }
+
 onBuildingChange() {
   let selected: string[] = this.guestLogForm.get('buildingName')?.value || [];
   if (selected.includes('ALL')) {
-    const allValues = this.buildings.map(b => b.value);
-    this.guestLogForm.get('buildingName')?.setValue(allValues);
+    this.guestLogForm.get('buildingName')?.setValue(
+      ['ALL', ...this.buildings.map(b => b.value)]
+    );
   }
 }
+
 
 onNrdChange() {
   let selected: string[] = this.guestLogForm.get('nrdName')?.value || [];
   if (selected.includes('ALL')) {
-    const allValues = this.neighbourhoods.map(n => n.value);
-    this.guestLogForm.get('nrdName')?.setValue(allValues);
+    this.guestLogForm.get('nrdName')?.setValue(
+      ['ALL', ...this.neighbourhoods.map(n => n.value)]
+    );
   }
 }
   

@@ -93,14 +93,23 @@ loadNRDList() {
     this.nrdList = res.map(n => n.name) || [];
 
     // Add 'All' option at top
-    this.nrdList.unshift('All');
+    this.nrdList.unshift('ALL');
   });
 }
 
+// onNRDChange() {
+//   const selected = this.reportForm.value.nrd;
+//   if (selected.includes('All')) {
+//     this.reportForm.patchValue({ nrd: this.nrdList.filter(n => n !== 'All') });
+//   }
+// }
+
 onNRDChange() {
   const selected = this.reportForm.value.nrd;
-  if (selected.includes('All')) {
-    this.reportForm.patchValue({ nrd: this.nrdList.filter(n => n !== 'All') });
+  if (selected.includes('ALL')) {
+    this.reportForm.patchValue({ 
+      nrd: ['ALL', ...this.nrdList.filter(n => n !== 'ALL')]
+    }, { emitEvent: false });
   }
 }
 

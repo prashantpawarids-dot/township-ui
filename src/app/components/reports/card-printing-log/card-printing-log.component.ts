@@ -91,13 +91,23 @@ export class CardPrintingLogComponent implements OnInit {
     });
   }
 
+  // onCardTypeChange(event: any) {
+  //   const selected = event.value;
+  //   if (selected.includes('all')) {
+  //     this.reportForm.get('cardType')?.setValue(
+  //       this.cardTypes.map(ct => ct.value),
+  //       { emitEvent: false }
+  //     );
+  //   } else {
+  //     this.reportForm.get('cardType')?.setValue(selected, { emitEvent: false });
+  //   }
+  // }
+
+
   onCardTypeChange(event: any) {
     const selected = event.value;
-    if (selected.includes('all')) {
-      this.reportForm.get('cardType')?.setValue(
-        this.cardTypes.map(ct => ct.value),
-        { emitEvent: false }
-      );
+    if (selected.includes('ALL')) {
+      this.reportForm.get('cardType')?.setValue(['ALL',...this.cardTypes.map(ct => ct.value)],{ emitEvent: false });
     } else {
       this.reportForm.get('cardType')?.setValue(selected, { emitEvent: false });
     }

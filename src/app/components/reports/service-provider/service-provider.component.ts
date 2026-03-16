@@ -98,11 +98,18 @@ loadNeighbourhoods() {
 onNeighbourhoodChange(event: any) {
   const selected = event.value;
 
+  // if (selected.includes('ALL')) {
+  //   // Only show ALL if selected
+  //   this.serviceForm.get('neighbourhood')?.setValue(['ALL'], { emitEvent: false });
+  //   return;
+  // }
+
   if (selected.includes('ALL')) {
-    // Only show ALL if selected
-    this.serviceForm.get('neighbourhood')?.setValue(['ALL'], { emitEvent: false });
-    return;
-  }
+  this.serviceForm.get('neighbourhood')?.setValue(
+    ['ALL', ...this.neighbourhoods.map(n => n.value)], { emitEvent: false }
+  );
+  return;
+}
 
   // Remove 'ALL' if other options are selected
   this.serviceForm.get('neighbourhood')?.setValue(selected.filter(v => v !== 'ALL'), { emitEvent: false });

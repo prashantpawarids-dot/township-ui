@@ -1,8 +1,3 @@
-
-
-
-
-
 import { Component, ViewChild, OnInit, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
@@ -205,20 +200,44 @@ getSortDirection(): 'asc' | 'desc' {
 
 
 
-  onProjectChange() {
+//   onProjectChange() {
+//   let selectedProjects: string[] = this.reportForm.get('project')?.value || [];
+
+//   if (selectedProjects.includes('ALL')) {
+//     // selectedProjects = [...this.projectList];
+//     selectedProjects = ['ALL', ...this.projectList];
+//     this.reportForm.get('project')?.setValue(selectedProjects);
+//   }
+
+//   // Filter buildings based on selected NRDs
+//   const filtered = this.allBuildings
+//     .filter(b => selectedProjects.includes(b.nrdName))
+//     .map(b => b.name);
+
+//   this.buildingList = [...new Set(filtered)];
+
+//   // Do NOT auto-select
+// }
+
+onProjectChange() {
   let selectedProjects: string[] = this.reportForm.get('project')?.value || [];
 
   if (selectedProjects.includes('ALL')) {
-    selectedProjects = [...this.projectList];
+    selectedProjects = ['ALL', ...this.projectList];
     this.reportForm.get('project')?.setValue(selectedProjects);
   }
 
   // Filter buildings based on selected NRDs
-  const filtered = this.allBuildings
-    .filter(b => selectedProjects.includes(b.nrdName))
-    .map(b => b.name);
+  const realSelected = selectedProjects.filter(p => p !== 'ALL');
 
-  this.buildingList = [...new Set(filtered)];
+  if (!realSelected.length) {
+    this.buildingList = [...new Set(this.allBuildings.map(b => b.name))];
+  } else {
+    const filtered = this.allBuildings
+      .filter(b => realSelected.includes(b.nrdName))
+      .map(b => b.name);
+    this.buildingList = [...new Set(filtered)];
+  }
 
   // Do NOT auto-select
 }
@@ -233,7 +252,8 @@ onBuildingChange() {
   let selectedBuildings: string[] = this.reportForm.get('building')?.value || [];
 
   if (selectedBuildings.includes('ALL')) {
-    selectedBuildings = [...this.buildingList];
+    // selectedBuildings = [...this.buildingList];
+    selectedBuildings = ['ALL', ...this.buildingList];
     this.reportForm.get('building')?.setValue(selectedBuildings);
   }
 }
@@ -241,16 +261,20 @@ onBuildingChange() {
 onVehicleTypeChange() {
   let selected: string[] = this.reportForm.get('vehicleType')?.value || [];
   if (selected.includes('ALL')) {
-    const allValues = this.vehicleTypes.filter(v => v.value !== 'ALL').map(v => v.value);
-    this.reportForm.get('vehicleType')?.setValue(allValues);
+    // const allValues = this.vehicleTypes.filter(v => v.value !== 'ALL').map(v => v.value);
+    // this.reportForm.get('vehicleType')?.setValue(allValues);
+    const allValues = ['ALL', ...this.vehicleTypes.filter(v => v.value !== 'ALL').map(v => v.value)];
+this.reportForm.get('vehicleType')?.setValue(allValues);
   }
 }
 
 onInOutChange() {
   let selected: string[] = this.reportForm.get('inOut')?.value || [];
   if (selected.includes('ALL')) {
-    const allValues = this.inOutOptions.filter(v => v.value !== 'ALL').map(v => v.value);
-    this.reportForm.get('inOut')?.setValue(allValues);
+    // const allValues = this.inOutOptions.filter(v => v.value !== 'ALL').map(v => v.value);
+    // this.reportForm.get('inOut')?.setValue(allValues);
+    const allValues = ['ALL', ...this.inOutOptions.filter(v => v.value !== 'ALL').map(v => v.value)];
+this.reportForm.get('inOut')?.setValue(allValues);
   }
 }
 
@@ -259,10 +283,12 @@ onInOutChange() {
 // ✅ Add selectAll here
   selectAll(type: 'project' | 'building') {
     if (type === 'project') {
-      this.reportForm.get('project')?.setValue([...this.projectList]);
+      // this.reportForm.get('project')?.setValue([...this.projectList]);
+      this.reportForm.get('project')?.setValue(['ALL', ...this.projectList]);
       this.onProjectChange();
     } else {
-      this.reportForm.get('building')?.setValue([...this.buildingList]);
+      // this.reportForm.get('building')?.setValue([...this.buildingList]);
+      this.reportForm.get('building')?.setValue(['ALL', ...this.buildingList]);
       this.onBuildingChange();
     }
   }

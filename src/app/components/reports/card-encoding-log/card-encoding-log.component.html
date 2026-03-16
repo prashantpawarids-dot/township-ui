@@ -39,7 +39,7 @@
       <mat-form-field appearance="outline" class="w-100">
         <mat-label>Card Type</mat-label>
         <mat-select formControlName="cardType" multiple (selectionChange)="onCardTypeChange($event)">
-          <mat-option [value]="'all'">All</mat-option>
+          <mat-option [value]="'ALL'">All</mat-option>
           <mat-option *ngFor="let ct of cardTypes" [value]="ct.value">{{ ct.label }}</mat-option>
         </mat-select>
       </mat-form-field>

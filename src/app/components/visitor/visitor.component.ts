@@ -146,6 +146,7 @@ export class VisitorComponent implements OnInit {
       this.visitor.visitEndDate = this.visitor.visitStartDate;
       this.visitor.visitEndTime = this.visitor.visitStartTime;
       this.visitor.shortName = this.visitor.firstName +  " " + this.visitor.lastName ;
+        this.visitor.logicalDeleted = 0;
       console.log(this.visitor);
        let photo = this.visitor.photo; 
     delete this.visitor.photo;

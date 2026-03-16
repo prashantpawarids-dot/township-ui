@@ -121,22 +121,38 @@ get paginatedData() {
 }
 
 
+// loadBuildingList() {
+//   this.http.get<any[]>(`${environment.apiurl}Building`).subscribe(res => {
+//     this.allBuildings = res.map(b => b.name);
+//     this.buildings = ['All', ...this.allBuildings]; // Add 'All' at the top
+//   }, err => console.error('Error fetching buildings:', err));
+// }
+
 loadBuildingList() {
   this.http.get<any[]>(`${environment.apiurl}Building`).subscribe(res => {
     this.allBuildings = res.map(b => b.name);
-    this.buildings = ['All', ...this.allBuildings]; // Add 'All' at the top
+    this.buildings = [...this.allBuildings];
   }, err => console.error('Error fetching buildings:', err));
 }
+
+// onBuildingChange() {
+//   const selected = this.reportForm.value.buildings;
+
+//   if (selected.includes('All')) {
+//     this.reportForm.patchValue({
+//       buildings: [...this.allBuildings]   // Use master list ONLY
+//     });
+//   }
+// }
+
 onBuildingChange() {
   const selected = this.reportForm.value.buildings;
-
-  if (selected.includes('All')) {
+  if (selected.includes('ALL')) {
     this.reportForm.patchValue({
-      buildings: [...this.allBuildings]   // Use master list ONLY
+      buildings: ['ALL', ...this.allBuildings]
     });
   }
 }
-
 
 
 public sortColumn(column: string) {

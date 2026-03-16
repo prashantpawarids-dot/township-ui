@@ -183,35 +183,57 @@ getSortDirection(): 'asc' | 'desc' {
 
 
  // Neighbourhood change
+// onNeighbourhoodChange(event: any) {
+//   const selected = event.value;
+//   if (selected.includes('ALL')) {
+//     // Select all neighbourhoods (without adding 'ALL' to the form value)
+//     this.landOwnerForm.get('neighbourhood')?.setValue([...this.uniqueProjects]);
+//   }
+
+//   // Filter buildings based on selected neighbourhoods
+//   const selectedNeighbourhoods = this.landOwnerForm.value.neighbourhood || [];
+//   if (selectedNeighbourhoods.length === 0) {
+//     this.filteredBuildings = this.allBuildings.map(b => b.buildingName);
+//   } else {
+//     this.filteredBuildings = this.allBuildings
+//       .filter(b => selectedNeighbourhoods.includes(b.nrdName))
+//       .map(b => b.buildingName);
+//   }
+
+//   // Reset building selection if no longer valid
+//   const selectedBuildings = this.landOwnerForm.value.building || [];
+//   const newSelection = selectedBuildings.filter(b => this.filteredBuildings.includes(b));
+//   this.landOwnerForm.patchValue({ building: newSelection });
+// }
+
 onNeighbourhoodChange(event: any) {
   const selected = event.value;
   if (selected.includes('ALL')) {
-    // Select all neighbourhoods (without adding 'ALL' to the form value)
-    this.landOwnerForm.get('neighbourhood')?.setValue([...this.uniqueProjects]);
-  }
-
-  // Filter buildings based on selected neighbourhoods
-  const selectedNeighbourhoods = this.landOwnerForm.value.neighbourhood || [];
-  if (selectedNeighbourhoods.length === 0) {
+    this.landOwnerForm.get('neighbourhood')?.setValue(
+      ['ALL', ...this.uniqueProjects], { emitEvent: false }
+    );
     this.filteredBuildings = this.allBuildings.map(b => b.buildingName);
-  } else {
-    this.filteredBuildings = this.allBuildings
-      .filter(b => selectedNeighbourhoods.includes(b.nrdName))
-      .map(b => b.buildingName);
+    return;
   }
-
-  // Reset building selection if no longer valid
-  const selectedBuildings = this.landOwnerForm.value.building || [];
-  const newSelection = selectedBuildings.filter(b => this.filteredBuildings.includes(b));
-  this.landOwnerForm.patchValue({ building: newSelection });
+  this.filteredBuildings = this.allBuildings
+    .filter(b => selected.includes(b.nrdName))
+    .map(b => b.buildingName);
 }
-
 // Building change
+// onBuildingChange(event: any) {
+//   const selected = event.value;
+//   if (selected.includes('ALL')) {
+//     // Select all filtered buildings
+//     this.landOwnerForm.get('building')?.setValue([...this.filteredBuildings]);
+//   }
+// }
+
 onBuildingChange(event: any) {
   const selected = event.value;
   if (selected.includes('ALL')) {
-    // Select all filtered buildings
-    this.landOwnerForm.get('building')?.setValue([...this.filteredBuildings]);
+    this.landOwnerForm.get('building')?.setValue(
+      ['ALL', ...this.filteredBuildings], { emitEvent: false }
+    );
   }
 }
 

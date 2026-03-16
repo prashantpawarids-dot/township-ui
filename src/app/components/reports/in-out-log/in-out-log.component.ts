@@ -127,16 +127,19 @@ ngOnInit() {
 }
 
 
-  ngAfterViewInit() {
-  // Attach paginator to table datasource
-  this.displayedData.paginator = this.paginator;
+//   ngAfterViewInit() {
+//   this.displayedData.paginator = this.paginator;
+//   this.paginator.page.subscribe(() => {
+//     this.updatePagedData();
+//   });
+//   this.updatePagedData();
+// }
 
-  // When user changes page (next/prev)
+
+ngAfterViewInit() {
   this.paginator.page.subscribe(() => {
     this.updatePagedData();
   });
-
-  // Show first page initially
   this.updatePagedData();
 }
 
@@ -187,39 +190,133 @@ getSortDirection(): 'asc' | 'desc' {
 
 
 
-
+//Api call to get all data - but do NOT assign to table until user clicks Search
 loadData() {
   this.http.get<any[]>(`${environment.apiurl}Report/InoutRegister`).subscribe(res => {
     this.inOutData = res || [];
-    this.filteredData = [...this.inOutData]; // keep for filtering
+    this.filteredData = [...this.inOutData]; 
 
-    // Do NOT assign to table yet — only assign when user clicks "Search" or applies filter
+   
   });
 }
 
+//hard coded data until API is ready
+
+// loadData() {
+//   this.inOutData = Array.from({ length: 20 }, (_, i) => ({
+//     ownerName: `Owner ${i + 1}`,
+//     nrdName: `NRD ${(i % 3) + 1}`,
+//     buildingName: `Building-${String.fromCharCode(65 + (i % 4))}`,
+//     csnNumber: `CSN100${i + 1}`,
+//     accessmode: i % 2 === 0 ? 'IN' : 'OUT',
+//     inoutTime: new Date(2026, 2, 11, 10 + (i % 8), i * 3 % 60).toISOString(),
+//     cardType: ['DResident', 'DTenant', 'SProvider', 'Employee', 'Guest'][i % 5]
+//   }));
+//   this.filteredData = [...this.inOutData];
+// }
+
+// onCardTypeChange(event: any) {
+//   const selected = event.value;
+
+//   if (selected.includes('ALL')) {
+//     // User clicked All → show only ALL in UI
+//     this.reportForm.get('cardType')?.setValue(['ALL'], { emitEvent: false });
+//   } else {
+//     // Remove ALL if any other selected
+//     this.reportForm.get('cardType')?.setValue(selected.filter(v => v !== 'ALL'), { emitEvent: false });
+//   }
+// }
+
+// // Neighbourhood: Select All logic
+// onNeighbourhoodChange(event: any) {
+//   const selected = event.value;
+//   if (selected.includes('ALL')) {
+//     // Only show ALL in the UI
+//     this.reportForm.get('neighbourhood')?.setValue(['ALL'], { emitEvent: false });
+//   } 
+//   // Optional: remove ALL if user selects something else
+//   else if (selected.length && selected.includes('ALL') === false) {
+//     this.reportForm.get('neighbourhood')?.setValue(selected.filter(v => v !== 'ALL'), { emitEvent: false });
+//   }
+// }
+
+
+// // Building: Select All logic
+// onBuildingChange(event: any) {
+//   const selected = event.value;
+//   if (selected.includes('ALL')) {
+//     // Only show ALL in the UI
+//     this.reportForm.get('buildingName')?.setValue(['ALL'], { emitEvent: false });
+//   } 
+//   // Optional: remove ALL if user selects something else
+//   else if (selected.length && !selected.includes('ALL')) {
+//     this.reportForm.get('buildingName')?.setValue(selected.filter(v => v !== 'ALL'), { emitEvent: false });
+//   }
+// }
+
+
+// onAccessModeChange(event: any) {
+//   const selected = event.value;
+
+//   if (selected.includes('ALL')) {
+//     this.reportForm.get('accessMode')?.setValue(['ALL'], { emitEvent: false });
+//   } else {
+//     this.reportForm.get('accessMode')?.setValue(selected.filter(v => v !== 'ALL'), { emitEvent: false });
+//   }
+// }
+
 onCardTypeChange(event: any) {
   const selected = event.value;
-
   if (selected.includes('ALL')) {
-    // User clicked All → show only ALL in UI
-    this.reportForm.get('cardType')?.setValue(['ALL'], { emitEvent: false });
+    this.reportForm.get('cardType')?.setValue(
+      ['ALL', ...this.cardTypes.map(c => c.value)], { emitEvent: false }
+    );
   } else {
-    // Remove ALL if any other selected
-    this.reportForm.get('cardType')?.setValue(selected.filter(v => v !== 'ALL'), { emitEvent: false });
+    this.reportForm.get('cardType')?.setValue(
+      selected.filter(v => v !== 'ALL'), { emitEvent: false }
+    );
   }
 }
 
 onAccessModeChange(event: any) {
   const selected = event.value;
-
   if (selected.includes('ALL')) {
-    this.reportForm.get('accessMode')?.setValue(['ALL'], { emitEvent: false });
+    this.reportForm.get('accessMode')?.setValue(
+      ['ALL', ...this.accessModes.map(a => a.value)], { emitEvent: false }
+    );
   } else {
-    this.reportForm.get('accessMode')?.setValue(selected.filter(v => v !== 'ALL'), { emitEvent: false });
+    this.reportForm.get('accessMode')?.setValue(
+      selected.filter(v => v !== 'ALL'), { emitEvent: false }
+    );
   }
 }
 
+onNeighbourhoodChange(event: any) {
+  const selected = event.value;
+  if (selected.includes('ALL')) {
+    this.reportForm.get('neighbourhood')?.setValue(
+      ['ALL', ...this.neighbourhoods.map(n => n.value)], { emitEvent: false }
+    );
+    this.buildings = [...this.allBuildings];
+  } else if (selected.length && !selected.includes('ALL')) {
+    this.reportForm.get('neighbourhood')?.setValue(
+      selected.filter(v => v !== 'ALL'), { emitEvent: false }
+    );
+  }
+}
 
+onBuildingChange(event: any) {
+  const selected = event.value;
+  if (selected.includes('ALL')) {
+    this.reportForm.get('buildingName')?.setValue(
+      ['ALL', ...this.buildings.map(b => b.value)], { emitEvent: false }
+    );
+  } else if (selected.length && !selected.includes('ALL')) {
+    this.reportForm.get('buildingName')?.setValue(
+      selected.filter(v => v !== 'ALL'), { emitEvent: false }
+    );
+  }
+}
 
   loadNRDList() {
     this.http.get<any[]>(`${environment.apiurl}nrd`).subscribe(res => {
@@ -386,32 +483,7 @@ this.updatePagedData();
     if (this.paginator) this.paginator.firstPage();
   }
 
-  // Neighbourhood: Select All logic
-onNeighbourhoodChange(event: any) {
-  const selected = event.value;
-  if (selected.includes('ALL')) {
-    // Only show ALL in the UI
-    this.reportForm.get('neighbourhood')?.setValue(['ALL'], { emitEvent: false });
-  } 
-  // Optional: remove ALL if user selects something else
-  else if (selected.length && selected.includes('ALL') === false) {
-    this.reportForm.get('neighbourhood')?.setValue(selected.filter(v => v !== 'ALL'), { emitEvent: false });
-  }
-}
-
-
-// Building: Select All logic
-onBuildingChange(event: any) {
-  const selected = event.value;
-  if (selected.includes('ALL')) {
-    // Only show ALL in the UI
-    this.reportForm.get('buildingName')?.setValue(['ALL'], { emitEvent: false });
-  } 
-  // Optional: remove ALL if user selects something else
-  else if (selected.length && !selected.includes('ALL')) {
-    this.reportForm.get('buildingName')?.setValue(selected.filter(v => v !== 'ALL'), { emitEvent: false });
-  }
-}
+  
 
 
 

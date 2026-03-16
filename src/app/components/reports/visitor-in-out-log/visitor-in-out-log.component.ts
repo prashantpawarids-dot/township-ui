@@ -104,11 +104,17 @@ loadBuildingList() {
 onNRDSelect(event: any) {
   const selectedNRDs: string[] = event.value;
 
-  if (selectedNRDs.includes('All')) {
-    this.reportForm.get('nrd')?.setValue([...this.neighbourhoods]);
-    this.buildings = [...this.allBuildings]; // show all buildings if All NRD is selected
-    return;
-  }
+  // if (selectedNRDs.includes('All')) {
+  //   this.reportForm.get('nrd')?.setValue([...this.neighbourhoods]);
+  //   this.buildings = [...this.allBuildings]; // show all buildings if All NRD is selected
+  //   return;
+  // }
+
+  if (selectedNRDs.includes('ALL')) {
+  this.reportForm.get('nrd')?.setValue(['ALL', ...this.neighbourhoods]);
+  this.buildings = [...this.allBuildings];
+  return;
+}
 
   // Filter buildings based on selected NRDs
   this.buildings = Array.from(
@@ -127,9 +133,12 @@ onNRDSelect(event: any) {
 
 onBuildingSelect(event: any) {
   const selected = event.value;
-  if (selected.includes('All')) {
-    this.reportForm.get('building')?.setValue([...this.buildings]);
-  }
+  // if (selected.includes('All')) {
+  //   this.reportForm.get('building')?.setValue([...this.buildings]);
+  // }
+  if (selected.includes('ALL')) {
+  this.reportForm.get('building')?.setValue(['ALL', ...this.buildings]);
+}
 }
 
 

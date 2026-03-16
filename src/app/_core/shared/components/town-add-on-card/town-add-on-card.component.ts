@@ -46,21 +46,37 @@ export class TownAddOnCardComponent {
 
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    //Called before any other lifecycle hook. Use it to inject dependencies, but avoid any serious work here.
-    //Add '${implements OnChanges}' to the class.
-    // console.log('dataToDisplay', this.dataToDisplay);
+//   ngOnChanges(changes: SimpleChanges): void {
+//     //Called before any other lifecycle hook. Use it to inject dependencies, but avoid any serious work here.
+//     //Add '${implements OnChanges}' to the class.
+//     // console.log('dataToDisplay', this.dataToDisplay);
     
-    this.dataToDisplay.forEach((data, index) => {
-      data.srno = (index + 1).toString();
-    });
-    this.dataSource.setData(this.dataToDisplay);
-    this.cd.detectChanges();
-    // this.getImage(this.addonCard.idNumber)
- if (this.addonCard.idNumber && this.addonCard.idNumber !== '0') {
-      this.getImage(this.addonCard.idNumber)
-    }
+//     this.dataToDisplay.forEach((data, index) => {
+//       data.srno = (index + 1).toString();
+//     });
+//     this.dataSource.setData(this.dataToDisplay);
+//     this.cd.detectChanges();
+//     // this.getImage(this.addonCard.idNumber)
+//  if (this.addonCard.idNumber && this.addonCard.idNumber !== '0') {
+//       this.getImage(this.addonCard.idNumber)
+//     }
+//   }
+
+//new code
+
+ngOnChanges(changes: SimpleChanges): void {
+  if (!this.addonCard.gender) {
+    this.addonCard.gender = 'Male';
   }
+  this.dataToDisplay.forEach((data, index) => {
+    data.srno = (index + 1).toString();
+  });
+  this.dataSource.setData(this.dataToDisplay);
+  this.cd.detectChanges();
+  if (this.addonCard.idNumber && this.addonCard.idNumber !== '0') {
+    this.getImage(this.addonCard.idNumber)
+  }
+}
   onClickAddon() {
     if (this.addonphoto)
       this.addonphoto.nativeElement.click()
@@ -79,6 +95,7 @@ export class TownAddOnCardComponent {
       }
     });
   }
+  
   onFileSelected(event: Event) {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length > 0) {
@@ -86,6 +103,7 @@ export class TownAddOnCardComponent {
       this.uploadFile()
     }
   }
+
   // onFileSelected(event) {
   //   const files = event.dataTransfer ? event.dataTransfer.files : event.target.files;
   //   for (let i = 0; i < files.length; i++) {
@@ -105,6 +123,7 @@ export class TownAddOnCardComponent {
   //     //}
   //   }
   // }
+
   uploadFile() {
     if (!this.selectedFile) return;
     this.showImageOnScreen()
@@ -154,21 +173,49 @@ export class TownAddOnCardComponent {
     return false
   }
 
-  addData() {
-    if (this.photoPreview) {
-      this.addonCard.photo = this.photoPreview as string;
-    }
-    this.addonEvent.emit(this.addonCard)
-    this.addonCard = new AddonCard();
-    //add local record logic
-    // const srno = this.dataToDisplay.length + 1;
-    // this.addonCard.srno = srno.toString();
-    // this.dataToDisplay = [...this.dataToDisplay, this.addonCard];
-    // this.dataSource.setData(this.dataToDisplay);
-    // this.addonEvent.emit(this.addonCard)
-    // this.addonCard = new AddonCard();
-  }
+  // addData() {
+  //   if (this.photoPreview) {
+  //     this.addonCard.photo = this.photoPreview as string;
+  //   }
+  //   this.addonEvent.emit(this.addonCard)
+  //   this.addonCard = new AddonCard();
+  //   //add local record logic
+  //   // const srno = this.dataToDisplay.length + 1;
+  //   // this.addonCard.srno = srno.toString();
+  //   // this.dataToDisplay = [...this.dataToDisplay, this.addonCard];
+  //   // this.dataSource.setData(this.dataToDisplay);
+  //   // this.addonEvent.emit(this.addonCard)
+  //   // this.addonCard = new AddonCard();
+  // }
 
+  
+  //new code
+  addData() {
+  if (!this.validateForm()) return;
+
+  if (this.photoPreview) {
+    this.addonCard.photo = this.photoPreview as string;
+  }
+  this.addonEvent.emit(this.addonCard);
+  this.addonCard = new AddonCard();
+  this.photoPreview = null;        // ← clear photo
+  this.selectedFile = null;        // ← clear selected file
+}
+
+validateForm(): boolean {
+  const aadhar = this.addonCard.aadharCardId;
+  const mobile = this.addonCard.mobileNo;
+
+  if (aadhar && !/^\d{12}$/.test(aadhar.replace(/\s/g, ''))) {
+    Swal.fire('Invalid Aadhaar', 'Format: 12 digits (e.g. 123456789012)', 'error');
+    return false;
+  }
+  if (mobile && !/^\d{10}$/.test(mobile)) {
+    Swal.fire('Invalid Mobile', 'Must be 10 digits', 'error');
+    return false;
+  }
+  return true;
+}
   // removeData(data) {
   //   // local delete logic 
   //   // this.dataToDisplay = this.dataToDisplay.filter(x => x.srno !== data.srno);
@@ -210,7 +257,11 @@ removeData(data: any) {
   });
 }
 
+
+
+
 // Add this helper method if not already present
+
 private showSwal(icon: 'success' | 'error' | 'warning', title: string) {
   Swal.fire({
     icon,

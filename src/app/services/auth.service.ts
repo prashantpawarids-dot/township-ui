@@ -1171,8 +1171,17 @@ getProfileName(): Observable<any> {
       catchError(this.handleError));
   }
   // Master/ContractorType
-  getContractorType(): Observable<any> {
-    let url = this.baseUrl + 'ServiceType';
+
+  // getContractorType(): Observable<any> {
+  //   let url = this.baseUrl + 'ServiceType';
+  //   return this.http.get(url).pipe(map(res => {
+  //     return res;
+  //   }),
+  //     catchError(this.handleError));
+  // }
+
+   getContractorType(): Observable<any> {
+    let url = this.baseUrl + 'ContractorType';
     return this.http.get(url).pipe(map(res => {
       return res;
     }),
