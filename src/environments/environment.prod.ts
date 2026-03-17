@@ -9,7 +9,7 @@ export const environment = {
 
   
   //office PC IP
-  //  apiurl: 'http://192.168.1.9:5253/api/',
+  //  apiurl: 'http://192.168.0.51:5253/api/',
   
    
   production: true

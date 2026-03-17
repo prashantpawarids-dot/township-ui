@@ -268,3 +268,43 @@ export class AddonDataSource extends DataSource<any> {
         this._dataStream.next(data);
     }
 }
+
+
+
+// ─── Card Print & Enroll ─────────────────────────────────────────────────────
+
+export class CardPrintEnroll {
+    idNumber: string;
+    name: string;
+    building: string;
+    flatNumber: string;
+    cardDetails: string;
+    neighbourhood: string;
+    cardCSN: string;
+    photoUrl?: string;
+    isPrinted: boolean;
+    isPersonalised: boolean;
+    holderType: string = 'Resident';
+}
+
+export class CardAccessPoint {
+    id: number;
+    accessPoint: string;
+}
+
+export class CardEditDetail {
+    cardHolder: string;
+    cardDetails: string;
+    cardCSN: string;
+    accessPoints: CardAccessPoint[] = [];
+}
+
+export class CardSearchFilter {
+    neighbourhood: string = 'ALL';
+    building: string = 'ALL';
+    searchBy: 'Name' | 'IDnumber' | 'flatnumber' | 'Building_NRD' | 'CardCSN' | '' = '';
+    searchValue: string = '';
+    showAll: boolean = true;
+    showNonPrinted: boolean = false;
+    showNonPersonalised: boolean = false;
+}

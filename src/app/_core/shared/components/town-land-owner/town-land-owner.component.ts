@@ -36,6 +36,7 @@ export class TownLandOwnerComponent implements OnInit, OnChanges {
   bloodGroupOptions: string[] = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
   vehicleTypes: string[] = ['Two Wheeler', 'Four Wheeler', 'Three Wheeler'];
   selectedFile: File | null = null;
+  allBuildingOptions: any[] = [];
   @ViewChild('fileUpload') fileUpload: ElementRef;
   @Output() changeTenantType = new EventEmitter<number>();
   @Output() guestResident = new EventEmitter<string>();
@@ -173,12 +174,12 @@ return;
     }
 
   }
-
-  getBuildings() {
-    this.authService.getBuildings().subscribe(res => {
-      this.buildingOptions = res;
-    })
-  }
+//old get buildings
+  // getBuildings() {
+  //   this.authService.getBuildings().subscribe(res => {
+  //     this.buildingOptions = res;
+  //   })
+  // }
 
   // getNeighbourhood() {
   //   this.authService.getNeighbourhood().subscribe(res => {
@@ -217,7 +218,7 @@ onServiceTypeChange(event: any): void {
 //   });
 // }
 
-
+//old get neighbourhood
 getNeighbourhood() {
   this.authService.getNeighbourhood().subscribe(res => {
     this.neighbourhoodOptions = res || [];
@@ -230,6 +231,31 @@ getNeighbourhood() {
       this.landOwner.neighbourhood = this.neighbourhoodOptions[0].id; // ✅ set default
     }
   });
+}
+
+// Update getBuildings() to store all buildings
+getBuildings() {
+  this.authService.getBuildings().subscribe(res => {
+    this.allBuildingOptions = res;         // ← keep master list
+    this.buildingOptions = res;            // ← shown list (unfiltered initially)
+  });
+}
+
+// Add new method to filter buildings by selected NRD
+onNeighbourhoodSelected(event: any): void {
+  const selectedNrdId = event.option.value;          // e.g. 66
+  this.landOwner.nrd = selectedNrdId;
+
+  // Filter buildings whose parentID matches the selected NRD id
+  this.buildingOptions = this.allBuildingOptions.filter(
+    b => b.parentID === selectedNrdId
+  );
+
+  // Reset building and flat selections since NRD changed
+  this.landOwner.building = null;
+  this.landOwner.flatNumber = null;
+
+  this.filterResident();
 }
 
 

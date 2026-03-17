@@ -243,105 +243,7 @@ export const NavigationItems: NavigationItem[] = [
       },
         ]
 },
-      // {
-      //   id: 'master',
-      //   title: 'Master',
-      //   type: 'item',
-      //   classes: 'nav-item',
-      //   url: 'master',
-      //   icon: 'dashboard',
-      //   breadcrumbs: true
-      // },
-      // {
-      //   id: 'land-owner',
-      //   title: 'Land Owner',
-      //   type: 'item',
-      //   classes: 'nav-item',
-      //   url: '/land-owner',
-      //   icon: 'dashboard',
-      //   breadcrumbs: true
-      // },
-      // {
-      //   id: 'resident',
-      //   title: 'Resident',
-      //   type: 'item',
-      //   classes: 'nav-item',
-      //   url: '/resident',
-      //   icon: 'dashboard',
-      //   breadcrumbs: true
-      // },
-      // {
-      //   id: 'tenant',
-      //   title: 'Tenant',
-      //   type: 'item',
-      //   classes: 'nav-item',
-      //   url: '/tenant',
-      //   icon: 'dashboard',
-      //   breadcrumbs: true
-      // },
-      // {
-      //   id: 'contractor',
-      //   title: 'Contractor',
-      //   type: 'item',
-      //   classes: 'nav-item',
-      //   url: '/contractor',
-      //   icon: 'dashboard',
-      //   breadcrumbs: true
-      // },
-      // {
-      //   id: 'service-provider',
-      //   title: 'Service Provider',
-      //   type: 'item',
-      //   classes: 'nav-item',
-      //   url: '/service-provider',
-      //   icon: 'dashboard',
-      //   breadcrumbs: true
-      // },
-      // {
-      //   id: 'employee',
-      //   title: 'Employee',
-      //   type: 'item',
-      //   classes: 'nav-item',
-      //   url: '/employee',
-      //   icon: 'dashboard',
-      //   breadcrumbs: true
-      // },
-      // {
-      //   id: 'card-lost-damage',
-      //   title: 'Card Lost Damage',
-      //   type: 'item',
-      //   classes: 'nav-item',
-      //   url: '/card-lost-damage',
-      //   icon: 'dashboard',
-      //   breadcrumbs: true
-      // },
-      // {
-      //   id: 'tag-block-revoke',
-      //   title: 'Tag Block Revoke',
-      //   type: 'item',
-      //   classes: 'nav-item',
-      //   url: '/tag-block-revoke',
-      //   icon: 'dashboard',
-      //   breadcrumbs: true
-      // },
-      // {
-      //   id: 'guest',
-      //   title: 'Guest',
-      //   type: 'item',
-      //   classes: 'nav-item',
-      //   url: '/guest',
-      //   icon: 'dashboard',
-      //   breadcrumbs: true
-      // },
-      // {
-      //   id: 'visitor',
-      //   title: 'Visitor',
-      //   type: 'item',
-      //   classes: 'nav-item',
-      //   url: '/visitor',
-      //   icon: 'dashboard',
-      //   breadcrumbs: true
-      // },
+      
       
       {
     id: 'reports',
@@ -403,34 +305,16 @@ export const NavigationItems: NavigationItem[] = [
       }
     ]
   },
+//   {
+//   id: 'card-print-enroll',
+//   title: 'Card Print Enroll',
+//   type: 'item',
+//   classes: 'nav-item',
+//   url: '/card-print-enroll',
+//   icon: 'dashboard',
+//   breadcrumbs: true
+// },
     ]
   },
-  // {
-  //   id: 'authentication',
-  //   title: 'Authentication',
-  //   type: 'group',
-  //   icon: 'icon-navigation',
-  //   children: [
-  //     {
-  //       id: 'login',
-  //       title: 'Login',
-  //       type: 'item',
-  //       classes: 'nav-item',
-  //       url: '/login',
-  //       icon: 'login',
-  //       target: true,
-  //       breadcrumbs: false
-  //     },
-  //     {
-  //       id: 'register',
-  //       title: 'Register',
-  //       type: 'item',
-  //       classes: 'nav-item',
-  //       url: '/register',
-  //       icon: 'profile',
-  //       target: true,
-  //       breadcrumbs: false
-  //     }
-  //   ]
-  // },
+  
 ];

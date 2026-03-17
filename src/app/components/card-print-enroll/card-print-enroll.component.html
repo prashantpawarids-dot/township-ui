@@ -1,0 +1,734 @@
+<!-- <div class="cpe-wrapper">
+
+  
+  <div class="cpe-header">
+    <div class="cpe-header__title">
+      <span class="cpe-header__icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/>
+        </svg>
+      </span>
+      <h2>ID Card Print &amp; Enroll</h2>
+    </div>
+    <div class="cpe-header__filters">
+      <mat-form-field appearance="outline" class="filter-field">
+        <mat-label>Neighbourhood</mat-label>
+        <mat-select [(ngModel)]="filter.neighbourhood" (ngModelChange)="onNeighbourhoodChange()">
+          <mat-option *ngFor="let n of neighbourhoods" [value]="n.name">{{ n.name }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="filter-field">
+        <mat-label>Building</mat-label>
+        <mat-select [(ngModel)]="filter.building">
+          <mat-option *ngFor="let b of buildings" [value]="b.name">{{ b.name }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="filter-field filter-field--search-by">
+        <mat-label>Search By</mat-label>
+        <mat-select [(ngModel)]="filter.searchBy">
+          <mat-option value="">-- Select --</mat-option>
+          <mat-option *ngFor="let opt of searchOptions" [value]="opt.value">{{ opt.label }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="filter-field filter-field--search">
+        <mat-label>Search</mat-label>
+        <input matInput [(ngModel)]="filter.searchValue" (keyup.enter)="search()" />
+        <mat-icon matSuffix>search</mat-icon>
+      </mat-form-field>
+      <button class="btn-search" (click)="search()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        Search
+      </button>
+    </div>
+  </div>
+
+
+  <div class="cpe-filterbar">
+    <div class="filterbar__checks">
+      <label class="custom-check">
+        <input type="checkbox" [(ngModel)]="filter.showAll" />
+        <span class="checkmark"></span>Show All
+      </label>
+      <label class="custom-check">
+        <input type="checkbox" [(ngModel)]="filter.showNonPrinted" />
+        <span class="checkmark"></span>Show Non Printed
+      </label>
+      <label class="custom-check">
+        <input type="checkbox" [(ngModel)]="filter.showNonPersonalised" />
+        <span class="checkmark"></span>Show Non Personalised
+      </label>
+    </div>
+    <div class="filterbar__right">
+      <span class="record-badge">
+        <span class="record-badge__count">{{ cardHolders.length }}</span> Record(s)
+      </span>
+      <button class="btn-photo" (click)="takePhoto()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+          <circle cx="12" cy="13" r="4"/>
+        </svg>
+        Take Photo
+      </button>
+    </div>
+  </div>
+
+ 
+  <div class="cpe-body">
+
+  
+    <div class="cpe-left">
+      <div class="card-preview-label">
+        {{ selectedCard ? selectedCard.name : 'No Member Selected' }}
+      </div>
+
+      <div class="id-card" [class.id-card--active]="selectedCard">
+        <div class="id-card__header">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+            <polyline points="9,22 9,12 15,12 15,22"/>
+          </svg>
+          <span class="id-card__org">{{ selectedCard ? selectedCard.neighbourhood : 'Falcon Towers' }}</span>
+        </div>
+        <div class="id-card__photo-wrap">
+          <img *ngIf="selectedCard?.photoUrl; else noPhoto"
+               [src]="selectedCard?.photoUrl" class="id-card__photo" alt="member photo" />
+          <ng-template #noPhoto>
+            <div class="id-card__photo--placeholder">
+              <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+              </svg>
+            </div>
+          </ng-template>
+        </div>
+        <div class="id-card__name">{{ selectedCard?.name || '— Select a member —' }}</div>
+        <div class="id-card__meta" *ngIf="selectedCard">
+          <span>{{ selectedCard.idNumber }}</span>
+          <span>{{ selectedCard.building }}-{{ selectedCard.flatNumber }}</span>
+        </div>
+        <div class="id-card__stripe"></div>
+      </div>
+
+      <div class="card-type-group">
+        <span class="card-type-group__label">Card Type</span>
+        <div class="card-type-options">
+          <label class="radio-option" [class.radio-option--active]="cardType === 'pre-printed'">
+            <input type="radio" name="cardType" value="pre-printed" [(ngModel)]="cardType" />
+            <span class="radio-dot"></span>Pre-Printed Card
+          </label>
+          <label class="radio-option" [class.radio-option--active]="cardType === 'blank'">
+            <input type="radio" name="cardType" value="blank" [(ngModel)]="cardType" />
+            <span class="radio-dot"></span>Blank Card
+          </label>
+        </div>
+      </div>
+
+      <div class="print-actions">
+        <button class="btn-print" (click)="print()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 6 2 18 2 18 9"/>
+            <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+            <rect x="6" y="14" width="12" height="8"/>
+          </svg>
+          Print
+        </button>
+        <button class="btn-export" (click)="printExport()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          Print Export
+        </button>
+      </div>
+    </div>
+
+   
+    <div class="cpe-right">
+
+   
+      <div class="table-container">
+        <table mat-table [dataSource]="cardHolders" class="cpe-table">
+          <ng-container matColumnDef="idNumber">
+            <th mat-header-cell *matHeaderCellDef>ID Number</th>
+            <td mat-cell *matCellDef="let row"><span class="id-badge">{{ row.idNumber }}</span></td>
+          </ng-container>
+          <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef>Name</th>
+            <td mat-cell *matCellDef="let row">
+              <div class="name-cell">
+                <div class="name-avatar">{{ row.name?.charAt(0) }}</div>
+                <span>{{ row.name }}</span>
+              </div>
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="building">
+            <th mat-header-cell *matHeaderCellDef>Building</th>
+            <td mat-cell *matCellDef="let row">{{ row.building }}</td>
+          </ng-container>
+          <ng-container matColumnDef="flatNumber">
+            <th mat-header-cell *matHeaderCellDef>Flat No.</th>
+            <td mat-cell *matCellDef="let row">{{ row.flatNumber }}</td>
+          </ng-container>
+          <ng-container matColumnDef="cardDetails">
+            <th mat-header-cell *matHeaderCellDef>Card CSN</th>
+            <td mat-cell *matCellDef="let row">
+              <span class="csn-pill" *ngIf="row.cardDetails; else noCard">{{ row.cardDetails }}</span>
+              <ng-template #noCard><span class="csn-pill csn-pill--empty">—</span></ng-template>
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="neighbourhood">
+            <th mat-header-cell *matHeaderCellDef>Neighbourhood</th>
+            <td mat-cell *matCellDef="let row">{{ row.neighbourhood }}</td>
+          </ng-container>
+          <ng-container matColumnDef="action">
+            <th mat-header-cell *matHeaderCellDef>Action</th>
+            <td mat-cell *matCellDef="let row">
+              <button class="btn-view" (click)="openViewDialog(row); $event.stopPropagation()">View</button>
+            </td>
+          </ng-container>
+          <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"
+              [class.row--selected]="selectedCard?.idNumber === row.idNumber"
+              (click)="onRowClick(row)">
+          </tr>
+        </table>
+        <div class="table-empty" *ngIf="cardHolders.length === 0">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" opacity="0.3">
+            <rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/>
+          </svg>
+          <p>No records found</p>
+        </div>
+      </div>
+
+      
+      <div class="bottom-form">
+        <div class="bottom-form__row">
+          <div class="form-field-group">
+            <label class="form-label">Cardholder No.</label>
+            <input class="form-input" [(ngModel)]="cardHolderNo" placeholder="—" readonly />
+          </div>
+          <div class="form-field-group form-field-group--csn">
+            <label class="form-label">Card CSN</label>
+            <div class="csn-input-wrap">
+              <input class="form-input" [(ngModel)]="cardCSN" placeholder="Enter CSN" />
+              <button class="btn-read" (click)="readCard()">Read Card</button>
+            </div>
+          </div>
+          <button class="btn-issue" (click)="issueCard()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+              <polyline points="22 4 12 14.01 9 11.01"/>
+            </svg>
+            Issue Card
+          </button>
+        </div>
+        <div class="bottom-form__row">
+          <div class="form-field-group form-field-group--wide">
+            <label class="form-label">Cardholder Name</label>
+            <input class="form-input" [(ngModel)]="cardHolderName" readonly placeholder="—" />
+          </div>
+          <div class="form-field-group">
+            <label class="form-label">Building / Flat No.</label>
+            <input class="form-input" [(ngModel)]="buildingFlatNo" readonly placeholder="—" />
+          </div>
+          <div class="form-field-group">
+            <label class="form-label">Neighbourhood</label>
+            <input class="form-input" [(ngModel)]="neighbourhoodDisplay" readonly placeholder="—" />
+          </div>
+        </div>
+      </div>
+
+     
+      <div class="camera-panel" *ngIf="showCamera">
+        <div class="camera-panel__header">
+          <div class="camera-panel__title">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+              <circle cx="12" cy="13" r="4"/>
+            </svg>
+            Take Photo — <strong>{{ selectedCard?.name }}</strong>
+          </div>
+          <button class="camera-close-btn" (click)="closeCamera()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </div>
+
+        <div class="camera-panel__content">
+       
+          <div class="camera-feed-wrap">
+            <video id="cameraFeed" autoplay playsinline class="camera-feed"
+                   [style.display]="capturedPhotoBase64 ? 'none' : 'block'">
+            </video>
+            <img *ngIf="capturedPhotoBase64" [src]="capturedPhotoBase64"
+                 class="camera-preview-img" alt="captured" />
+          </div>
+
+          <div class="camera-panel__actions">
+          
+            <ng-container *ngIf="!capturedPhotoBase64">
+              <button class="btn-capture" (click)="captureSnapshot()">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/>
+                </svg>
+                Capture
+              </button>
+              <button class="btn-cancel-cam" (click)="closeCamera()">Cancel</button>
+            </ng-container>
+
+          
+            <ng-container *ngIf="capturedPhotoBase64">
+              <div class="capture-result-msg">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00c9a7" stroke-width="2.5">
+                  <polyline points="20 6 9 17 4 12"/>
+                </svg>
+                Photo captured! Use this or retake.
+              </div>
+              <button class="btn-confirm-photo" (click)="confirmPhoto()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <polyline points="20 6 9 17 4 12"/>
+                </svg>
+                Use This Photo
+              </button>
+              <button class="btn-retake" (click)="retakePhoto()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="1 4 1 10 7 10"/>
+                  <path d="M3.51 15a9 9 0 1 0 .49-4"/>
+                </svg>
+                Retake
+              </button>
+              <button class="btn-cancel-cam" (click)="closeCamera()">Cancel</button>
+            </ng-container>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div> -->
+
+
+<div class="cpe-wrapper">
+
+  <!-- HEADER -->
+  <div class="cpe-header">
+    <div class="cpe-header__title">
+      <span class="cpe-header__icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/>
+        </svg>
+      </span>
+      <h2>ID Card Print &amp; Enroll</h2>
+    </div>
+    <div class="cpe-header__filters">
+      <mat-form-field appearance="outline" class="filter-field">
+        <mat-label>Neighbourhood</mat-label>
+        <mat-select [(ngModel)]="filter.neighbourhood" (ngModelChange)="onNeighbourhoodChange()">
+          <mat-option *ngFor="let n of neighbourhoods" [value]="n.name">{{ n.name }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="filter-field">
+        <mat-label>Building</mat-label>
+        <mat-select [(ngModel)]="filter.building">
+          <mat-option *ngFor="let b of buildings" [value]="b.name">{{ b.name }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="filter-field filter-field--search-by">
+        <mat-label>Search By</mat-label>
+        <mat-select [(ngModel)]="filter.searchBy">
+          <mat-option value="">-- Select --</mat-option>
+          <mat-option *ngFor="let opt of searchOptions" [value]="opt.value">{{ opt.label }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="filter-field filter-field--search">
+        <mat-label>Search</mat-label>
+        <input matInput [(ngModel)]="filter.searchValue" (keyup.enter)="search()" />
+        <mat-icon matSuffix>search</mat-icon>
+      </mat-form-field>
+      <button class="btn-search" (click)="search()">Search</button>
+    </div>
+  </div>
+
+  <!-- FILTER BAR -->
+  <div class="cpe-filterbar">
+    <div class="filterbar__checks">
+      <label class="custom-check">
+        <input type="checkbox" [(ngModel)]="filter.showAll" /><span class="checkmark"></span>Show All
+      </label>
+      <label class="custom-check">
+        <input type="checkbox" [(ngModel)]="filter.showNonPrinted" /><span class="checkmark"></span>Show Non Printed
+      </label>
+      <label class="custom-check">
+        <input type="checkbox" [(ngModel)]="filter.showNonPersonalised" /><span class="checkmark"></span>Show Non Personalised
+      </label>
+    </div>
+    <div class="filterbar__right">
+      <span class="record-badge"><span class="record-badge__count">{{ cardHolders.length }}</span> Record(s)</span>
+      <button class="btn-photo" (click)="takePhoto()">📷 Take Photo</button>
+    </div>
+  </div>
+
+  <!-- MAIN BODY -->
+  <div class="cpe-body">
+
+    <!-- LEFT PANEL -->
+    <!-- <div class="cpe-left">
+      <div class="card-preview-label">{{ selectedCard ? selectedCard.name : 'No Member Selected' }}</div>
+
+      <div class="id-card" [class.id-card--active]="selectedCard">
+        <div class="id-card__header">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+            <polyline points="9,22 9,12 15,12 15,22"/>
+          </svg>
+          <span class="id-card__org">{{ selectedCard ? selectedCard.neighbourhood : 'Falcon Towers' }}</span>
+        </div>
+        <div class="id-card__photo-wrap">
+          <img *ngIf="selectedCard?.photoUrl" [src]="selectedCard!.photoUrl" class="id-card__photo" alt="photo" />
+          <div *ngIf="!selectedCard?.photoUrl" class="id-card__photo--placeholder">
+            <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+              <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+            </svg>
+          </div>
+        </div>
+        <div class="id-card__name">{{ selectedCard?.name || '— Select a member —' }}</div>
+        <div class="id-card__meta" *ngIf="selectedCard">
+          <span>{{ selectedCard.idNumber }}</span>
+          <span>{{ selectedCard.building }}-{{ selectedCard.flatNumber }}</span>
+        </div>
+        <div class="id-card__stripe"></div>
+      </div>
+
+      <div class="card-type-group">
+        <span class="card-type-group__label">Card Type</span>
+        <div class="card-type-options">
+          <label class="radio-option" [class.radio-option--active]="cardType === 'pre-printed'">
+            <input type="radio" name="cardType" value="pre-printed" [(ngModel)]="cardType" />
+            <span class="radio-dot"></span>Pre-Printed Card
+          </label>
+          <label class="radio-option" [class.radio-option--active]="cardType === 'blank'">
+            <input type="radio" name="cardType" value="blank" [(ngModel)]="cardType" />
+            <span class="radio-dot"></span>Blank Card
+          </label>
+        </div>
+      </div>
+
+      <div class="print-actions">
+        <button class="btn-print"  (click)="print()">🖨️ Print</button>
+        <button class="btn-export" (click)="printExport()">⬇️ Print Export</button>
+      </div>
+    </div> -->
+<!-- LEFT PANEL -->
+<div class="cpe-left">
+  <div class="card-preview-label">
+    {{ selectedCard ? selectedCard.name : 'No Member Selected' }}
+  </div>
+
+  <!-- ── REAL CARD PREVIEW using actual template image ── -->
+  <div class="real-card-wrap">
+
+  <!-- No card selected -->
+  <div class="real-card-empty" *ngIf="!selectedCard">
+    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" opacity="0.3">
+      <rect x="2" y="5" width="20" height="14" rx="2"/>
+      <line x1="2" y1="10" x2="22" y2="10"/>
+    </svg>
+    <p>Select a member<br/>to preview card</p>
+  </div>
+
+  <!-- Card selected -->
+  <div class="real-card" *ngIf="selectedCard">
+
+    <!-- ── PRE-PRINTED: Show actual Riverview City template ── -->
+    <ng-container *ngIf="cardType === 'pre-printed'">
+
+      <img class="real-card__bg"
+           [src]="currentCardTemplate"
+           alt="card template" />
+
+      <div class="real-card__photo-overlay"
+           [style.top]="currentCardPhotoStyle['top']"
+           [style.left]="currentCardPhotoStyle['left']"
+           [style.width]="currentCardPhotoStyle['width']"
+           [style.height]="currentCardPhotoStyle['height']"
+           [style.position]="'absolute'">
+        <img *ngIf="selectedCard?.photoUrl"
+             [src]="selectedCard?.photoUrl"
+             class="real-card__photo-img"
+             alt="member photo" />
+        <div *ngIf="!selectedCard?.photoUrl" class="real-card__photo-placeholder">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="1">
+            <circle cx="12" cy="8" r="4"/>
+            <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="real-card__text-overlay">
+        <div class="real-card__name">{{ selectedCard?.name }}</div>
+        <div class="real-card__flat">{{ selectedCard?.building }} - {{ selectedCard?.flatNumber }}</div>
+        <div class="real-card__id">ID: {{ selectedCard?.idNumber }}</div>
+      </div>
+
+    </ng-container>
+
+    <!-- ── BLANK CARD: Plain white card ── -->
+    <ng-container *ngIf="cardType === 'blank'">
+
+      <div class="blank-card">
+
+        <div class="blank-card__photo-wrap">
+          <img *ngIf="selectedCard?.photoUrl"
+               [src]="selectedCard?.photoUrl"
+               class="blank-card__photo"
+               alt="member photo" />
+          <div *ngIf="!selectedCard?.photoUrl" class="blank-card__photo-placeholder">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1">
+              <circle cx="12" cy="8" r="4"/>
+              <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="blank-card__info">
+          <div class="blank-card__name">{{ selectedCard?.name }}</div>
+          <div class="blank-card__flat">{{ selectedCard?.building }} - {{ selectedCard?.flatNumber }}</div>
+          <div class="blank-card__id">ID: {{ selectedCard?.idNumber }}</div>
+        </div>
+
+      </div>
+
+    </ng-container>
+
+  </div>
+</div>
+
+  <!-- Card Type -->
+  <div class="card-type-group">
+    <span class="card-type-group__label">Card Type</span>
+    <div class="card-type-options">
+      <label class="radio-option" [class.radio-option--active]="cardType === 'pre-printed'">
+        <input type="radio" name="cardType" value="pre-printed" [(ngModel)]="cardType" />
+        <span class="radio-dot"></span>Pre-Printed Card
+      </label>
+      <label class="radio-option" [class.radio-option--active]="cardType === 'blank'">
+        <input type="radio" name="cardType" value="blank" [(ngModel)]="cardType" />
+        <span class="radio-dot"></span>Blank Card
+      </label>
+    </div>
+  </div>
+
+  <div class="print-actions">
+    <button class="btn-print"  (click)="print()">🖨️ Print</button>
+    <button class="btn-export" (click)="printExport()">⬇️ Print Export</button>
+  </div>
+</div>
+    <!-- RIGHT PANEL -->
+    <div class="cpe-right">
+
+      <!-- TABLE -->
+      <div class="table-container">
+        <table mat-table [dataSource]="cardHolders" class="cpe-table">
+          <ng-container matColumnDef="idNumber">
+            <th mat-header-cell *matHeaderCellDef>ID Number</th>
+            <td mat-cell *matCellDef="let row"><span class="id-badge">{{ row.idNumber }}</span></td>
+          </ng-container>
+          <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef>Name</th>
+            <td mat-cell *matCellDef="let row">
+              <div class="name-cell">
+                <div class="name-avatar">{{ row.name?.charAt(0) }}</div>
+                <span>{{ row.name }}</span>
+              </div>
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="building">
+            <th mat-header-cell *matHeaderCellDef>Building</th>
+            <td mat-cell *matCellDef="let row">{{ row.building }}</td>
+          </ng-container>
+          <ng-container matColumnDef="flatNumber">
+            <th mat-header-cell *matHeaderCellDef>Flat No.</th>
+            <td mat-cell *matCellDef="let row">{{ row.flatNumber }}</td>
+          </ng-container>
+          <ng-container matColumnDef="cardDetails">
+            <th mat-header-cell *matHeaderCellDef>Card CSN</th>
+            <td mat-cell *matCellDef="let row">
+              <span class="csn-pill" *ngIf="row.cardDetails; else noCard">{{ row.cardDetails }}</span>
+              <ng-template #noCard><span class="csn-pill csn-pill--empty">—</span></ng-template>
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="neighbourhood">
+            <th mat-header-cell *matHeaderCellDef>Neighbourhood</th>
+            <td mat-cell *matCellDef="let row">{{ row.neighbourhood }}</td>
+          </ng-container>
+          <ng-container matColumnDef="action">
+            <th mat-header-cell *matHeaderCellDef>Action</th>
+            <td mat-cell *matCellDef="let row">
+              <button class="btn-view" (click)="openViewDialog(row); $event.stopPropagation()">View</button>
+            </td>
+          </ng-container>
+          <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"
+              [class.row--selected]="selectedCard?.idNumber === row.idNumber"
+              (click)="onRowClick(row)">
+          </tr>
+        </table>
+        <div class="table-empty" *ngIf="cardHolders.length === 0">
+          <p>No records found</p>
+        </div>
+      </div>
+
+      <!-- BOTTOM FORM -->
+      <div class="bottom-form">
+        <div class="bottom-form__row">
+          <div class="form-field-group">
+            <label class="form-label">Cardholder No.</label>
+            <input class="form-input" [(ngModel)]="cardHolderNo" readonly placeholder="—" />
+          </div>
+          <div class="form-field-group form-field-group--csn">
+            <label class="form-label">Card CSN</label>
+            <div class="csn-input-wrap">
+              <input class="form-input" [(ngModel)]="cardCSN" placeholder="Enter CSN" />
+              <button class="btn-read" (click)="readCard()">Read Card</button>
+            </div>
+          </div>
+          <button class="btn-issue" (click)="issueCard()">✅ Issue Card</button>
+        </div>
+        <div class="bottom-form__row">
+          <div class="form-field-group form-field-group--wide">
+            <label class="form-label">Cardholder Name</label>
+            <input class="form-input" [(ngModel)]="cardHolderName" readonly placeholder="—" />
+          </div>
+          <div class="form-field-group">
+            <label class="form-label">Building / Flat No.</label>
+            <input class="form-input" [(ngModel)]="buildingFlatNo" readonly placeholder="—" />
+          </div>
+          <div class="form-field-group">
+            <label class="form-label">Neighbourhood</label>
+            <input class="form-input" [(ngModel)]="neighbourhoodDisplay" readonly placeholder="—" />
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       CAMERA CAPTURE POPUP MODAL
+  ══════════════════════════════════════════════════════════ -->
+  <div class="cam-overlay" *ngIf="showCameraModal" (click)="closeCameraModal()">
+    <div class="cam-modal" (click)="$event.stopPropagation()">
+
+      <!-- Modal Title Bar -->
+      <div class="cam-modal__titlebar">
+        <div class="cam-modal__titlebar-left">
+          <span class="cam-icon">📷</span>
+          <span>Camera Capture — <strong>{{ selectedCard?.name }}</strong></span>
+        </div>
+        <div class="cam-modal__titlebar-actions">
+          <button class="cam-titlebar-btn" (click)="closeCameraModal()">✕</button>
+        </div>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="cam-modal__body">
+
+        <!-- LEFT: Camera Feed Area -->
+        <div class="cam-left">
+          <!-- Camera Control Buttons -->
+          <div class="cam-controls">
+            <button class="cam-btn cam-btn--start" (click)="startCamera()" [disabled]="cameraActive">
+              ▶ Start Camera
+            </button>
+            <button class="cam-btn cam-btn--stop" (click)="stopCamera()" [disabled]="!cameraActive">
+              ■ Stop Camera
+            </button>
+            <button class="cam-btn cam-btn--capture" (click)="capturePhoto()" [disabled]="!cameraActive">
+              📸 Capture
+            </button>
+          </div>
+
+          <!-- Video Feed -->
+          <div class="cam-feed-box">
+            <video id="camVideo" autoplay playsinline class="cam-video"
+                   [style.display]="cameraActive ? 'block' : 'none'">
+            </video>
+            <div class="cam-feed-placeholder" *ngIf="!cameraActive && !capturedImage">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                <circle cx="12" cy="13" r="4"/>
+              </svg>
+              <p>Click "Start Camera" to begin</p>
+            </div>
+            <img *ngIf="!cameraActive && capturedImage" [src]="capturedImage"
+                 class="cam-captured-preview" alt="captured" />
+          </div>
+        </div>
+<!-- RIGHT: Crop + Save -->
+<div class="cam-right">
+  <div class="cam-right__label">Croppable Image</div>
+
+  <!-- CROPPER — shows after capture or upload -->
+  <div class="cam-crop-box" *ngIf="showCropper && imageToCrop">
+    <image-cropper
+  [imageBase64]="imageToCrop"
+  [maintainAspectRatio]="false"
+  [resizeToWidth]="400"
+  [onlyScaleDown]="true"
+  format="jpeg"
+  [cropperMinWidth]="30"
+  [cropperMinHeight]="30"
+  (imageCropped)="imageCropped($event)"
+  backgroundColor="#0d1520"
+  style="max-height: 320px; background: #0d1520;">
+</image-cropper>
+  </div>
+
+  <!-- Empty placeholder before any image -->
+  <div class="cam-crop-box" *ngIf="!showCropper">
+    <div class="cam-crop-placeholder">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" opacity="0.3">
+        <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+        <circle cx="12" cy="13" r="4"/>
+      </svg>
+      <p>Photo will appear here</p>
+    </div>
+  </div>
+
+  <!-- Cropped preview thumbnail -->
+  <div class="cam-preview-thumb" *ngIf="croppedResult">
+    <span class="cam-preview-label">Preview</span>
+    <img [src]="croppedResult" class="cam-thumb-img" alt="cropped preview" />
+  </div>
+
+  <!-- Upload + Clear -->
+  <div class="cam-upload-left">
+    <label class="cam-upload-btn">
+      ⬆ Upload Image
+      <input type="file" accept="image/*" (change)="onUploadImage($event)" style="display:none" />
+    </label>
+    <button class="cam-clear-btn" (click)="clearCaptured()">✕ Clear</button>
+  </div>
+
+  <!-- Card No -->
+  <div class="cam-cardno-row">
+    <label class="cam-cardno-label">CardNo</label>
+    <input class="cam-cardno-input" [(ngModel)]="cardNoForPhoto" readonly />
+  </div>
+
+  <!-- Save and Exit -->
+  <button class="cam-save-btn" (click)="saveAndExit()"
+          [disabled]="!croppedResult && !capturedImage">
+    💾 Save and Exit
+  </button>
+
+</div>
+
+      </div>
+    </div>
+  </div>
+
+</div>

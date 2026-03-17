@@ -441,8 +441,8 @@ setBuilding() {
   this.searchByOptions = [
     { name: "Id", key: "id" },
     { name: "Name", key: "name" },
-    { name: "Short Name", key: "code" },
-    // { name: "Neighbourhood", key: "nrdName" } 
+    // { name: "Short Name", key: "code" },
+    { name: "Neighbourhood", key: "nrdName" } 
   ];
 
   this.authService.getBuildings().subscribe(res => {
@@ -451,7 +451,7 @@ setBuilding() {
     this.dataSource.data = this.dataToDisplay;
 
     // ✅ Changed 'Neighbourhood' to 'nrdName'
-    this.displayedColumns = ['srno', 'Id', 'short name', 'Name', 'nrdName', 'actions'];
+    this.displayedColumns = ['srno', 'Id', 'Name', 'nrdName', 'actions'];
   });
 }
 

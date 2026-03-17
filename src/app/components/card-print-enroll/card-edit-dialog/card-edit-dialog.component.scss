@@ -1,0 +1,314 @@
+$navy: #0f1c2e;
+$navy-light: #162436;
+$navy-card: #1a2d42;
+$teal: #00c9a7;
+$teal-soft: #00c9a715;
+$teal-border: #00c9a740;
+$blue-accent: #3d8ef8;
+$text-primary: #e2eaf4;
+$text-secondary: #7b92ad;
+$text-muted: #4a6278;
+$border: #1f3448;
+$danger: #f05a5a;
+$danger-soft: #f05a5a18;
+
+// Override Angular Material Dialog
+::ng-deep .mat-mdc-dialog-container {
+  --mdc-dialog-container-color: #{$navy} !important;
+  border-radius: 14px !important;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6) !important;
+  border: 1px solid $border;
+  overflow: hidden;
+}
+
+.ced-dialog {
+  background: $navy;
+  color: $text-primary;
+  font-family: 'DM Sans', 'Segoe UI', sans-serif;
+  display: flex;
+  flex-direction: column;
+  width: 480px;
+  max-width: 100%;
+}
+
+// ── Header ───────────────────────────────────────────────────
+.ced-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 20px 22px 16px;
+  border-bottom: 1px solid $border;
+  position: relative;
+
+  &__icon {
+    width: 38px;
+    height: 38px;
+    background: $teal-soft;
+    border: 1px solid $teal-border;
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: $teal;
+    flex-shrink: 0;
+  }
+
+  &__title {
+    font-size: 15px;
+    font-weight: 700;
+    color: $text-primary;
+    margin: 0 0 3px;
+    letter-spacing: 0.01em;
+  }
+
+  &__sub {
+    font-size: 12px;
+    color: $text-secondary;
+    margin: 0;
+  }
+}
+
+.ced-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 28px;
+  height: 28px;
+  background: transparent;
+  border: 1px solid $border;
+  border-radius: 6px;
+  color: $text-secondary;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+
+  &:hover { background: rgba($danger, 0.1); border-color: rgba($danger, 0.4); color: $danger; }
+}
+
+// ── Body ─────────────────────────────────────────────────────
+.ced-body {
+  padding: 20px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-height: 60vh;
+  overflow-y: auto;
+
+  &::-webkit-scrollbar { width: 5px; }
+  &::-webkit-scrollbar-track { background: transparent; }
+  &::-webkit-scrollbar-thumb { background: $border; border-radius: 3px; }
+}
+
+.ced-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ced-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: $text-muted;
+}
+
+.ced-input {
+  background: $navy-light;
+  border: 1px solid $border;
+  border-radius: 8px;
+  color: $text-primary;
+  font-size: 13px;
+  padding: 9px 13px;
+  outline: none;
+  font-family: inherit;
+  transition: border-color 0.15s;
+
+  &:focus { border-color: $teal; box-shadow: 0 0 0 3px rgba($teal, 0.08); }
+  &::placeholder { color: $text-muted; }
+  &--mono { font-family: 'SF Mono', 'Fira Code', monospace; letter-spacing: 0.05em; }
+}
+
+.ced-readonly {
+  background: $navy-light;
+  border: 1px solid $border;
+  border-radius: 8px;
+  color: $text-secondary;
+  font-size: 13px;
+  padding: 9px 13px;
+  cursor: default;
+}
+
+.csn-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  .ced-input { flex: 1; }
+}
+
+.csn-indicator {
+  width: 24px;
+  height: 24px;
+  background: rgba($teal, 0.15);
+  border: 1px solid $teal-border;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: $teal;
+  flex-shrink: 0;
+}
+
+// ── Access Points Section ────────────────────────────────────
+.ced-section {
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: $text-muted;
+    margin-bottom: 10px;
+    svg { color: $teal; }
+  }
+}
+
+.access-count {
+  background: $teal-soft;
+  color: $teal;
+  border: 1px solid $teal-border;
+  border-radius: 10px;
+  padding: 1px 8px;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.access-table-wrap {
+  border: 1px solid $border;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.access-table {
+  width: 100%;
+  border-collapse: collapse;
+
+  thead tr {
+    background: $navy-light;
+  }
+
+  th {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.09em;
+    color: $text-muted;
+    padding: 9px 12px;
+    text-align: left;
+    border-bottom: 1px solid $border;
+  }
+
+  tbody tr {
+    border-bottom: 1px solid $border;
+    transition: background 0.12s;
+
+    &:last-child { border-bottom: none; }
+    &:hover { background: $navy-light; }
+  }
+
+  td {
+    padding: 9px 12px;
+    font-size: 12px;
+    color: $text-primary;
+  }
+}
+
+.ap-id {
+  font-size: 11px;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  color: $blue-accent;
+  font-weight: 700;
+}
+
+.ap-name {
+  font-size: 12px;
+  color: $text-primary;
+}
+
+.btn-block {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  background: $danger-soft;
+  color: $danger;
+  border: 1px solid rgba($danger, 0.3);
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.15s;
+  letter-spacing: 0.03em;
+
+  &:hover { background: rgba($danger, 0.2); border-color: $danger; transform: translateY(-1px); }
+}
+
+.no-access {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 24px;
+  color: $text-muted;
+
+  p { margin: 0; font-size: 12px; }
+}
+
+// ── Footer ───────────────────────────────────────────────────
+.ced-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 14px 22px 18px;
+  border-top: 1px solid $border;
+  background: $navy-light;
+}
+
+.btn-cancel {
+  padding: 9px 20px;
+  font-size: 13px;
+  font-weight: 600;
+  background: transparent;
+  color: $text-secondary;
+  border: 1px solid $border;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s;
+
+  &:hover { border-color: $text-secondary; color: $text-primary; background: rgba(255,255,255,0.04); }
+}
+
+.btn-save {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 22px;
+  font-size: 13px;
+  font-weight: 700;
+  background: $teal;
+  color: #061520;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  letter-spacing: 0.02em;
+
+  &:hover { background: lighten($teal, 8%); box-shadow: 0 4px 16px rgba(0, 201, 167, 0.35); transform: translateY(-1px); }
+  &:active { transform: translateY(0); }
+}

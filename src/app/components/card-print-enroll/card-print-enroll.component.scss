@@ -1,0 +1,1273 @@
+// ── Variables ────────────────────────────────────────────────
+$navy: #0f1c2e;
+$navy-light: #162436;
+$navy-card: #1a2d42;
+$teal: #00c9a7;
+$teal-soft: #00c9a720;
+$teal-border: #00c9a740;
+$blue-accent: #3d8ef8;
+$text-primary: #e2eaf4;
+$text-secondary: #7b92ad;
+$text-muted: #4a6278;
+$border: #1f3448;
+$row-hover: #162843;
+$row-selected: #0e2a42;
+$danger: #f05a5a;
+$card-shadow: 0 8px 32px rgba(0,0,0,0.45);
+
+// ── Global Reset for this component ─────────────────────────
+.cpe-wrapper {
+  background: $navy;
+  min-height: 100vh;
+  color: $text-primary;
+  font-family: 'DM Sans', 'Segoe UI', sans-serif;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 0;
+
+  // Mat overrides
+  ::ng-deep {
+    .mat-mdc-form-field { font-family: inherit; }
+    .mat-mdc-text-field-wrapper { background: $navy-light !important; border-radius: 8px !important; }
+    .mdc-notched-outline__leading,
+    .mdc-notched-outline__notch,
+    .mdc-notched-outline__trailing { border-color: $border !important; }
+    .mdc-notched-outline__leading { border-radius: 8px 0 0 8px !important; }
+    .mdc-notched-outline__trailing { border-radius: 0 8px 8px 0 !important; }
+    .mat-mdc-form-field:hover .mdc-notched-outline__leading,
+    .mat-mdc-form-field:hover .mdc-notched-outline__notch,
+    .mat-mdc-form-field:hover .mdc-notched-outline__trailing { border-color: $teal-border !important; }
+    .mat-mdc-form-field.mat-focused .mdc-notched-outline__leading,
+    .mat-mdc-form-field.mat-focused .mdc-notched-outline__notch,
+    .mat-mdc-form-field.mat-focused .mdc-notched-outline__trailing { border-color: $teal !important; }
+    .mat-mdc-select-value,
+    .mat-mdc-input-element,
+    .mat-mdc-floating-label { color: $text-primary !important; }
+    .mat-mdc-floating-label { color: $text-secondary !important; }
+    .mat-mdc-select-arrow { color: $text-secondary !important; }
+    .mat-mdc-option { background: $navy-card !important; color: $text-primary !important; }
+    .mat-mdc-option:hover,
+    .mat-mdc-option.mat-mdc-option-active { background: $row-hover !important; color: $teal !important; }
+    .mat-mdc-select-panel { background: $navy-card !important; border: 1px solid $border; border-radius: 8px; }
+    .mat-mdc-table { background: transparent !important; }
+    .mat-mdc-header-row { background: $navy-light !important; }
+    .mat-mdc-header-cell { color: $text-secondary !important; font-size: 11px !important; font-weight: 600 !important;
+      letter-spacing: 0.08em !important; text-transform: uppercase !important; border-color: $border !important; }
+    .mat-mdc-row { background: transparent !important; cursor: pointer; transition: background 0.15s; }
+    .mat-mdc-row:hover { background: $row-hover !important; }
+    .mat-mdc-row.row--selected { background: $row-selected !important; border-left: 3px solid $teal; }
+    .mat-mdc-cell { color: $text-primary !important; border-color: $border !important; font-size: 13px !important; }
+    .mat-icon { color: $text-secondary; font-size: 18px !important; }
+  }
+}
+
+// ── Header ───────────────────────────────────────────────────
+.cpe-header {
+  background: $navy-light;
+  border-bottom: 1px solid $border;
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+
+  &__title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+
+    h2 {
+      font-size: 16px;
+      font-weight: 600;
+      color: $text-primary;
+      margin: 0;
+      white-space: nowrap;
+      letter-spacing: 0.01em;
+    }
+  }
+
+  &__icon {
+    width: 36px;
+    height: 36px;
+    background: $teal-soft;
+    border: 1px solid $teal-border;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: $teal;
+    flex-shrink: 0;
+  }
+
+  &__filters {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    flex: 1;
+  }
+}
+
+.filter-field {
+  width: 160px;
+
+  &--search-by { width: 150px; }
+  &--search { width: 200px; }
+}
+
+.btn-search {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 20px;
+  background: $teal;
+  color: #0a1a2a;
+  font-size: 13px;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+  height: 40px;
+
+  &:hover { background: lighten($teal, 8%); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(0, 201, 167, 0.3); }
+  &:active { transform: translateY(0); }
+}
+
+// ── Filter Bar ───────────────────────────────────────────────
+.cpe-filterbar {
+  background: $navy-light;
+  border-bottom: 1px solid $border;
+  padding: 10px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+
+  &__checks {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  &__right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+}
+
+.custom-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  color: $text-secondary;
+  user-select: none;
+  transition: color 0.15s;
+
+  input { display: none; }
+
+  .checkmark {
+    width: 16px;
+    height: 16px;
+    border: 1.5px solid $text-muted;
+    border-radius: 4px;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+    flex-shrink: 0;
+  }
+
+  input:checked ~ .checkmark {
+    background: $teal;
+    border-color: $teal;
+
+    &::after {
+      content: '';
+      width: 9px;
+      height: 5px;
+      border-left: 2px solid #0a1a2a;
+      border-bottom: 2px solid #0a1a2a;
+      transform: rotate(-45deg) translateY(-1px);
+      display: block;
+    }
+  }
+
+  &:hover { color: $text-primary; }
+}
+
+.record-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: $text-secondary;
+  background: $navy;
+  border: 1px solid $border;
+  border-radius: 20px;
+  padding: 4px 12px;
+
+  &__count {
+    font-weight: 700;
+    color: $teal;
+    font-size: 14px;
+  }
+}
+
+.btn-photo {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 14px;
+  background: transparent;
+  color: $blue-accent;
+  font-size: 12px;
+  font-weight: 500;
+  border: 1px solid rgba($blue-accent, 0.4);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover { background: rgba($blue-accent, 0.1); border-color: $blue-accent; }
+}
+
+// ── Main Body ────────────────────────────────────────────────
+.cpe-body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+// ── Left Panel ───────────────────────────────────────────────
+.cpe-left {
+  width: 220px;
+  min-width: 220px;
+  background: $navy-light;
+  border-right: 1px solid $border;
+  padding: 20px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.card-preview-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: $text-muted;
+}
+
+// ── ID Card ──────────────────────────────────────────────────
+.id-card {
+  background: linear-gradient(145deg, #1a3a5c 0%, #0f2035 100%);
+  border: 1px solid $border;
+  border-radius: 12px;
+  overflow: hidden;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  position: relative;
+  transition: all 0.3s;
+  min-height: 200px;
+  box-shadow: $card-shadow;
+
+  &--active {
+    border-color: $teal-border;
+    box-shadow: 0 8px 32px rgba(0, 201, 167, 0.15);
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: $text-secondary;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    align-self: flex-start;
+    width: 100%;
+
+    svg { flex-shrink: 0; color: $teal; }
+  }
+
+  &__org {
+    color: $teal;
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 0.04em;
+  }
+
+  &__photo-wrap {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    border: 2.5px solid $teal-border;
+    overflow: hidden;
+    background: #0d1f33;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  &__photo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+
+    &--placeholder {
+      color: $text-muted;
+    }
+  }
+
+  &__name {
+    font-size: 13px;
+    font-weight: 600;
+    color: $text-primary;
+    text-align: center;
+    line-height: 1.3;
+  }
+
+  &__meta {
+    display: flex;
+    gap: 12px;
+    font-size: 10px;
+    color: $text-secondary;
+    font-weight: 500;
+  }
+
+  &__stripe {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 6px;
+    background: linear-gradient(90deg, $teal 0%, $blue-accent 100%);
+    opacity: 0.7;
+  }
+}
+
+// ── Card Type ────────────────────────────────────────────────
+.card-type-group {
+  &__label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: $text-muted;
+    display: block;
+    margin-bottom: 8px;
+  }
+}
+
+.card-type-options { display: flex; flex-direction: column; gap: 6px; }
+
+.radio-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: $text-secondary;
+  cursor: pointer;
+  padding: 7px 10px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  transition: all 0.15s;
+  user-select: none;
+
+  input { display: none; }
+
+  .radio-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 1.5px solid $text-muted;
+    flex-shrink: 0;
+    transition: all 0.15s;
+    position: relative;
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      width: 6px;
+      height: 6px;
+      background: $teal;
+      border-radius: 50%;
+      transition: transform 0.15s;
+    }
+  }
+
+  input:checked ~ .radio-dot {
+    border-color: $teal;
+    &::after { transform: translate(-50%, -50%) scale(1); }
+  }
+
+  &--active {
+    background: $teal-soft;
+    border-color: $teal-border;
+    color: $text-primary;
+  }
+}
+
+// ── Print Buttons ────────────────────────────────────────────
+.print-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: auto;
+}
+
+.btn-print, .btn-export {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 9px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: all 0.2s;
+  letter-spacing: 0.02em;
+  width: 100%;
+}
+
+.btn-print {
+  background: $teal;
+  color: #061520;
+  border: none;
+  &:hover { background: lighten($teal, 8%); box-shadow: 0 4px 14px rgba(0, 201, 167, 0.3); }
+}
+
+.btn-export {
+  background: transparent;
+  color: $teal;
+  border: 1px solid $teal-border;
+  &:hover { background: $teal-soft; border-color: $teal; }
+}
+
+// ── Right Panel ──────────────────────────────────────────────
+.cpe-right {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+// ── Table ────────────────────────────────────────────────────
+.table-container {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: auto;
+  border-bottom: 1px solid $border;
+
+  &::-webkit-scrollbar { width: 6px; height: 6px; }
+  &::-webkit-scrollbar-track { background: $navy; }
+  &::-webkit-scrollbar-thumb { background: $border; border-radius: 3px; }
+  &::-webkit-scrollbar-thumb:hover { background: $text-muted; }
+}
+
+.cpe-table { width: 100%; min-width: 700px; }
+
+.id-badge {
+  font-size: 11px;
+  font-weight: 700;
+  color: $blue-accent;
+  background: rgba($blue-accent, 0.1);
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  letter-spacing: 0.04em;
+}
+
+.name-cell {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.name-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #1a3a5c, #264e70);
+  border: 1px solid $border;
+  color: $teal;
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.csn-pill {
+  font-size: 11px;
+  padding: 3px 9px;
+  border-radius: 4px;
+  background: rgba($teal, 0.1);
+  color: $teal;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  border: 1px solid $teal-border;
+
+  &--empty { background: transparent; color: $text-muted; border-color: transparent; }
+}
+
+.btn-view {
+  padding: 5px 14px;
+  font-size: 11px;
+  font-weight: 600;
+  background: transparent;
+  color: $blue-accent;
+  border: 1px solid rgba($blue-accent, 0.35);
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.15s;
+  letter-spacing: 0.04em;
+
+  &:hover { background: rgba($blue-accent, 0.12); border-color: $blue-accent; transform: translateY(-1px); }
+}
+
+.table-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 60px 24px;
+  color: $text-muted;
+
+  p { margin: 0; font-size: 13px; }
+}
+
+// ── Bottom Form ──────────────────────────────────────────────
+.bottom-form {
+  background: $navy-light;
+  border-top: 1px solid $border;
+  padding: 14px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  &__row {
+    display: flex;
+    align-items: flex-end;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+}
+
+.form-field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+
+  &--wide { flex: 1.5; min-width: 180px; }
+  &--csn { flex: 1; min-width: 200px; }
+}
+
+.form-label {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: $text-muted;
+}
+
+.form-input {
+  background: $navy;
+  border: 1px solid $border;
+  border-radius: 7px;
+  color: $text-primary;
+  font-size: 13px;
+  padding: 8px 12px;
+  outline: none;
+  min-width: 140px;
+  transition: border-color 0.15s;
+  font-family: inherit;
+
+  &:focus { border-color: $teal; box-shadow: 0 0 0 3px rgba($teal, 0.08); }
+  &[readonly] { color: $text-secondary; cursor: default; background: lighten($navy, 2%); }
+
+  &::placeholder { color: $text-muted; }
+}
+
+.csn-input-wrap {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-read {
+  padding: 8px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  background: transparent;
+  color: $text-secondary;
+  border: 1px solid $border;
+  border-radius: 7px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s;
+
+  &:hover { border-color: $teal-border; color: $teal; background: $teal-soft; }
+}
+
+.btn-issue {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 20px;
+  background: $blue-accent;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  border: none;
+  border-radius: 7px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+  align-self: flex-end;
+  height: 38px;
+
+  &:hover { background: lighten($blue-accent, 8%); box-shadow: 0 4px 14px rgba(61, 142, 248, 0.35); transform: translateY(-1px); }
+  &:active { transform: translateY(0); }
+}
+// ── Camera Panel (slides in at bottom of right panel) ─────────
+.camera-panel {
+  border-top: 2px solid $teal-border;
+  background: $navy-light;
+  animation: slideUp 0.25s ease-out;
+  flex-shrink: 0;
+
+  &__header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 16px; border-bottom: 1px solid $border;
+  }
+
+  &__title {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 13px; color: $text-secondary;
+    svg { color: $teal; }
+    strong { color: $teal; font-weight: 600; }
+  }
+
+  &__content {
+    display: flex; align-items: flex-start; gap: 16px;
+    padding: 14px 16px;
+  }
+
+  &__actions {
+    display: flex; flex-direction: column; gap: 8px;
+    justify-content: center; min-width: 140px;
+  }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.camera-close-btn {
+  width: 26px; height: 26px; background: transparent;
+  border: 1px solid $border; border-radius: 6px; color: $text-secondary;
+  cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s;
+  &:hover { background: rgba($danger, 0.1); border-color: rgba($danger, 0.4); color: $danger; }
+}
+
+.camera-feed-wrap {
+  width: 280px; height: 180px; flex-shrink: 0;
+  border-radius: 8px; overflow: hidden; border: 1px solid $border; background: #000;
+}
+
+.camera-feed {
+  width: 100%; height: 100%; object-fit: cover; display: block;
+}
+
+.camera-preview-img {
+  width: 100%; height: 100%; object-fit: cover; display: block;
+}
+
+.capture-result-msg {
+  display: flex; align-items: center; gap: 7px;
+  font-size: 12px; color: $teal; font-weight: 500; margin-bottom: 4px;
+}
+
+.btn-capture {
+  display: flex; align-items: center; gap: 7px;
+  padding: 9px 18px; background: $teal; color: #061520;
+  font-size: 13px; font-weight: 700; border: none;
+  border-radius: 8px; cursor: pointer; transition: all 0.2s;
+  &:hover { background: lighten($teal, 8%); }
+}
+
+.btn-confirm-photo {
+  display: flex; align-items: center; gap: 7px;
+  padding: 9px 16px; background: $teal; color: #061520;
+  font-size: 12px; font-weight: 700; border: none;
+  border-radius: 8px; cursor: pointer; transition: all 0.2s;
+  &:hover { background: lighten($teal, 8%); }
+}
+
+.btn-retake {
+  display: flex; align-items: center; gap: 7px;
+  padding: 8px 16px; background: transparent; color: $blue-accent;
+  font-size: 12px; font-weight: 600;
+  border: 1px solid rgba($blue-accent, 0.4); border-radius: 8px;
+  cursor: pointer; transition: all 0.2s;
+  &:hover { background: rgba($blue-accent, 0.1); border-color: $blue-accent; }
+}
+
+.btn-cancel-cam {
+  padding: 8px 16px; font-size: 12px; font-weight: 600;
+  background: transparent; color: $text-secondary;
+  border: 1px solid $border; border-radius: 8px; cursor: pointer; transition: all 0.15s;
+  &:hover { border-color: $text-secondary; color: $text-primary; }
+}
+
+
+// ══════════════════════════════════════════════════════════════
+// CAMERA CAPTURE POPUP
+// ══════════════════════════════════════════════════════════════
+
+.cam-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.cam-modal {
+  background: #1a2535;
+  border: 1px solid #2a3f58;
+  border-radius: 10px;
+  width: 780px;
+  max-width: 96vw;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: popIn 0.22s ease;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.6);
+
+  &__titlebar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    background: #162030;
+    border-bottom: 1px solid #2a3f58;
+  }
+
+  &__titlebar-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #c8d8e8;
+
+    strong { color: #00c9a7; }
+  }
+
+  &__titlebar-actions {
+    display: flex;
+    gap: 6px;
+  }
+
+  &__body {
+    display: flex;
+    gap: 0;
+    flex: 1;
+    overflow: hidden;
+  }
+}
+
+@keyframes popIn {
+  from { opacity: 0; transform: scale(0.95) translateY(-10px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.cam-icon { font-size: 16px; }
+
+.cam-titlebar-btn {
+  width: 26px;
+  height: 26px;
+  background: transparent;
+  border: 1px solid #2a3f58;
+  border-radius: 5px;
+  color: #7b92ad;
+  cursor: pointer;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+
+  &:hover {
+    background: rgba(240, 90, 90, 0.15);
+    border-color: rgba(240, 90, 90, 0.5);
+    color: #f05a5a;
+  }
+}
+
+// ── Left: Camera Feed ─────────────────────────────────────────
+.cam-left {
+  flex: 1;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  border-right: 1px solid #2a3f58;
+}
+
+.cam-controls {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.cam-btn {
+  padding: 7px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s;
+  border: 1px solid transparent;
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  &--start {
+    background: #00c9a7;
+    color: #061520;
+    border-color: #00c9a7;
+    &:hover:not(:disabled) { background: lighten(#00c9a7, 8%); }
+  }
+
+  &--stop {
+    background: transparent;
+    color: #f05a5a;
+    border-color: rgba(240, 90, 90, 0.4);
+    &:hover:not(:disabled) { background: rgba(240, 90, 90, 0.12); border-color: #f05a5a; }
+  }
+
+  &--capture {
+    background: #3d8ef8;
+    color: #fff;
+    border-color: #3d8ef8;
+    &:hover:not(:disabled) { background: lighten(#3d8ef8, 8%); }
+  }
+}
+
+.cam-feed-box {
+  flex: 1;
+  min-height: 280px;
+  border: 1px solid #2a3f58;
+  border-radius: 8px;
+  background: #0d1520;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cam-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.cam-feed-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  color: #4a6278;
+
+  p { font-size: 13px; }
+}
+
+.cam-captured-preview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+// ── Right: Crop + Save ────────────────────────────────────────
+.cam-right {
+  width: 220px;
+  flex-shrink: 0;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: #152030;
+
+  &__label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.09em;
+    color: #4a6278;
+  }
+}
+
+.cam-crop-box {
+  width: 100%;
+  height: 140px;
+  border: 1px solid #2a3f58;
+  border-radius: 6px;
+  background: #0d1520;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cam-crop-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cam-crop-placeholder {
+  color: #4a6278;
+  font-size: 12px;
+  text-align: center;
+  padding: 10px;
+}
+
+.cam-upload-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cam-upload-left {
+  display: flex;
+  gap: 8px;
+}
+
+.cam-upload-btn {
+  flex: 1;
+  padding: 7px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  background: #1f3448;
+  color: #7b92ad;
+  border: 1px solid #2a3f58;
+  border-radius: 6px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.15s;
+
+  &:hover { background: #243d54; color: #e2eaf4; border-color: #3d8ef8; }
+}
+
+.cam-clear-btn {
+  padding: 7px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  background: transparent;
+  color: #f05a5a;
+  border: 1px solid rgba(240, 90, 90, 0.3);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s;
+
+  &:hover { background: rgba(240, 90, 90, 0.12); border-color: #f05a5a; }
+}
+
+.cam-cardno-row {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.cam-cardno-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: #4a6278;
+}
+
+.cam-cardno-input {
+  background: #0d1520;
+  border: 1px solid #2a3f58;
+  border-radius: 6px;
+  color: #e2eaf4;
+  font-size: 13px;
+  padding: 7px 10px;
+  outline: none;
+  font-family: 'SF Mono', monospace;
+  cursor: default;
+}
+
+.cam-save-btn {
+  margin-top: auto;
+  padding: 10px 16px;
+  font-size: 13px;
+  font-weight: 700;
+  background: #00c9a7;
+  color: #061520;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  width: 100%;
+
+  &:hover { background: lighten(#00c9a7, 8%); box-shadow: 0 4px 14px rgba(0, 201, 167, 0.35); }
+}
+
+// ── Cropper overrides ─────────────────────────────────────────
+.cam-crop-box {
+  width: 100%;
+  min-height: 160px;
+  border: 1px solid #2a3f58;
+  border-radius: 6px;
+  background: #0d1520;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  image-cropper {
+    width: 100% !important;
+    background: #0d1520 !important;
+  }
+}
+
+.cam-preview-thumb {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.cam-preview-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: #4a6278;
+}
+
+.cam-thumb-img {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 2px solid rgba(0, 201, 167, 0.4);
+}
+
+.cam-save-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+// ── Real Card Preview ─────────────────────────────────────────
+.real-card-wrap {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 0;
+}
+
+.real-card-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 200px;
+  color: $text-muted;
+  text-align: center;
+  p { font-size: 12px; line-height: 1.5; }
+}
+
+.real-card {
+  position: relative;
+  width: 185px;
+
+  // ✅ KEY FIX: card images are portrait ~640x1010px → ratio = 1.578
+  // padding-bottom trick forces correct height so % positions work
+  padding-bottom: 0; // we use img natural height instead
+
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+  transition: all 0.3s;
+  flex-shrink: 0;
+
+  &:hover {
+    transform: scale(1.02);
+    box-shadow: 0 12px 32px rgba(0,0,0,0.5);
+  }
+
+  // Template background — sets natural height of container
+  &__bg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  // Photo overlay — absolute % relative to .real-card
+  // ✅ KEY: .real-card must have explicit height for % to work
+  // We handle this by making .real-card position relative
+  // and the img sets the height naturally
+  &__photo-overlay {
+    position: absolute;
+    overflow: hidden;
+    background: #e8e8e8;
+  }
+
+  &__photo-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  &__photo-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #e0e0e0;
+  }
+
+  &__text-overlay {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 23%;
+    text-align: center;
+    padding: 0 6px;
+  }
+
+  &__name {
+    font-size: 9px;
+    font-weight: 700;
+    color: #111;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__flat {
+    font-size: 7px;
+    color: #333;
+    margin-top: 1px;
+  }
+
+  &__id {
+    font-size: 6px;
+    color: #555;
+    font-family: monospace;
+    margin-top: 1px;
+  }
+}
+// ── Blank Card Preview ────────────────────────────────────────
+.blank-card {
+  width: 185px;
+  background: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px 12px 12px;
+  gap: 10px;
+  min-height: 240px;
+
+  &__photo-wrap {
+    width: 100px;
+    height: 120px;
+    border: 1.5px solid #ddd;
+    border-radius: 4px;
+    overflow: hidden;
+    background: #f5f5f5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  &__photo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  &__photo-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+  }
+
+  &__info {
+    width: 100%;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    padding: 4px 0;
+    border-top: 1px solid #eee;
+  }
+
+  &__name {
+    font-size: 10px;
+    font-weight: 700;
+    color: #111;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__flat {
+    font-size: 8px;
+    color: #444;
+  }
+
+  &__id {
+    font-size: 7px;
+    color: #777;
+    font-family: monospace;
+  }
+}

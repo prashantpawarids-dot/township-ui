@@ -165,7 +165,8 @@
                     matInput minlength="16" maxlength="16" />
             </mat-form-field>
         </div>
-        <div class="col-md-3">
+        <!-- old code -->
+        <!-- <div class="col-md-3">
             <mat-form-field class="full-width">
                 <mat-label>Neighbourhood</mat-label>
                 <input [disabled]="disableFields" (change)="filterResident()" type="text" placeholder="Select Neighbourhood"
@@ -181,7 +182,35 @@
                     }
                 </mat-autocomplete>
             </mat-form-field>
-        </div>
+        </div> -->
+
+        <div class="col-md-3">
+  <mat-form-field class="full-width">
+    <mat-label>Neighbourhood</mat-label>
+    <input
+      [disabled]="disableFields"
+      type="text"
+      placeholder="Select Neighbourhood"
+      aria-label="Neighbourhood"
+      matInput
+      name="nrdForm"
+      #neighbourForm="ngModel"
+      [(ngModel)]="landOwner.nrd"
+      readonly
+      (click)="neighbourLandOwnerTrigger.openPanel()"
+      [matAutocomplete]="autoNeighbour"
+      #neighbourLandOwnerTrigger="matAutocompleteTrigger">
+    <!-- ✅ Use (optionSelected) on mat-autocomplete instead of (change) on input -->
+    <mat-autocomplete
+      #autoNeighbour="matAutocomplete"
+      [displayWith]="displayNeighbourhood"
+      (optionSelected)="onNeighbourhoodSelected($event)">
+      @for (option of neighbourhoodOptions; track option) {
+        <mat-option [value]="option.id">{{ option.name }}</mat-option>
+      }
+    </mat-autocomplete>
+  </mat-form-field>
+</div>
         <div class="col-md-3">
             <mat-form-field class="full-width">
                 <mat-label>Building</mat-label>

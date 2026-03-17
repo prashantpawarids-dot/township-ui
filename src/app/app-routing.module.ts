@@ -316,7 +316,14 @@ const routes: Routes = [
       {
         path: 'search',
         loadComponent: () => import('./components/search/search.component').then((c) => c.SearchComponent)
-      }
+      },
+      {
+  path: 'card-print-enroll',
+  // canActivate: [authGuard],
+  loadComponent: () =>
+    import('./components/card-print-enroll/card-print-enroll.component')
+      .then((c) => c.CardPrintEnrollComponent)
+},
     ]
   },
   {

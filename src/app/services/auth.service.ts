@@ -1955,5 +1955,55 @@ searchCardHolder(searchValue: string): Observable<any> {
     );
 
   }
+
+
+  // ─── Card Print & Enroll ─────────────────────────────────────────────────────
+
+getCardHolders(neighbourhood: string, building: string, searchBy: string,
+               searchValue: string, showAll: boolean, showNonPrinted: boolean,
+               showNonPersonalised: boolean): Observable<any[]> {
+  const url = `${this.baseUrl}CardPrint/GetCardHolders?neighbourhood=${neighbourhood}`
+    + `&building=${building}&searchBy=${searchBy}&searchValue=${searchValue}`
+    + `&showAll=${showAll}&showNonPrinted=${showNonPrinted}&showNonPersonalised=${showNonPersonalised}`;
+  return this.http.get<any[]>(url).pipe(
+    map(res => res),
+    catchError(this.handleError)
+  );
+}
+
+getCardEditDetail(idNumber: string): Observable<any> {
+  return this.http.get(`${this.baseUrl}CardPrint/GetCardDetail/${idNumber}`).pipe(
+    map(res => res),
+    catchError(this.handleError)
+  );
+}
+
+saveAndPrintCard(payload: any): Observable<any> {
+  return this.http.post(`${this.baseUrl}CardPrint/SaveAndPrint`, payload).pipe(
+    map(res => res),
+    catchError(this.handleError)
+  );
+}
+
+issueCard(idNumber: string, cardCSN: string): Observable<any> {
+  return this.http.post(`${this.baseUrl}CardPrint/IssueCard`, { idNumber, cardCSN }).pipe(
+    map(res => res),
+    catchError(this.handleError)
+  );
+}
+
+readCard(cardCSN: string): Observable<any> {
+  return this.http.get(`${this.baseUrl}CardPrint/ReadCard/${cardCSN}`).pipe(
+    map(res => res),
+    catchError(this.handleError)
+  );
+}
+
+blockCardAccessPoint(id: number): Observable<any> {
+  return this.http.post(`${this.baseUrl}CardPrint/BlockAccessPoint/${id}`, {}).pipe(
+    map(res => res),
+    catchError(this.handleError)
+  );
+}
   
 }
