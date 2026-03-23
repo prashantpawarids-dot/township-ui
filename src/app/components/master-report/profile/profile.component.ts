@@ -7,13 +7,14 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { HttpClientModule, HttpClient } from '@angular/common/http';
-
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { environment } from 'src/environments/environment.prod';
-
 import * as XLSX from 'xlsx-js-style';
 import { saveAs } from 'file-saver';
+import { DateAdapter } from '@angular/material/core';
+import { CustomDateAdapter } from 'src/app/_core/shared/utils/custom-date-adapter';
+
 
 @Component({
   selector: 'app-profile',
@@ -28,6 +29,7 @@ import { saveAs } from 'file-saver';
     MatPaginatorModule,
     HttpClientModule
   ],
+    providers: [{ provide: DateAdapter, useClass: CustomDateAdapter }],
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.scss','../../../../table.css']
 })

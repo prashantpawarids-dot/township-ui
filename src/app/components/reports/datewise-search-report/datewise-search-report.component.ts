@@ -15,6 +15,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
+import { DateAdapter } from '@angular/material/core';
+import { CustomDateAdapter } from 'src/app/_core/shared/utils/custom-date-adapter';
 @Component({
   selector: 'app-datewise-search-report',
   standalone: true,
@@ -31,6 +33,7 @@ import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
     MatTableModule, 
     MatPaginatorModule
   ],
+  providers: [{ provide: DateAdapter, useClass: CustomDateAdapter }],
   templateUrl: './datewise-search-report.component.html',
   styleUrl: './datewise-search-report.component.scss'
 })

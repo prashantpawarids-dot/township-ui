@@ -16,6 +16,8 @@ import autoTable from 'jspdf-autotable';
 import { environment } from 'src/environments/environment';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
+import { DateAdapter } from '@angular/material/core';
+import { CustomDateAdapter } from 'src/app/_core/shared/utils/custom-date-adapter';
 
 @Component({
   selector: 'app-tag-block-remove',
@@ -34,6 +36,7 @@ import { saveAs } from 'file-saver';
     MatNativeDateModule,
     MatRadioModule
   ],
+  providers: [{ provide: DateAdapter, useClass: CustomDateAdapter }],
   templateUrl: './tag-block-remove.component.html',
   styleUrls: ['../../../../table.css']
 })

@@ -13,6 +13,8 @@ import autoTable from 'jspdf-autotable';
 import { environment } from 'src/environments/environment.prod';
 import * as XLSX from 'xlsx-js-style';
 import { saveAs } from 'file-saver';
+import { DateAdapter } from '@angular/material/core';
+import { CustomDateAdapter } from 'src/app/_core/shared/utils/custom-date-adapter';
 
 @Component({
   selector: 'app-service-type',
@@ -28,6 +30,7 @@ import { saveAs } from 'file-saver';
     MatPaginatorModule,
     HttpClientModule
   ],
+    providers: [{ provide: DateAdapter, useClass: CustomDateAdapter }],
   templateUrl: './service-type.component.html',
   styleUrls: ['./service-type.component.scss', '../../../../table.css']
 })

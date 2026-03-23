@@ -17,6 +17,8 @@ import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 import { environment } from 'src/environments/environment';
 import { DateTimeUtil } from 'src/app/_core/shared/utils/datetime.util';
+import { DateAdapter } from '@angular/material/core';
+import { CustomDateAdapter } from 'src/app/_core/shared/utils/custom-date-adapter';
 @Component({
   selector: 'app-tenant',
   standalone: true,
@@ -33,6 +35,7 @@ import { DateTimeUtil } from 'src/app/_core/shared/utils/datetime.util';
     MatDatepickerModule,
     MatNativeDateModule
   ],
+  providers: [{ provide: DateAdapter, useClass: CustomDateAdapter }],
   templateUrl: './tenant.component.html',
   styleUrls: ['../../../../table.css']
 })

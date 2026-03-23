@@ -305,15 +305,15 @@ export const NavigationItems: NavigationItem[] = [
       }
     ]
   },
-//   {
-//   id: 'card-print-enroll',
-//   title: 'Card Print Enroll',
-//   type: 'item',
-//   classes: 'nav-item',
-//   url: '/card-print-enroll',
-//   icon: 'dashboard',
-//   breadcrumbs: true
-// },
+  {
+  id: 'card-print-enroll',
+  title: 'Card Print Enroll',
+  type: 'item',
+  classes: 'nav-item',
+  url: '/card-print-enroll',
+  icon: 'dashboard',
+  breadcrumbs: true
+},
     ]
   },
   

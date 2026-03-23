@@ -18,6 +18,8 @@ import { saveAs } from 'file-saver';
 import { sortByTimeOnly } from 'src/app/_core/shared/utils/sort.util';
 import { TableSortService } from 'src/app/_core/shared/services/table-sort.services';
 import { DateTimeUtil } from 'src/app/_core/shared/utils/datetime.util';
+import { DateAdapter } from '@angular/material/core';
+import { CustomDateAdapter } from 'src/app/_core/shared/utils/custom-date-adapter';
 @Component({
   selector: 'app-guest-in-out-log',
   standalone: true,
@@ -34,6 +36,7 @@ import { DateTimeUtil } from 'src/app/_core/shared/utils/datetime.util';
     MatDatepickerModule,
     MatNativeDateModule
   ],
+  providers: [{ provide: DateAdapter, useClass: CustomDateAdapter }],
   templateUrl: './guest-in-out-log.component.html',
   styleUrls: ['../../../../table.css']
 })

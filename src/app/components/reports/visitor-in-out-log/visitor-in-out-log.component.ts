@@ -17,6 +17,9 @@ import { saveAs } from 'file-saver';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { DateTimeUtil } from 'src/app/_core/shared/utils/datetime.util';
+import { DateAdapter } from '@angular/material/core';
+import { CustomDateAdapter } from 'src/app/_core/shared/utils/custom-date-adapter';
+
 @Component({
   selector: 'app-visitor-in-out-log',
   standalone: true,
@@ -34,6 +37,7 @@ import { DateTimeUtil } from 'src/app/_core/shared/utils/datetime.util';
     MatPaginatorModule,
     HttpClientModule
   ],
+  providers: [{ provide: DateAdapter, useClass: CustomDateAdapter }],
   templateUrl: './visitor-in-out-log.component.html',
   styleUrls: ['../../../../table.css']
 })

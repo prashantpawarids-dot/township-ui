@@ -18,6 +18,8 @@ import { environment } from 'src/environments/environment';
 import { sortByTimeOnly } from 'src/app/_core/shared/utils/sort.util';
 import { TableSortService } from 'src/app/_core/shared/services/table-sort.services';
 import { DateTimeUtil } from 'src/app/_core/shared/utils/datetime.util';
+import { DateAdapter } from '@angular/material/core';
+import { CustomDateAdapter } from 'src/app/_core/shared/utils/custom-date-adapter';
 @Component({
   selector: 'app-vechile-encoding-log',
   standalone: true,
@@ -32,6 +34,7 @@ import { DateTimeUtil } from 'src/app/_core/shared/utils/datetime.util';
     MatDatepickerModule,
     MatNativeDateModule
   ],
+  providers: [{ provide: DateAdapter, useClass: CustomDateAdapter }],
   templateUrl: './vechile-encoding-log.component.html',
   styleUrls: ['../../../../table.css']
 })

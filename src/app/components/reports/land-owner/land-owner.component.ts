@@ -17,6 +17,8 @@ import { saveAs } from 'file-saver';
 import { environment } from 'src/environments/environment';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
 import { TableSortService } from 'src/app/_core/shared/services/table-sort.services';
+import { DateAdapter } from '@angular/material/core';
+import { CustomDateAdapter } from 'src/app/_core/shared/utils/custom-date-adapter';
 @Component({
   selector: 'app-land-owner',
   standalone: true,
@@ -33,6 +35,7 @@ import { TableSortService } from 'src/app/_core/shared/services/table-sort.servi
     MatDatepickerModule,
     MatNativeDateModule
   ],
+  providers: [{ provide: DateAdapter, useClass: CustomDateAdapter }],
   templateUrl: './land-owner.component.html',
   styleUrls: ['../../../../table.css']
 })

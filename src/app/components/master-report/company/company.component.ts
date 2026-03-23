@@ -8,14 +8,14 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { HttpClientModule, HttpClient } from '@angular/common/http';
-
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-
 import * as XLSX from 'xlsx-js-style';
-
 import { saveAs } from 'file-saver';
 import { environment } from 'src/environments/environment.prod';
+import { DateAdapter } from '@angular/material/core';
+import { CustomDateAdapter } from 'src/app/_core/shared/utils/custom-date-adapter';
+
 
 @Component({
   selector: 'app-company-report',
@@ -31,6 +31,7 @@ import { environment } from 'src/environments/environment.prod';
     MatPaginatorModule,
     HttpClientModule
   ],
+    providers: [{ provide: DateAdapter, useClass: CustomDateAdapter }],
   templateUrl: './company.component.html',
   styleUrls: ['./company.component.scss','../../../../table.css']
 })

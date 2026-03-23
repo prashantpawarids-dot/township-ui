@@ -12,6 +12,8 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx-js-style';
 import { saveAs } from 'file-saver';
+import { DateAdapter } from '@angular/material/core';
+import { CustomDateAdapter } from 'src/app/_core/shared/utils/custom-date-adapter';
 
 @Component({
   selector: 'app-user',
@@ -26,6 +28,7 @@ import { saveAs } from 'file-saver';
     MatTableModule,
     HttpClientModule
   ],
+    providers: [{ provide: DateAdapter, useClass: CustomDateAdapter }],
   templateUrl: './user.component.html',
   styleUrls: ['./user.component.scss','../../../../table.css']
 })

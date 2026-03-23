@@ -16,6 +16,8 @@ import autoTable from 'jspdf-autotable';
 import { environment } from 'src/environments/environment';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
+import { DateAdapter } from '@angular/material/core';
+import { CustomDateAdapter } from 'src/app/_core/shared/utils/custom-date-adapter';
 @Component({
   selector: 'app-tag-lost-damage',
   standalone: true,
@@ -33,6 +35,7 @@ import { saveAs } from 'file-saver';
     MatNativeDateModule,
     MatRadioModule
   ],
+  providers: [{ provide: DateAdapter, useClass: CustomDateAdapter }],
   templateUrl: './tag-lost-damage.component.html',
   styleUrls: ['../../../../table.css']
 })

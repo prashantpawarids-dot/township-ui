@@ -9,7 +9,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatNativeDateModule } from '@angular/material/core';
+// import { MatNativeDateModule } from '@angular/material/core';
+import { MatNativeDateModule, DateAdapter, NativeDateAdapter } from '@angular/material/core';
 import { TableSortService } from 'src/app/_core/shared/services/table-sort.services';
 import { sortByTimeOnly } from 'src/app/_core/shared/utils/sort.util';
 import jsPDF from 'jspdf';
@@ -18,6 +19,25 @@ import * as XLSX from 'xlsx-js-style';
 import { saveAs } from 'file-saver';
 import { environment } from 'src/environments/environment';
 import { DateTimeUtil } from 'src/app/_core/shared/utils/datetime.util';
+class CustomDateAdapter extends NativeDateAdapter {
+  override parse(value: any): Date | null {
+    if (!value) return null;
+    if (value instanceof Date) return value;
+    const str = value.toString().trim();
+    const parts = str.split('/');
+    if (parts.length === 3) {
+      const d = new Date(`${parts[2]}-${parts[1].padStart(2,'0')}-${parts[0].padStart(2,'0')}`);
+      if (!isNaN(d.getTime())) return d;
+    }
+    const fallback = new Date(str);
+    return isNaN(fallback.getTime()) ? null : fallback;
+  }
+  override format(date: Date): string {
+    const dd = date.getDate().toString().padStart(2,'0');
+    const mm = (date.getMonth()+1).toString().padStart(2,'0');
+    return `${dd}/${mm}/${date.getFullYear()}`;
+  }
+}
 @Component({
   selector: 'app-vechile-list',
   standalone: true,
@@ -34,6 +54,8 @@ import { DateTimeUtil } from 'src/app/_core/shared/utils/datetime.util';
     MatDatepickerModule,
     MatNativeDateModule
   ],
+  // templateUrl: './vechile-list.component.html',
+  providers: [{ provide: DateAdapter, useClass: CustomDateAdapter }],
   templateUrl: './vechile-list.component.html',
   styleUrls: ['../../../../table.css']
 })
@@ -67,9 +89,18 @@ let today=new Date();
 }
 
 
+  // ngAfterViewInit() {
+  //   this.displayedData.paginator = this.paginator;
+  // }
+
   ngAfterViewInit() {
-    this.displayedData.paginator = this.paginator;
-  }
+  this.displayedData.paginator = this.paginator;
+
+  // ✅ FIX: Re-render table rows on every page change
+  this.paginator.page.subscribe(() => {
+    // triggers change detection so pagedData getter re-runs
+  });
+}
 
   /** LOAD DATA FROM NEW API */
   loadAllData() {
@@ -85,6 +116,30 @@ let today=new Date();
       this.displayedData.data = [];
     });
   }
+
+
+//   loadAllData() {
+//   // ✅ TEST: 20 hardcoded records to verify pagination (remove when API is ready)
+//   const testData = Array.from({ length: 20 }, (_, i) => ({
+//     regNo: `MH12TEST${1000 + i}`,
+//     vType: i % 2 === 0 ? 'Two Wheeler' : 'Four Wheeler',
+//     shortname: `Owner ${i + 1}`,
+//     idNumber: `30000${i}`,
+//     nrd: i < 10 ? 'NRD ONE' : 'NRD TWO',
+//     building: `Building-${String.fromCharCode(65 + (i % 4))}`,
+//     flatNumber: `${100 + i}`,
+//     tagUID: `TAG${3000 + i}`,
+//     stickerNo: i % 3 === 0 ? `S${1000 + i}` : null,
+//     vMake: 'Honda',
+//     vColor: 'Black',
+//     printedTagID: null,
+//     createdon: new Date(2025, 8, 25 - (i % 10)).toISOString()
+//   }));
+
+//   this.allData = testData;
+//   this.uniqueNRD = [...new Set(testData.map(x => x.nrd).filter(Boolean))];
+//   this.displayedData.data = [];
+// }
  
 
 loadNRDList() {
@@ -125,17 +180,81 @@ onNRDChange() {
       filtered = filtered.filter(x => f.nrd.includes(x.nrd));
     }
 
-    // Date filter (createdon field)
-if (f.fromDate) {
-  const from = new Date(f.fromDate).getTime();
-  filtered = filtered.filter(x => new Date(x.createdon).getTime() >= from);
-}
+//     // Date filter (createdon field)
+// if (f.fromDate) {
+//   const from = new Date(f.fromDate).getTime();
+//   filtered = filtered.filter(x => new Date(x.createdon).getTime() >= from);
+// }
 
-if (f.toDate) {
-  const to = new Date(f.toDate);
-  // Include the entire day until 23:59:59.999
-  to.setHours(23, 59, 59, 999);
-  filtered = filtered.filter(x => new Date(x.createdon).getTime() <= to.getTime());
+// if (f.toDate) {
+//   const to = new Date(f.toDate);
+//   // Include the entire day until 23:59:59.999
+//   to.setHours(23, 59, 59, 999);
+//   filtered = filtered.filter(x => new Date(x.createdon).getTime() <= to.getTime());
+// }
+
+// if (f.fromDate && f.toDate) {
+
+//   // Convert any date to local YYYY-MM-DD string
+//   const toYMD = (d: Date): string => d.toLocaleDateString('en-CA'); // en-CA = YYYY-MM-DD
+
+//   const fromStr = toYMD(new Date(f.fromDate));
+//   const toStr   = toYMD(new Date(f.toDate));
+
+//   filtered = filtered.filter(x => {
+//     if (!x.createdon) return false;              // no date → exclude
+//     const d = new Date(x.createdon);
+//     if (isNaN(d.getTime())) return false;        // invalid date → exclude
+//     const recordStr = toYMD(d);
+//     if (recordStr === '0001-01-01') return false; // SQL default date → exclude
+//     return recordStr >= fromStr && recordStr <= toStr;
+//   });
+// }
+
+if (f.fromDate && f.toDate) {
+
+  // ✅ FIX: Handle both Date object (from calendar) and typed string (manual input)
+  const parseDate = (val: any): Date | null => {
+    if (!val) return null;
+    if (val instanceof Date) return val;          // calendar pick → already a Date
+
+    const str = val.toString().trim();
+
+    // Try native parse first (handles ISO: 2026-03-18)
+    let d = new Date(str);
+    if (!isNaN(d.getTime())) return d;
+
+    // Try DD/MM/YYYY (typed manually in most locales)
+    const parts = str.split('/');
+    if (parts.length === 3) {
+      d = new Date(`${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`);
+      if (!isNaN(d.getTime())) return d;
+    }
+
+    return null; // unparseable
+  };
+
+  const fromDate = parseDate(f.fromDate);
+  const toDate   = parseDate(f.toDate);
+
+  if (!fromDate || !toDate) {
+    alert('Please enter valid dates (DD/MM/YYYY)');
+    return;
+  }
+
+  const toYMD = (d: Date): string => d.toLocaleDateString('en-CA'); // YYYY-MM-DD
+
+  const fromStr = toYMD(fromDate);
+  const toStr   = toYMD(toDate);
+
+  filtered = filtered.filter(x => {
+    if (!x.createdon) return false;
+    const d = new Date(x.createdon);
+    if (isNaN(d.getTime())) return false;
+    const recordStr = toYMD(d);
+    if (recordStr === '0001-01-01') return false;
+    return recordStr >= fromStr && recordStr <= toStr;
+  });
 }
 
 
@@ -159,10 +278,14 @@ if (f.searchText && f.searchText.toString().trim() !== '') {
   filtered = sortByTimeOnly(filtered, 'createdon', 'asc');
 
   // ✅ Store filtered data separately
-  this.filteredData = filtered;
+ this.filteredData = filtered;
   this.displayedData.data = filtered;
 
-  if (this.paginator) this.paginator.firstPage();
+  // ✅ FIX: Tell paginator total record count & go to page 1
+  if (this.paginator) {
+    this.paginator.length = filtered.length;  // ← ADD THIS
+    this.paginator.firstPage();
+  }
   }
 
   /** RESET + SHOW ALL */
@@ -204,6 +327,13 @@ getSortColumn(): string {
 
 getSortDirection(): 'asc' | 'desc' {
   return this.sortService.getSortDirection();
+}
+
+// ✅ FIX: Slice data manually for plain HTML table (mat-table does this automatically)
+get pagedData(): any[] {
+  if (!this.paginator) return this.displayedData.data;
+  const startIndex = this.paginator.pageIndex * this.paginator.pageSize;
+  return this.displayedData.data.slice(startIndex, startIndex + this.paginator.pageSize);
 }
 
   /** EXPORT EXCEL */

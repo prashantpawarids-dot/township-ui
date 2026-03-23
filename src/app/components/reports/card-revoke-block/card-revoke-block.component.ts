@@ -18,6 +18,8 @@ import { saveAs } from 'file-saver';
 import { environment } from 'src/environments/environment';
 import { TableSortService } from 'src/app/_core/shared/services/table-sort.services';
 import { DateTimeUtil } from 'src/app/_core/shared/utils/datetime.util';
+import { DateAdapter } from '@angular/material/core';
+import { CustomDateAdapter } from 'src/app/_core/shared/utils/custom-date-adapter';
 
 @Component({
   selector: 'app-card-revoke-block',
@@ -35,6 +37,7 @@ import { DateTimeUtil } from 'src/app/_core/shared/utils/datetime.util';
     MatTableModule,
     MatPaginatorModule
   ],
+  providers: [{ provide: DateAdapter, useClass: CustomDateAdapter }],
   templateUrl: './card-revoke-block.component.html',
   styleUrls: ['../../../../table.css']
 })
