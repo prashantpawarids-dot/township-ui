@@ -261,6 +261,10 @@ const routes: Routes = [
             loadComponent: () => import('./components/reports/tenant/tenant.component').then((c) => c.TenantComponent)
           },
           {
+            path: 'unauthorized',
+            loadComponent: () => import('./components/reports/unauthorized/unauthorized.component').then((c) => c.UnauthorizedComponent)
+          },
+          {
             path: 'serviceProvider',
             loadComponent: () => import('./components/reports/service-provider/service-provider.component').then((c) => c.ServiceProviderComponent)
           },

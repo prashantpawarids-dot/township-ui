@@ -1,0 +1,189 @@
+<form [formGroup]="reportForm" class="container-fluid">
+
+  <div class="row mt-3 g-2 align-items-end">
+
+    <!-- FROM DATE -->
+    <div class="col-12 col-md-2">
+      <label class="fw-bold">From Date</label>
+      <mat-form-field appearance="outline" class="w-100">
+        <input matInput [matDatepicker]="fromPicker" formControlName="fromDate" placeholder="Date" />
+        <mat-datepicker-toggle matSuffix [for]="fromPicker"></mat-datepicker-toggle>
+        <mat-datepicker #fromPicker></mat-datepicker>
+      </mat-form-field>
+    </div>
+
+    <!-- TO DATE -->
+    <div class="col-12 col-md-2">
+      <label class="fw-bold">To Date</label>
+      <mat-form-field appearance="outline" class="w-100">
+        <input matInput [matDatepicker]="toPicker" formControlName="toDate" placeholder="Date" />
+        <mat-datepicker-toggle matSuffix [for]="toPicker"></mat-datepicker-toggle>
+        <mat-datepicker #toPicker></mat-datepicker>
+      </mat-form-field>
+    </div>
+
+    <!-- IN / OUT -->
+    <div class="col-12 col-md-2">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>IN / OUT</mat-label>
+        <mat-select formControlName="inOut" multiple (selectionChange)="onInOutChange()">
+          <mat-select-trigger>
+            {{ getSelectedLabels('inOut', inOutOptions) }}
+          </mat-select-trigger>
+          <mat-option *ngFor="let io of inOutOptions" [value]="io.value">
+            {{ io.label }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <!-- SEARCH Vehicle No -->
+    <div class="col-12 col-md-2">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>Search Vehicle No</mat-label>
+        <input matInput formControlName="searchValue" placeholder="Enter vehicle no..." />
+      </mat-form-field>
+    </div>
+
+    <!-- BUTTONS -->
+    <div class="col-auto d-flex gap-2 align-items-center">
+      <button class="btn" type="button" (click)="showReports()">Search</button>
+      <button class="btn" type="button" (click)="showAll()">Clear</button>
+      <button class="btn" type="button" (click)="All()">All</button>
+      <button class="btn" type="button" *ngIf="pagedData.length" (click)="exportExcel()">Excel</button>
+      <button class="btn" type="button" *ngIf="pagedData.length" (click)="exportPDF()">PDF</button>
+    </div>
+
+  </div>
+
+  <div class="table-responsive mt-3">
+    <table class="table table-bordered table-hover table-striped"
+           style="table-layout:auto; white-space:nowrap;">
+      <thead class="table-dark">
+        <tr>
+          <th>Sr No</th>
+          <th (click)="sortColumn('vehicleNumber')">
+            Vehicle No
+            <span *ngIf="getSortColumn() === 'vehicleNumber'">{{ getSortDirection() === 'asc' ? '▲' : '▼' }}</span>
+          </th>
+          <th (click)="sortColumn('tagUID')">
+            Tag UID
+            <span *ngIf="getSortColumn() === 'tagUID'">{{ getSortDirection() === 'asc' ? '▲' : '▼' }}</span>
+          </th>
+          <th (click)="sortColumn('ownerName')">
+            Name
+            <span *ngIf="getSortColumn() === 'ownerName'">{{ getSortDirection() === 'asc' ? '▲' : '▼' }}</span>
+          </th>
+         
+         
+         
+          <th (click)="sortColumn('inTime')">
+            IN Time
+            <span *ngIf="getSortColumn() === 'inTime'">{{ getSortDirection() === 'asc' ? '▲' : '▼' }}</span>
+          </th>
+          <th (click)="sortColumn('outTime')">
+            OUT Time
+            <span *ngIf="getSortColumn() === 'outTime'">{{ getSortDirection() === 'asc' ? '▲' : '▼' }}</span>
+          </th>
+          <th>IN Image</th>
+          <th>OUT Image</th>
+        </tr>
+      </thead>
+
+   <tbody>
+  <tr *ngIf="!pagedData.length">
+    <td colspan="13" class="text-center">No Data Found</td>
+  </tr>
+
+  <tr *ngFor="let d of pagedData; let i = index">
+    <td>{{ i + 1 + paginator.pageIndex * paginator.pageSize }}</td>
+    <td>{{ d.vehicleNumber }}</td>
+    <td>{{ d.tagUID }}</td>
+    <td>{{ d.ownerName }}</td>
+
+    <td>{{ d.inTime | date:'dd-MM-yyyy HH:mm' }}</td>
+    <td>{{ d.outTime ? (d.outTime | date:'dd-MM-yyyy HH:mm') : '—' }}</td>
+
+    <!-- IN Image -->
+    <td style="white-space:nowrap;">
+      <div style="display:flex; align-items:center; gap:8px;">
+        <img
+          *ngIf="d.numberPlateImage"
+          [src]="d.numberPlateImage"
+          style="height:32px; width:auto; border:1px solid #ccc; border-radius:3px;"
+          [title]="d.vehicleNumber"
+        />
+
+        <!-- 🔥 FIXED HERE -->
+        <mat-icon
+          *ngIf="d.inCameraImageRaw"
+          title="Click to view IN frame"
+          (click)="openVehiclePopup(d, 'in')"
+          style="cursor:pointer; font-size:28px; width:28px; height:28px; color:#1e40af;">
+          directions_car
+        </mat-icon>
+      </div>
+    </td>
+
+    <!-- OUT Image -->
+    <td style="white-space:nowrap;">
+      <!-- 🔥 FIXED HERE -->
+      <mat-icon
+        *ngIf="d.outCameraImageRaw"
+        title="Click to view OUT frame"
+        (click)="openVehiclePopup(d, 'out')"
+        style="cursor:pointer; font-size:28px; width:28px; height:28px; color:#dc2626;">
+        directions_car
+      </mat-icon>
+
+      <!-- 🔥 FIXED HERE -->
+      <span *ngIf="!d.outCameraImageRaw">—</span>
+    </td>
+
+  </tr>
+</tbody>
+    </table>
+  </div>
+
+  <mat-paginator
+    [pageSizeOptions]="[10, 25, 50, 100, 150, 200, 250, 300]"
+    [pageSize]="10"
+    showFirstLastButtons
+    (page)="updatePagination()">
+  </mat-paginator>
+
+</form>
+
+
+<!-- ─── Vehicle Detail Popup ──────────────────────────────────────────────── -->
+<div *ngIf="selectedVehicle"
+     class="vp-overlay"
+     (click)="closeVehiclePopup()">
+
+  <div class="vp-card" (click)="$event.stopPropagation()">
+
+    <button class="vp-close" (click)="closeVehiclePopup()">&#10005;</button>
+
+    <div class="vp-img-container">
+      <img [src]="selectedVehicleImage" class="vp-img" alt="Vehicle Image" />
+
+      <div class="vp-bottom-bar">
+
+       
+
+        <div class="vp-row">
+         
+          <span class="vp-vnum"><b>Vehicle No:</b> {{ selectedVehicle.vehicleNumber || '—' }}</span>
+        </div>
+
+        <div class="vp-row">
+          <span><b>IN Time:</b> {{ selectedVehicle.inTime | date:'dd-MM-yyyy HH:mm' }}</span>
+          <span><b>OUT Time:</b> {{ selectedVehicle.outTime ? (selectedVehicle.outTime | date:'dd-MM-yyyy HH:mm') : '—' }}</span>
+          <span><b>IN Location:</b> {{ selectedVehicle.inCameraLocation || '—' }}</span>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>

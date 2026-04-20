@@ -1,305 +1,25 @@
-<!-- <form [formGroup]="reportForm" class="container-fluid">
+<form [formGroup]="reportForm" class="container-fluid">
 
   <div class="row mt-3 g-2 align-items-end">
 
-   <div class="col-12 col-md-2">
-  <label class="fw-bold">From Date & Time</label>
-
-  <div class="row g-1">
-
-    <div class="col-8">
+    <!-- FROM DATE -->
+    <div class="col-12 col-md-2">
+      <label class="fw-bold">From Date</label>
       <mat-form-field appearance="outline" class="w-100">
-        <input
-          matInput
-          [matDatepicker]="fromPicker"
-          formControlName="fromDate"
-          placeholder="Date"
-        />
+        <input matInput [matDatepicker]="fromPicker" formControlName="fromDate" placeholder="Date" />
         <mat-datepicker-toggle matSuffix [for]="fromPicker"></mat-datepicker-toggle>
         <mat-datepicker #fromPicker></mat-datepicker>
       </mat-form-field>
     </div>
 
-   
-    <div class="col-4">
-      <input
-        type="time"
-        class="form-control"
-        formControlName="fromTime"
-      />
-    </div>
-  </div>
-</div>
-
-
-
-
+    <!-- TO DATE -->
     <div class="col-12 col-md-2">
-  <label class="fw-bold">To Date & Time</label>
-
-  <div class="row g-1">
-
-    <div class="col-8">
+      <label class="fw-bold">To Date</label>
       <mat-form-field appearance="outline" class="w-100">
-        <input
-          matInput
-          [matDatepicker]="toPicker"
-          formControlName="toDate"
-          placeholder="Date"
-        />
+        <input matInput [matDatepicker]="toPicker" formControlName="toDate" placeholder="Date" />
         <mat-datepicker-toggle matSuffix [for]="toPicker"></mat-datepicker-toggle>
         <mat-datepicker #toPicker></mat-datepicker>
       </mat-form-field>
-    </div>
-
-    
-    <div class="col-4">
-      <input
-        type="time"
-        class="form-control"
-        formControlName="toTime"
-      />
-    </div>
-  </div>
-</div>
-
-
-
-
-    
-    <div class="col-12 col-md-2">
-      <mat-form-field appearance="outline" class="w-100">
-        <mat-label>Vehicle Type</mat-label>
-        <mat-select formControlName="vehicleType" multiple (selectionChange)="onVehicleTypeChange()">
-          <mat-option *ngFor="let v of vehicleTypes" [value]="v.value">
-            {{ v.label }}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
-    </div>
-
-
-    <div class="col-12 col-md-2">
-      <mat-form-field appearance="outline" class="w-100">
-        <mat-label>IN / OUT</mat-label>
-      <mat-select formControlName="inOut" multiple (selectionChange)="onInOutChange()">
-          <mat-option *ngFor="let io of inOutOptions" [value]="io.value">
-            {{ io.label }}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
-    </div>
-
-    <div class="col-12 col-md-2">
-      <mat-form-field appearance="outline" class="w-100">
-        <mat-label>Neighbourhood</mat-label>
-        <mat-select multiple formControlName="project" (selectionChange)="onProjectChange()">
-        
-           <mat-option value="ALL" (click)="selectAll('project')">All</mat-option>
-          <mat-option *ngFor="let p of projectList" [value]="p">{{ p }}</mat-option>
-        </mat-select>
-      </mat-form-field>
-    </div>
-
-    <div class="col-12 col-md-2">
-      <mat-form-field appearance="outline" class="w-100">
-        <mat-label>Building</mat-label>
-        <mat-select multiple formControlName="building" (selectionChange)="onBuildingChange()">
-         
-          <mat-option value="ALL" (click)="selectAll('building')">All</mat-option>
-
-          <mat-option *ngFor="let b of buildingList" [value]="b">{{ b }}</mat-option>
-        </mat-select>
-      </mat-form-field>
-    </div>
-
-    <div class="col-12 col-md-2">
-      <mat-form-field appearance="outline" class="w-100">
-        <mat-label>Search By</mat-label>
-        <mat-select formControlName="searchBy">
-          <mat-option value="vehicleNumber">Reg No</mat-option>
-          <mat-option value="stickerNo">Vehicle StickerNo</mat-option>
-          <mat-option value="vMake">Vehicle Make</mat-option>
-          <mat-option value="vColor">Color</mat-option>
-        </mat-select>
-      </mat-form-field>
-    </div>
-
-  
-    <div class="col-12 col-md-2">
-      <mat-form-field appearance="outline" class="w-100">
-        <mat-label>Search</mat-label>
-        <input matInput formControlName="searchValue" placeholder="Enter text..." />
-      </mat-form-field>
-    </div>
-
- 
-    <div class="col-auto d-flex gap-2 align-items-center">
-      <button class="btn" type="button" (click)="showReports()">Search</button>
-      <button class="btn" type="button" (click)="showAll()">Clear</button>
-      <button class="btn" type="button" *ngIf="pagedData.length" (click)="exportExcel()">Excel</button>
-      <button class="btn" type="button" *ngIf="pagedData.length" (click)="exportPDF()">PDF</button>
-    </div>
-
-  </div>
-
-  <div class="table-responsive mt-3">
-  <table class="table table-bordered table-hover table-striped"
-         style="table-layout:auto; white-space:nowrap;">
-    <thead class="table-dark">
-      <tr>
-         <th>Sr No</th>
-        <th (click)="sortColumn('vehicleNumber')">
-          Vehicle No
-          <span *ngIf="getSortColumn() === 'vehicleNumber'">
-            {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
-          </span>
-        </th>
-        <th (click)="sortColumn('ownerName')">
-          Name
-          <span *ngIf="getSortColumn() === 'ownerName'">
-            {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
-          </span>
-        </th>
-        <th (click)="sortColumn('building')">
-          Building
-          <span *ngIf="getSortColumn() === 'building'">
-            {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
-          </span>
-        </th>
-        <th (click)="sortColumn('flatNumber')">
-          Flat
-          <span *ngIf="getSortColumn() === 'flatNumber'">
-            {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
-          </span>
-        </th>
-        <th (click)="sortColumn('vehicleCategory')">
-          Vehicle Type
-          <span *ngIf="getSortColumn() === 'vehicleCategory'">
-            {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
-          </span>
-        </th>
-        <th (click)="sortColumn('cameraLocation')">
-          Location
-          <span *ngIf="getSortColumn() === 'cameraLocation'">
-            {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
-          </span>
-        </th>
-        <th (click)="sortColumn('inoutFlag')">
-          IN/OUT
-          <span *ngIf="getSortColumn() === 'inoutFlag'">
-            {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
-          </span>
-        </th>
-        <th (click)="sortColumn('inoutTime')">
-          Time
-          <span *ngIf="getSortColumn() === 'inoutTime'">
-            {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
-          </span>
-        </th>
-
-        <th (click)="sortColumn('vMake')">
-  Make
-  <span *ngIf="getSortColumn() === 'vMake'">
-    {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
-  </span>
-</th>
-
-<th (click)="sortColumn('stickerNo')">
-  Sticker No
-  <span *ngIf="getSortColumn() === 'stickerNo'">
-    {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
-  </span>
-</th>
-
-<th (click)="sortColumn('vColor')">
-  Color
-  <span *ngIf="getSortColumn() === 'vColor'">
-    {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
-  </span>
-</th>
-
-        <th (click)="sortColumn('nrdName')">
-          Neighbourhood
-          <span *ngIf="getSortColumn() === 'nrdName'">
-            {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
-          </span>
-        </th>
-        <th>Image</th>
-      </tr>
-    </thead>
-
-    <tbody>
-      <tr *ngIf="!pagedData.length">
-        <td colspan="11" class="text-center">No Data Found</td>
-      </tr>
-      <tr *ngFor="let d of pagedData; let i = index">
-        <td>{{ i + 1 + paginator.pageIndex * paginator.pageSize }}</td>
-        <td>{{ d.vehicleNumber }}</td>
-        <td>{{ d.ownerName }}</td>
-        <td>{{ d.building }}</td>
-        <td>{{ d.flatNumber }}</td>
-        <td>{{ d.vehicleCategory }}</td>
-        <td>{{ d.cameraLocation }}</td>
-        <td>{{ d.inoutFlag }}</td>
-       <td>{{ d.inoutTime | date:'dd-MM-yyyy HH:mm' }}</td>
-<td>{{ d.vMake }}</td>
-<td>{{ d.stickerNo }}</td>
-<td>{{ d.vColor }}</td>
-
-        <td>{{ d.nrdName }}</td>
-        <td>
-          <button *ngIf="d.cameraImage" class="btn btn-sm btn-primary" (click)="openImage(d.cameraImage)">View</button>
-        </td>
-      </tr>
-    </tbody>
-  </table>
-</div>
-<mat-paginator
-    [pageSizeOptions]="[10, 25, 50, 100,150,200,250,300]"
-    [pageSize]="10"
-    showFirstLastButtons
-    (page)="updatePagination()">
-  </mat-paginator>
-</form> -->
-
-<!-- new code -->
-
-
-<form [formGroup]="reportForm" class="container-fluid">
-
-  <div class="row mt-3 g-2 align-items-end">
-
-    <div class="col-12 col-md-2">
-      <label class="fw-bold">From Date & Time</label>
-      <div class="row g-1">
-        <div class="col-8">
-          <mat-form-field appearance="outline" class="w-100">
-            <input matInput [matDatepicker]="fromPicker" formControlName="fromDate" placeholder="Date" />
-            <mat-datepicker-toggle matSuffix [for]="fromPicker"></mat-datepicker-toggle>
-            <mat-datepicker #fromPicker></mat-datepicker>
-          </mat-form-field>
-        </div>
-        <div class="col-4">
-          <input type="time" class="form-control" formControlName="fromTime" />
-        </div>
-      </div>
-    </div>
-
-    <div class="col-12 col-md-2">
-      <label class="fw-bold">To Date & Time</label>
-      <div class="row g-1">
-        <div class="col-8">
-          <mat-form-field appearance="outline" class="w-100">
-            <input matInput [matDatepicker]="toPicker" formControlName="toDate" placeholder="Date" />
-            <mat-datepicker-toggle matSuffix [for]="toPicker"></mat-datepicker-toggle>
-            <mat-datepicker #toPicker></mat-datepicker>
-          </mat-form-field>
-        </div>
-        <div class="col-4">
-          <input type="time" class="form-control" formControlName="toTime" />
-        </div>
-      </div>
     </div>
 
     <!-- VEHICLE TYPE -->
@@ -307,6 +27,9 @@
       <mat-form-field appearance="outline" class="w-100">
         <mat-label>Vehicle Type</mat-label>
         <mat-select formControlName="vehicleType" multiple (selectionChange)="onVehicleTypeChange()">
+          <mat-select-trigger>
+            {{ getSelectedLabels('vehicleType', vehicleTypes) }}
+          </mat-select-trigger>
           <mat-option *ngFor="let v of vehicleTypes" [value]="v.value">
             {{ v.label }}
           </mat-option>
@@ -319,6 +42,9 @@
       <mat-form-field appearance="outline" class="w-100">
         <mat-label>IN / OUT</mat-label>
         <mat-select formControlName="inOut" multiple (selectionChange)="onInOutChange()">
+          <mat-select-trigger>
+            {{ getSelectedLabels('inOut', inOutOptions) }}
+          </mat-select-trigger>
           <mat-option *ngFor="let io of inOutOptions" [value]="io.value">
             {{ io.label }}
           </mat-option>
@@ -331,6 +57,9 @@
       <mat-form-field appearance="outline" class="w-100">
         <mat-label>Neighbourhood</mat-label>
         <mat-select multiple formControlName="project" (selectionChange)="onProjectChange()">
+          <mat-select-trigger>
+            {{ reportForm.get('project')?.value | arrayJoin }}
+          </mat-select-trigger>
           <mat-option value="ALL" (click)="selectAll('project')">All</mat-option>
           <mat-option *ngFor="let p of projectList" [value]="p">{{ p }}</mat-option>
         </mat-select>
@@ -342,6 +71,9 @@
       <mat-form-field appearance="outline" class="w-100">
         <mat-label>Building</mat-label>
         <mat-select multiple formControlName="building" (selectionChange)="onBuildingChange()">
+          <mat-select-trigger>
+            {{ reportForm.get('building')?.value | arrayJoin }}
+          </mat-select-trigger>
           <mat-option value="ALL" (click)="selectAll('building')">All</mat-option>
           <mat-option *ngFor="let b of buildingList" [value]="b">{{ b }}</mat-option>
         </mat-select>
@@ -457,38 +189,23 @@
           <td>{{ d.nrdName }}</td>
 
           <!-- Image cell -->
-          <!-- <td style="white-space:nowrap;">
-            <img
-              *ngIf="d.numberPlateImage"
-              [src]="d.numberPlateImage"
-              style="height:32px; width:auto; display:block; margin-bottom:4px; border:1px solid #ccc; border-radius:3px;"
-              [title]="d.vehicleNumber"
-            />
-            <button
-              *ngIf="d.fullVehicleImage"
-              class="btn btn-sm btn-primary"
-              (click)="openVehiclePopup(d)">
-              View
-            </button>
-          </td> -->
-
-          <!-- Image cell -->
-<td style="white-space:nowrap;">
-  <div style="display:flex; align-items:center; gap:8px;">
-    <img
-      *ngIf="d.numberPlateImage"
-      [src]="d.numberPlateImage"
-      style="height:32px; width:auto; border:1px solid #ccc; border-radius:3px;"
-      [title]="d.vehicleNumber"
-    />
-   <mat-icon
-  *ngIf="d.fullVehicleImage"
-  title="Click to view frame"
-  (click)="openVehiclePopup(d)"
-  style="cursor:pointer; font-size:28px; width:28px; height:28px; color:#1e40af; vertical-align:middle;"
->{{ d.vehicleCategory === 'Two Wheeler' ? 'two_wheeler' : d.vehicleCategory === 'Three Wheeler' ? 'electric_rickshaw' : 'directions_car' }}</mat-icon>
-  </div>
-</td>
+          <td style="white-space:nowrap;">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <img
+                *ngIf="d.numberPlateImage"
+                [src]="d.numberPlateImage"
+                style="height:32px; width:auto; border:1px solid #ccc; border-radius:3px;"
+                [title]="d.vehicleNumber"
+              />
+              <mat-icon
+                *ngIf="d.fullVehicleImage"
+                title="Click to view frame"
+                (click)="openVehiclePopup(d)"
+                style="cursor:pointer; font-size:28px; width:28px; height:28px; color:#1e40af; vertical-align:middle;">
+                {{ d.vehicleCategory === 'Two Wheeler' ? 'two_wheeler' : d.vehicleCategory === 'Three Wheeler' ? 'electric_rickshaw' : 'directions_car' }}
+              </mat-icon>
+            </div>
+          </td>
         </tr>
       </tbody>
     </table>
@@ -511,50 +228,48 @@
 
   <div class="vp-card" (click)="$event.stopPropagation()">
 
+    <!-- Close Button -->
     <button class="vp-close" (click)="closeVehiclePopup()">&#10005;</button>
 
-    <div class="vp-header">
-      <span class="vp-badge">ANPR CAPTURE</span>
-      <h5 class="vp-title">Vehicle Detail</h5>
-    </div>
+    <!-- IMAGE FULL -->
+    <div class="vp-img-container">
 
-    <div class="vp-img-wrap">
-      <img [src]="selectedVehicle.fullVehicleImage" class="vp-img" alt="Vehicle Image" />
-      <!-- <img *ngIf="selectedVehicle.numberPlateImage"
-           [src]="selectedVehicle.numberPlateImage"
-           class="vp-plate-overlay"
-           [title]="selectedVehicle.vehicleNumber" /> -->
-    </div>
+      <img
+        [src]="selectedVehicle.cameraFrameImage || selectedVehicle.fullVehicleImage"
+        class="vp-img"
+        alt="Vehicle Image"
+      />
 
-    <div class="vp-info">
-      <div class="vp-info-item">
-        <span class="vp-label">&#128100; Name</span>
-        <span class="vp-value">{{ selectedVehicle.ownerName || '—' }}</span>
+      <!-- BOTTOM INFO (2 ROWS WITH LABELS) -->
+      <div class="vp-bottom-bar">
+
+        <!-- ROW 1 -->
+        <div class="vp-row">
+          <span><b>Name:</b> {{ selectedVehicle.ownerName || 'Unknown' }}</span>
+
+          <span
+            [style.color]="selectedVehicle.inoutFlag === 'IN' ? '#22c55e' : '#ef4444'">
+            <b>Flag:</b> {{ selectedVehicle.inoutFlag || '—' }}
+          </span>
+
+          <span>
+            <b>DateTime:</b> {{ selectedVehicle.inoutTime | date:'dd-MM-yyyy HH:mm' }}
+          </span>
+        </div>
+
+        <!-- ROW 2 -->
+        <div class="vp-row">
+          <span><b>Flat No:</b> {{ selectedVehicle.flatNumber || '—' }}</span>
+
+          <span><b>Building:</b> {{ selectedVehicle.building || '—' }}</span>
+
+          <span class="vp-vnum">
+            <b>Vehicle No:</b> {{ selectedVehicle.vehicleNumber || '—' }}
+          </span>
+        </div>
+
       </div>
-      <div class="vp-info-item">
-        <span class="vp-label">&#127968; Building</span>
-        <span class="vp-value">{{ selectedVehicle.building || '—' }}</span>
-      </div>
-      <div class="vp-info-item">
-        <span class="vp-label">&#128205; Flat No</span>
-        <span class="vp-value">{{ selectedVehicle.flatNumber || '—' }}</span>
-      </div>
-      <div class="vp-info-item">
-        <span class="vp-label">&#128663; Vehicle No</span>
-        <span class="vp-value vp-vnum">{{ selectedVehicle.vehicleNumber || '—' }}</span>
-      </div>
-      <div class="vp-info-item">
-        <span class="vp-label">&#9202; Time</span>
-        <span class="vp-value">{{ selectedVehicle.inoutTime | date:'dd-MM-yyyy HH:mm' }}</span>
-      </div>
-      <div class="vp-info-item">
-        <span class="vp-label">&#128336; IN / OUT</span>
-        <span class="vp-value"
-              [style.color]="selectedVehicle.inoutFlag === 'IN' ? '#16a34a' : '#dc2626'"
-              style="font-weight:700;">
-          {{ selectedVehicle.inoutFlag || '—' }}
-        </span>
-      </div>
+
     </div>
 
   </div>

@@ -291,6 +291,7 @@ export const NavigationItems: NavigationItem[] = [
           // { id: 'tagLostDamage', title: 'Tag Lost Damage', type: 'item', url: '/reports/tagLostDamage', icon: 'ant-design' },
           // { id: 'tagBlockRemove', title: 'Card Revoke/Block', type: 'item', url: '/reports/tagBlockRemove', icon: 'ant-design' },
           { id: 'resident', title: 'Resident', type: 'item', url: '/reports/resident', icon: 'ant-design' },
+          { id: '', title: 'Unauthorized Vehicle Register', type: 'item', url: '/reports/unauthorized', icon: 'ant-design' },
           { id: 'tenant', title: 'Tenant', type: 'item', url: '/reports/tenant', icon: 'ant-design' },
           { id: 'serviceProvider', title: 'Service Provider', type: 'item', url: '/reports/serviceProvider', icon: 'ant-design' },
           // { id: 'riverViewCityEmployee', title: 'RiverView City Employee', type: 'item', url: '/reports/riverViewCityEmployee', icon: 'ant-design' },
@@ -305,15 +306,15 @@ export const NavigationItems: NavigationItem[] = [
       }
     ]
   },
-  {
-  id: 'card-print-enroll',
-  title: 'Card Print Enroll',
-  type: 'item',
-  classes: 'nav-item',
-  url: '/card-print-enroll',
-  icon: 'dashboard',
-  breadcrumbs: true
-},
+//   {
+//   id: 'card-print-enroll',
+//   title: 'Card Print Enroll',
+//   type: 'item',
+//   classes: 'nav-item',
+//   url: '/card-print-enroll',
+//   icon: 'dashboard',
+//   breadcrumbs: true
+// },
     ]
   },
   

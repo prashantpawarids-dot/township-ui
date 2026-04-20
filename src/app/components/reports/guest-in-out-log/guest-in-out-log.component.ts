@@ -20,6 +20,7 @@ import { TableSortService } from 'src/app/_core/shared/services/table-sort.servi
 import { DateTimeUtil } from 'src/app/_core/shared/utils/datetime.util';
 import { DateAdapter } from '@angular/material/core';
 import { CustomDateAdapter } from 'src/app/_core/shared/utils/custom-date-adapter';
+
 @Component({
   selector: 'app-guest-in-out-log',
   standalone: true,
@@ -123,12 +124,12 @@ filteredData:any[]=[];
 
   if (f.buildingName?.length && !f.buildingName.includes('ALL')) {
   filtered = filtered.filter(x =>
-    f.buildingName.some(b => b.toLowerCase() === (x.buildingName || '').toLowerCase())
+    f.buildingName.some((b : any) => b.toLowerCase() === (x.buildingName || '').toLowerCase())
   );
 }
 if (f.nrdName?.length && !f.nrdName.includes('ALL')) {
   filtered = filtered.filter(x =>
-    f.nrdName.some(n => n.toLowerCase() === (x.nrdName || '').toLowerCase())
+    f.nrdName.some((n : any) => n.toLowerCase() === (x.nrdName || '').toLowerCase())
   );
 }
 
@@ -298,7 +299,7 @@ getSortDirection(): 'asc' | 'desc' {
     doc.addImage(logo, 'JPEG', 10, 10, 25, 25);
 
     // Title
-    doc.setFont(undefined, 'bold');
+    doc.setFont('helvetica', 'bold');
     doc.setFontSize(18);
     doc.text('Guest In-Out Log Report', pageWidth / 2, 20, { align: 'center' });
 
