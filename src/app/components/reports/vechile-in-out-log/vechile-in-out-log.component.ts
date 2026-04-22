@@ -206,6 +206,7 @@ export class VehicleInOutLogComponent implements OnInit, AfterViewInit {
   getSortColumn(): string { return this.sortService.getSortColumn(); }
   getSortDirection(): 'asc' | 'desc' { return this.sortService.getSortDirection(); }
 
+  //Real API call to fetch vehicle data based on date range and other filters
   loadVehicleData(fromDate?: Date, toDate?: Date, onLoaded?: (data: any[]) => void) {
 
     const from = fromDate || new Date();
@@ -284,6 +285,393 @@ export class VehicleInOutLogComponent implements OnInit, AfterViewInit {
       }
     });
   }
+
+
+// Mock data loader for development/testing without real API
+//   loadVehicleData(fromDate?: Date, toDate?: Date, onLoaded?: (data: any[]) => void) {
+//   const today = new Date();
+//   const yesterday = new Date();
+//   yesterday.setDate(today.getDate() - 1);
+
+//   const mockApiData = [
+//     // ===== TODAY (10 records) =====
+//     {
+//       vehicleNumber: 'MH14AB1234',
+//       ownerName: 'Prashant Pawar',
+//       building: 'A Wing',
+//       flatNumber: '101',
+//       cardType: 'Resident',
+//       cameraLocation: 'Gate 1',
+//       inoutFlag: 'IN',
+//       inoutTime: new Date(today.getFullYear(), today.getMonth(), today.getDate(), 8, 15, 0).toISOString(),
+//       nrd: 'Green Valley',
+//       vType: 'Four Wheeler',
+//       vMake: 'Hyundai',
+//       stickerNo: 'ST101',
+//       vColor: 'White',
+//       cameraImage: '',
+//       cameraFrameImage: ''
+//     },
+//     {
+//       vehicleNumber: 'MH12CD5678',
+//       ownerName: 'Amit Sharma',
+//       building: 'B Wing',
+//       flatNumber: '202',
+//       cardType: 'Visitor',
+//       cameraLocation: 'Gate 2',
+//       inoutFlag: 'OUT',
+//       inoutTime: new Date(today.getFullYear(), today.getMonth(), today.getDate(), 9, 5, 0).toISOString(),
+//       nrd: 'Green Valley',
+//       vType: 'Two Wheeler',
+//       vMake: 'Honda',
+//       stickerNo: 'ST102',
+//       vColor: 'Black',
+//       cameraImage: '',
+//       cameraFrameImage: ''
+//     },
+//     {
+//       vehicleNumber: 'MH04EF9012',
+//       ownerName: 'Sneha Patil',
+//       building: 'C Wing',
+//       flatNumber: '303',
+//       cardType: 'Resident',
+//       cameraLocation: 'Main Gate',
+//       inoutFlag: 'IN',
+//       inoutTime: new Date(today.getFullYear(), today.getMonth(), today.getDate(), 10, 20, 0).toISOString(),
+//       nrd: 'Blue Residency',
+//       vType: 'Four Wheeler',
+//       vMake: 'Tata',
+//       stickerNo: 'ST103',
+//       vColor: 'Silver',
+//       cameraImage: '',
+//       cameraFrameImage: ''
+//     },
+//     {
+//       vehicleNumber: 'MH01GH3456',
+//       ownerName: 'Rohit Jain',
+//       building: 'D Wing',
+//       flatNumber: '404',
+//       cardType: 'Guest',
+//       cameraLocation: 'Gate 1',
+//       inoutFlag: 'OUT',
+//       inoutTime: new Date(today.getFullYear(), today.getMonth(), today.getDate(), 11, 45, 0).toISOString(),
+//       nrd: 'Blue Residency',
+//       vType: 'Three Wheeler',
+//       vMake: 'Bajaj',
+//       stickerNo: 'ST104',
+//       vColor: 'Yellow',
+//       cameraImage: '',
+//       cameraFrameImage: ''
+//     },
+//     {
+//       vehicleNumber: 'MH16IJ7890',
+//       ownerName: 'Pooja More',
+//       building: 'E Wing',
+//       flatNumber: '505',
+//       cardType: 'Resident',
+//       cameraLocation: 'Parking Gate',
+//       inoutFlag: 'IN',
+//       inoutTime: new Date(today.getFullYear(), today.getMonth(), today.getDate(), 12, 10, 0).toISOString(),
+//       nrd: 'Palm Court',
+//       vType: 'Two Wheeler',
+//       vMake: 'TVS',
+//       stickerNo: 'ST105',
+//       vColor: 'Red',
+//       cameraImage: '',
+//       cameraFrameImage: ''
+//     },
+//     {
+//       vehicleNumber: 'MH20KL1122',
+//       ownerName: 'Vikas Singh',
+//       building: 'F Wing',
+//       flatNumber: '606',
+//       cardType: 'Vendor',
+//       cameraLocation: 'Service Gate',
+//       inoutFlag: 'OUT',
+//       inoutTime: new Date(today.getFullYear(), today.getMonth(), today.getDate(), 13, 25, 0).toISOString(),
+//       nrd: 'Palm Court',
+//       vType: 'Four Wheeler',
+//       vMake: 'Mahindra',
+//       stickerNo: 'ST106',
+//       vColor: 'Blue',
+//       cameraImage: '',
+//       cameraFrameImage: ''
+//     },
+//     {
+//       vehicleNumber: 'MH21MN3344',
+//       ownerName: 'Neha Kulkarni',
+//       building: 'A Wing',
+//       flatNumber: '107',
+//       cardType: 'Resident',
+//       cameraLocation: 'Gate 2',
+//       inoutFlag: 'IN',
+//       inoutTime: new Date(today.getFullYear(), today.getMonth(), today.getDate(), 14, 5, 0).toISOString(),
+//       nrd: 'Green Valley',
+//       vType: 'Four Wheeler',
+//       vMake: 'Kia',
+//       stickerNo: 'ST107',
+//       vColor: 'Grey',
+//       cameraImage: '',
+//       cameraFrameImage: ''
+//     },
+//     {
+//       vehicleNumber: 'MH22OP5566',
+//       ownerName: 'Karan Mehta',
+//       building: 'B Wing',
+//       flatNumber: '208',
+//       cardType: 'Visitor',
+//       cameraLocation: 'Main Gate',
+//       inoutFlag: 'OUT',
+//       inoutTime: new Date(today.getFullYear(), today.getMonth(), today.getDate(), 15, 30, 0).toISOString(),
+//       nrd: 'Green Valley',
+//       vType: 'Two Wheeler',
+//       vMake: 'Yamaha',
+//       stickerNo: 'ST108',
+//       vColor: 'Blue',
+//       cameraImage: '',
+//       cameraFrameImage: ''
+//     },
+//     {
+//       vehicleNumber: 'MH23QR7788',
+//       ownerName: 'Anjali Deshmukh',
+//       building: 'C Wing',
+//       flatNumber: '309',
+//       cardType: 'Resident',
+//       cameraLocation: 'Parking Gate',
+//       inoutFlag: 'IN',
+//       inoutTime: new Date(today.getFullYear(), today.getMonth(), today.getDate(), 16, 40, 0).toISOString(),
+//       nrd: 'Blue Residency',
+//       vType: 'Four Wheeler',
+//       vMake: 'Maruti',
+//       stickerNo: 'ST109',
+//       vColor: 'White',
+//       cameraImage: '',
+//       cameraFrameImage: ''
+//     },
+//     {
+//       vehicleNumber: 'MH24ST9900',
+//       ownerName: 'Rahul Verma',
+//       building: 'D Wing',
+//       flatNumber: '410',
+//       cardType: 'Guest',
+//       cameraLocation: 'Gate 1',
+//       inoutFlag: 'OUT',
+//       inoutTime: new Date(today.getFullYear(), today.getMonth(), today.getDate(), 18, 0, 0).toISOString(),
+//       nrd: 'Blue Residency',
+//       vType: 'Three Wheeler',
+//       vMake: 'Piaggio',
+//       stickerNo: 'ST110',
+//       vColor: 'Green',
+//       cameraImage: '',
+//       cameraFrameImage: ''
+//     },
+
+//     // ===== YESTERDAY (10 records) =====
+//     {
+//       vehicleNumber: 'MH11AA1111',
+//       ownerName: 'Suresh Patil',
+//       building: 'A Wing',
+//       flatNumber: '102',
+//       cardType: 'Resident',
+//       cameraLocation: 'Gate 1',
+//       inoutFlag: 'IN',
+//       inoutTime: new Date(yesterday.getFullYear(), yesterday.getMonth(), yesterday.getDate(), 8, 10, 0).toISOString(),
+//       nrd: 'Green Valley',
+//       vType: 'Two Wheeler',
+//       vMake: 'Hero',
+//       stickerNo: 'ST201',
+//       vColor: 'Black',
+//       cameraImage: '',
+//       cameraFrameImage: ''
+//     },
+//     {
+//       vehicleNumber: 'MH11BB2222',
+//       ownerName: 'Meera Joshi',
+//       building: 'B Wing',
+//       flatNumber: '203',
+//       cardType: 'Visitor',
+//       cameraLocation: 'Gate 2',
+//       inoutFlag: 'OUT',
+//       inoutTime: new Date(yesterday.getFullYear(), yesterday.getMonth(), yesterday.getDate(), 9, 20, 0).toISOString(),
+//       nrd: 'Green Valley',
+//       vType: 'Four Wheeler',
+//       vMake: 'Toyota',
+//       stickerNo: 'ST202',
+//       vColor: 'Silver',
+//       cameraImage: '',
+//       cameraFrameImage: ''
+//     },
+//     {
+//       vehicleNumber: 'MH11CC3333',
+//       ownerName: 'Akash More',
+//       building: 'C Wing',
+//       flatNumber: '304',
+//       cardType: 'Resident',
+//       cameraLocation: 'Main Gate',
+//       inoutFlag: 'IN',
+//       inoutTime: new Date(yesterday.getFullYear(), yesterday.getMonth(), yesterday.getDate(), 10, 0, 0).toISOString(),
+//       nrd: 'Blue Residency',
+//       vType: 'Four Wheeler',
+//       vMake: 'Skoda',
+//       stickerNo: 'ST203',
+//       vColor: 'Blue',
+//       cameraImage: '',
+//       cameraFrameImage: ''
+//     },
+//     {
+//       vehicleNumber: 'MH11DD4444',
+//       ownerName: 'Ritika Shah',
+//       building: 'D Wing',
+//       flatNumber: '405',
+//       cardType: 'Guest',
+//       cameraLocation: 'Gate 1',
+//       inoutFlag: 'OUT',
+//       inoutTime: new Date(yesterday.getFullYear(), yesterday.getMonth(), yesterday.getDate(), 11, 15, 0).toISOString(),
+//       nrd: 'Blue Residency',
+//       vType: 'Two Wheeler',
+//       vMake: 'Suzuki',
+//       stickerNo: 'ST204',
+//       vColor: 'Red',
+//       cameraImage: '',
+//       cameraFrameImage: ''
+//     },
+//     {
+//       vehicleNumber: 'MH11EE5555',
+//       ownerName: 'Nitin Kale',
+//       building: 'E Wing',
+//       flatNumber: '506',
+//       cardType: 'Resident',
+//       cameraLocation: 'Parking Gate',
+//       inoutFlag: 'IN',
+//       inoutTime: new Date(yesterday.getFullYear(), yesterday.getMonth(), yesterday.getDate(), 12, 35, 0).toISOString(),
+//       nrd: 'Palm Court',
+//       vType: 'Three Wheeler',
+//       vMake: 'Bajaj',
+//       stickerNo: 'ST205',
+//       vColor: 'Yellow',
+//       cameraImage: '',
+//       cameraFrameImage: ''
+//     },
+//     {
+//       vehicleNumber: 'MH11FF6666',
+//       ownerName: 'Komal Patne',
+//       building: 'F Wing',
+//       flatNumber: '607',
+//       cardType: 'Vendor',
+//       cameraLocation: 'Service Gate',
+//       inoutFlag: 'OUT',
+//       inoutTime: new Date(yesterday.getFullYear(), yesterday.getMonth(), yesterday.getDate(), 13, 40, 0).toISOString(),
+//       nrd: 'Palm Court',
+//       vType: 'Four Wheeler',
+//       vMake: 'Ford',
+//       stickerNo: 'ST206',
+//       vColor: 'White',
+//       cameraImage: '',
+//       cameraFrameImage: ''
+//     },
+//     {
+//       vehicleNumber: 'MH11GG7777',
+//       ownerName: 'Priya Nair',
+//       building: 'A Wing',
+//       flatNumber: '108',
+//       cardType: 'Resident',
+//       cameraLocation: 'Gate 2',
+//       inoutFlag: 'IN',
+//       inoutTime: new Date(yesterday.getFullYear(), yesterday.getMonth(), yesterday.getDate(), 14, 25, 0).toISOString(),
+//       nrd: 'Green Valley',
+//       vType: 'Two Wheeler',
+//       vMake: 'Activa',
+//       stickerNo: 'ST207',
+//       vColor: 'Grey',
+//       cameraImage: '',
+//       cameraFrameImage: ''
+//     },
+//     {
+//       vehicleNumber: 'MH11HH8888',
+//       ownerName: 'Sameer Khan',
+//       building: 'B Wing',
+//       flatNumber: '209',
+//       cardType: 'Visitor',
+//       cameraLocation: 'Main Gate',
+//       inoutFlag: 'OUT',
+//       inoutTime: new Date(yesterday.getFullYear(), yesterday.getMonth(), yesterday.getDate(), 15, 10, 0).toISOString(),
+//       nrd: 'Green Valley',
+//       vType: 'Four Wheeler',
+//       vMake: 'Honda',
+//       stickerNo: 'ST208',
+//       vColor: 'Brown',
+//       cameraImage: '',
+//       cameraFrameImage: ''
+//     },
+//     {
+//       vehicleNumber: 'MH11II9999',
+//       ownerName: 'Deepali Chavan',
+//       building: 'C Wing',
+//       flatNumber: '310',
+//       cardType: 'Resident',
+//       cameraLocation: 'Parking Gate',
+//       inoutFlag: 'IN',
+//       inoutTime: new Date(yesterday.getFullYear(), yesterday.getMonth(), yesterday.getDate(), 16, 50, 0).toISOString(),
+//       nrd: 'Blue Residency',
+//       vType: 'Four Wheeler',
+//       vMake: 'MG',
+//       stickerNo: 'ST209',
+//       vColor: 'Black',
+//       cameraImage: '',
+//       cameraFrameImage: ''
+//     },
+//     {
+//       vehicleNumber: 'MH11JJ0000',
+//       ownerName: 'Arun Salunkhe',
+//       building: 'D Wing',
+//       flatNumber: '411',
+//       cardType: 'Guest',
+//       cameraLocation: 'Gate 1',
+//       inoutFlag: 'OUT',
+//       inoutTime: new Date(yesterday.getFullYear(), yesterday.getMonth(), yesterday.getDate(), 18, 5, 0).toISOString(),
+//       nrd: 'Blue Residency',
+//       vType: 'Three Wheeler',
+//       vMake: 'Atul',
+//       stickerNo: 'ST210',
+//       vColor: 'Blue',
+//       cameraImage: '',
+//       cameraFrameImage: ''
+//     }
+//   ];
+
+//   this.vehicleData = mockApiData.map(v => {
+//     const plateImg = this.generatePlateImg(v.vehicleNumber || 'UNKNOWN');
+
+//     return {
+//       vehicleNumber: v.vehicleNumber || '',
+//       ownerName: v.ownerName || '',
+//       building: v.building || '',
+//       flatNumber: v.flatNumber || '',
+//       cardType: v.cardType || '',
+//       cameraLocation: v.cameraLocation || '',
+//       inoutFlag: v.inoutFlag || '',
+//       inoutTime: v.inoutTime || '',
+//       nrdName: v.nrd || '',
+//       vehicleCategory: v.vType || '',
+//       numberPlateImage: plateImg,
+//       fullVehicleImage: 'assets/images/demo-vehicle.jpg',
+//       cameraFrameImage: 'assets/images/demo-vehicle.jpg',
+//       vMake: v.vMake || '',
+//       stickerNo: v.stickerNo || '',
+//       vColor: v.vColor || ''
+//     };
+//   });
+
+//   this.filteredData = this.vehicleData;
+//   this.displayedData.data = this.vehicleData;
+
+//   if (this.paginator) {
+//     this.paginator.firstPage();
+//     this.updatePagination();
+//   }
+
+//   if (onLoaded) onLoaded(this.vehicleData);
+// }
 
   onProjectChange() {
     let selected: string[] = this.reportForm.get('project')?.value || [];

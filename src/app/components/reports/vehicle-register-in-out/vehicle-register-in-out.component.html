@@ -183,14 +183,21 @@
       <h5 class="vp-title">Vehicle Detail — {{ selectedVehicle.activeLabel }}</h5>
     </div>
 
-    <div class="vp-img-wrap">
+    <!-- <div class="vp-img-wrap">
       <img [src]="selectedVehicle.activeImage" class="vp-img" alt="Vehicle Image" />
       <img *ngIf="selectedVehicle.frameImage"
            [src]="selectedVehicle.frameImage"
            class="vp-img mt-2"
            style="border:2px dashed #999;"
            alt="Frame Image" />
-    </div>
+    </div> -->
+
+    <div class="vp-img-wrap">
+  <img *ngIf="selectedVehicle.frameImage"
+       [src]="selectedVehicle.frameImage"
+       class="vp-img"
+       alt="Frame Image" />
+</div>
 
     <div class="vp-info">
       <div class="vp-info-item">
