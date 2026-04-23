@@ -283,7 +283,7 @@ if (f.searchText && f.searchText.trim() !== '') {
 
   const txt = f.searchText.trim().toLowerCase();
   data = data.filter(item =>
-    item[f.searchType]?.toString().toLowerCase().startsWith(txt)
+    item[f.searchType]?.toString().toLowerCase().includes(txt)
   );
 }
 

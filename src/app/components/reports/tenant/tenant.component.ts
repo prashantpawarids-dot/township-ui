@@ -269,7 +269,7 @@ if (searchText && searchText.trim() !== '') {
     if (!field) return false;
 
     const fieldStr = field.toString().toLowerCase();
-    return field.toString().toLowerCase().startsWith(txt);
+    return field.toString().toLowerCase().includes(txt);
   });
 }
 

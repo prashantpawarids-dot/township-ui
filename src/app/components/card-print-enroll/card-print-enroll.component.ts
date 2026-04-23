@@ -1,150 +1,5 @@
-// import { Component, OnInit } from '@angular/core';
-// import { CommonModule } from '@angular/common';
-// import { FormsModule } from '@angular/forms';
-// import { MatTableModule } from '@angular/material/table';
-// import { MatSelectModule } from '@angular/material/select';
-// import { MatInputModule } from '@angular/material/input';
-// import { MatButtonModule } from '@angular/material/button';
-// import { MatCheckboxModule } from '@angular/material/checkbox';
-// import { MatRadioModule } from '@angular/material/radio';
-// import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-// import { MatFormFieldModule } from '@angular/material/form-field';
-// import { MatIconModule } from '@angular/material/icon';
-// import { AuthService } from '../../services/auth.service';
-// import { CardPrintEnroll, CardSearchFilter } from '../../models/common.model';
-// import { CardEditDialogComponent } from './card-edit-dialog/card-edit-dialog.component';
+// CHANGES: Added AuthService import + injection, updated loadNeighbourhoods() and loadBuildings() to use real API
 
-// @Component({
-//   selector: 'app-card-print-enroll',
-//   standalone: true,
-//   imports: [
-//     CommonModule, FormsModule,
-//     MatTableModule, MatSelectModule, MatInputModule,
-//     MatButtonModule, MatCheckboxModule, MatRadioModule,
-//     MatDialogModule, MatFormFieldModule, MatIconModule
-//   ],
-//   templateUrl: './card-print-enroll.component.html',
-//   styleUrls: ['./card-print-enroll.component.scss']
-// })
-// export class CardPrintEnrollComponent implements OnInit {
-
-//   displayedColumns = ['idNumber', 'name', 'building', 'flatNumber', 'cardDetails', 'neighbourhood', 'action'];
-
-//   cardHolders: CardPrintEnroll[] = [];
-//   selectedCard: CardPrintEnroll | null = null;
-
-//   neighbourhoods: any[] = [];
-//   buildings: any[] = [];
-
-//   filter: CardSearchFilter = new CardSearchFilter();
-
-//   searchOptions = [
-//     { value: 'Name',         label: 'Name' },
-//     { value: 'IDnumber',     label: 'IDnumber' },
-//     { value: 'flatnumber',   label: 'flatnumber' },
-//     { value: 'Building_NRD', label: 'Building, NRD' },
-//     { value: 'CardCSN',      label: 'CardCSN' }
-//   ];
-
-//   cardType: 'pre-printed' | 'blank' = 'blank';
-
-//   cardHolderNo: string = '';
-//   cardCSN: string = '';
-//   cardHolderName: string = '';
-//   buildingFlatNo: string = '';
-//   neighbourhoodDisplay: string = '';
-
-//   constructor(private authService: AuthService, private dialog: MatDialog) {}
-
-//   ngOnInit(): void {
-//     this.loadNeighbourhoods();
-//     this.loadBuildings();
-//     this.search();
-//   }
-
-//   loadNeighbourhoods(): void {
-//     this.authService.getNeighbourhood().subscribe({
-//       next: data => this.neighbourhoods = [{ name: 'ALL' }, ...data],
-//       error: err => console.error(err)
-//     });
-//   }
-
-//   loadBuildings(): void {
-//     this.authService.getBuildings().subscribe({
-//       next: data => this.buildings = [{ name: 'ALL' }, ...data],
-//       error: err => console.error(err)
-//     });
-//   }
-
-//   onNeighbourhoodChange(): void {
-//     this.filter.building = 'ALL';
-//     this.loadBuildings();
-//   }
-
-//   search(): void {
-//     this.authService.getCardHolders(
-//       this.filter.neighbourhood,
-//       this.filter.building,
-//       this.filter.searchBy,
-//       this.filter.searchValue,
-//       this.filter.showAll,
-//       this.filter.showNonPrinted,
-//       this.filter.showNonPersonalised
-//     ).subscribe({
-//       next: data => this.cardHolders = data,
-//       error: err => console.error(err)
-//     });
-//   }
-
-//   onRowClick(card: CardPrintEnroll): void {
-//     this.selectedCard = card;
-//     this.cardHolderNo       = card.idNumber;
-//     this.cardCSN            = card.cardDetails;
-//     this.cardHolderName     = card.name;
-//     this.buildingFlatNo     = `${card.building}/${card.flatNumber}`;
-//     this.neighbourhoodDisplay = card.neighbourhood;
-//   }
-
-//   openViewDialog(card: CardPrintEnroll): void {
-//     this.onRowClick(card);
-//     this.authService.getCardEditDetail(card.idNumber).subscribe({
-//       next: detail => {
-//         const dialogRef = this.dialog.open(CardEditDialogComponent, {
-//           width: '520px',
-//           disableClose: false,
-//           data: detail
-//         });
-//         dialogRef.afterClosed().subscribe(result => {
-//           if (result) this.search();
-//         });
-//       },
-//       error: err => console.error(err)
-//     });
-//   }
-
-//   readCard(): void {
-//     if (!this.cardCSN) return;
-//     this.authService.readCard(this.cardCSN).subscribe({
-//       next: data => console.log('Read card:', data),
-//       error: err => console.error(err)
-//     });
-//   }
-
-//   issueCard(): void {
-//     if (!this.cardHolderNo || !this.cardCSN) return;
-//     this.authService.issueCard(this.cardHolderNo, this.cardCSN).subscribe({
-//       next: () => this.search(),
-//       error: err => console.error(err)
-//     });
-//   }
-
-//   print(): void { window.print(); }
-//   printExport(): void { /* export logic */ }
-//   takePhoto(): void { /* camera logic */ }
-// }
-
-
-//new code hard coded for now, will implement the search and filter functionality later
 import { ImageCropperComponent, ImageCroppedEvent } from 'ngx-image-cropper';
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -160,6 +15,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { CardPrintEnroll, CardSearchFilter } from '../../models/common.model';
 import { CardEditDialogComponent } from './card-edit-dialog/card-edit-dialog.component';
+import { AuthService } from '../../services/auth.service'; // ← ADDED
 
 @Component({
   selector: 'app-card-print-enroll',
@@ -181,6 +37,7 @@ export class CardPrintEnrollComponent implements OnInit {
   selectedCard: CardPrintEnroll | null = null;
   neighbourhoods: any[] = [];
   buildings: any[] = [];
+  allBuildings: any[] = [];
   filter: CardSearchFilter = new CardSearchFilter();
 
   searchOptions = [
@@ -198,6 +55,15 @@ export class CardPrintEnrollComponent implements OnInit {
   buildingFlatNo: string = '';
   neighbourhoodDisplay: string = '';
 
+  // ── Pagination ────────────────────────────────────────────────
+pageSize: number = 10;
+currentPage: number = 1;
+totalRecords: number = 0;
+pagedCardHolders: CardPrintEnroll[] = [];
+
+// ── Issue Card Toggle ─────────────────────────────────────────
+showIssueForm: boolean = false;
+
   // ── Camera Modal State ────────────────────────────────────────
   showCameraModal: boolean = false;
   cameraActive: boolean = false;
@@ -213,40 +79,41 @@ export class CardPrintEnrollComponent implements OnInit {
 
   // ── Card Template Config ──────────────────────────────────────
   private cardTemplates: Record<string, {
-  front: string; back: string;
-  photoTop: number; photoLeft: number;
-  photoWidth: number; photoHeight: number;
-}> = {
-  'LandOwner':       { front: 'assets/cards/LandOwner.jpeg',       back: 'assets/cards/PLandowner.jpg',    photoTop: 22, photoLeft: 18, photoWidth: 56, photoHeight: 34 },
-  'Resident':        { front: 'assets/cards/Resident.jpeg',         back: 'assets/cards/PResident.jpeg',   photoTop: 21, photoLeft: 22, photoWidth: 54, photoHeight: 34 },
-  'DResident':       { front: 'assets/cards/DResident.jpeg',        back: 'assets/cards/PResident.jpeg',   photoTop: 21, photoLeft: 22, photoWidth: 54, photoHeight: 34 },
-  'Tenant':          { front: 'assets/cards/Tenant.jpeg',           back: 'assets/cards/PTenant.jpg',      photoTop: 22, photoLeft: 18, photoWidth: 56, photoHeight: 34 },
-  'DTenant':         { front: 'assets/cards/DTenant.jpg',           back: 'assets/cards/PTenant.jpg',      photoTop: 20, photoLeft: 18, photoWidth: 56, photoHeight: 34 },
-  'Employee':        { front: 'assets/cards/Employee.jpg',         back: 'assets/cards/EmployeeBack.jpg', photoTop: 20, photoLeft: 18, photoWidth: 56, photoHeight: 34 },
-  'ServiceProvider': { front: 'assets/cards/ServiceProvider.jpeg',  back: 'assets/cards/SProvider.jpg',    photoTop: 20, photoLeft: 18, photoWidth: 56, photoHeight: 34 },
-  'Guest':           { front: 'assets/cards/Guest.jpeg',            back: 'assets/cards/CardBorder.png',   photoTop: 21, photoLeft: 22, photoWidth: 54, photoHeight: 34 },
-};
- get currentCardTemplate(): string {
-  if (!this.selectedCard) return '';
-  const tmpl = (this.cardTemplates as any)[this.selectedCard.holderType ?? 'Resident']
-             ?? this.cardTemplates['Resident'];
-  return tmpl.front;
-}
-
-get currentCardPhotoStyle(): any {
-  if (!this.selectedCard) return {};
-  const tmpl = (this.cardTemplates as any)[this.selectedCard.holderType ?? 'Resident']
-             ?? this.cardTemplates['Resident'];
-  return {
-    'position':  'absolute',
-    'top':       tmpl.photoTop    + '%',
-    'left':      tmpl.photoLeft   + '%',
-    'width':     tmpl.photoWidth  + '%',
-    'height':    tmpl.photoHeight + '%',
+    front: string; back: string;
+    photoTop: number; photoLeft: number;
+    photoWidth: number; photoHeight: number;
+  }> = {
+    'LandOwner':       { front: 'assets/cards/LandOwner.jpeg',       back: 'assets/cards/PLandowner.jpg',    photoTop: 22, photoLeft: 18, photoWidth: 56, photoHeight: 34 },
+    'Resident':        { front: 'assets/cards/Resident.jpeg',         back: 'assets/cards/PResident.jpeg',   photoTop: 21, photoLeft: 22, photoWidth: 54, photoHeight: 34 },
+    'DResident':       { front: 'assets/cards/DResident.jpeg',        back: 'assets/cards/PResident.jpeg',   photoTop: 21, photoLeft: 22, photoWidth: 54, photoHeight: 34 },
+    'Tenant':          { front: 'assets/cards/Tenant.jpeg',           back: 'assets/cards/PTenant.jpg',      photoTop: 22, photoLeft: 18, photoWidth: 56, photoHeight: 34 },
+    'DTenant':         { front: 'assets/cards/DTenant.jpg',           back: 'assets/cards/PTenant.jpg',      photoTop: 20, photoLeft: 18, photoWidth: 56, photoHeight: 34 },
+    'Employee':        { front: 'assets/cards/Employee.jpg',          back: 'assets/cards/EmployeeBack.jpg', photoTop: 20, photoLeft: 18, photoWidth: 56, photoHeight: 34 },
+    'ServiceProvider': { front: 'assets/cards/ServiceProvider.jpeg',  back: 'assets/cards/SProvider.jpg',    photoTop: 20, photoLeft: 18, photoWidth: 56, photoHeight: 34 },
+    'Guest':           { front: 'assets/cards/Guest.jpeg',            back: 'assets/cards/CardBorder.png',   photoTop: 21, photoLeft: 22, photoWidth: 54, photoHeight: 34 },
   };
-}
 
-  // ── Hardcoded Data ────────────────────────────────────────────
+  get currentCardTemplate(): string {
+    if (!this.selectedCard) return '';
+    const tmpl = (this.cardTemplates as any)[this.selectedCard.holderType ?? 'Resident']
+               ?? this.cardTemplates['Resident'];
+    return tmpl.front;
+  }
+
+  get currentCardPhotoStyle(): any {
+    if (!this.selectedCard) return {};
+    const tmpl = (this.cardTemplates as any)[this.selectedCard.holderType ?? 'Resident']
+               ?? this.cardTemplates['Resident'];
+    return {
+      'position':  'absolute',
+      'top':       tmpl.photoTop    + '%',
+      'left':      tmpl.photoLeft   + '%',
+      'width':     tmpl.photoWidth  + '%',
+      'height':    tmpl.photoHeight + '%',
+    };
+  }
+
+  // ── Hardcoded Card Holder Data (API not yet available) ────────
   private rawData: CardPrintEnroll[] = [
     { idNumber: '100001', name: 'Dilip Shendge',     building: 'Falcon-B', flatNumber: 'B-906',  cardDetails: '6074271',        cardCSN: '6074271',        neighbourhood: 'Falcon Towers', isPrinted: true,  isPersonalised: true,  photoUrl: '', holderType: 'Resident'        },
     { idNumber: '100002', name: 'Ntrial Trial',       building: 'Falcon-E', flatNumber: '1102',   cardDetails: '10049530072345', cardCSN: '10049530072345', neighbourhood: 'Falcon Towers', isPrinted: false, isPersonalised: false, photoUrl: '', holderType: 'LandOwner'       },
@@ -265,7 +132,8 @@ get currentCardPhotoStyle(): any {
     { idNumber: '100015', name: 'Nagesh Bogar',       building: 'Falcon-C', flatNumber: 'C-1007', cardDetails: '224767',         cardCSN: '224767',         neighbourhood: 'Falcon Towers', isPrinted: true,  isPersonalised: true,  photoUrl: '', holderType: 'Resident'        },
   ];
 
-  constructor(private dialog: MatDialog) {}
+  // ← CHANGED: injected AuthService
+  constructor(private dialog: MatDialog, private authService: AuthService) {}
 
   ngOnInit(): void {
     this.loadNeighbourhoods();
@@ -273,48 +141,117 @@ get currentCardPhotoStyle(): any {
     this.search();
   }
 
+  
   loadNeighbourhoods(): void {
-    this.neighbourhoods = [
-      { name: 'ALL' }, { name: 'Falcon Towers' }, { name: 'Magarpaata City' }
-    ];
+    this.authService.getNeighbourhood().subscribe({
+      next: (res) => {
+        // Prepend ALL option for "show all" filter
+        this.neighbourhoods = [{ name: 'ALL' }, ...res.map((n: any) => ({ name: n.name ?? n.nrdname ?? n.Name }))];
+        // Set default filter value
+        if (!this.filter.neighbourhood) this.filter.neighbourhood = 'ALL';
+      },
+      error: (err) => {
+        console.error('Failed to load neighbourhoods:', err);
+        // Fallback so UI doesn't break
+        this.neighbourhoods = [{ name: 'ALL' }];
+      }
+    });
   }
 
-  loadBuildings(): void {
+  
+loadBuildings(): void {
+  this.authService.getBuildings().subscribe({
+    next: (res) => {
+      this.allBuildings = res;   // ✅ STORE ORIGINAL DATA
+
+      this.buildings = [
+        { name: 'ALL' },
+        ...res.map((b: any) => ({
+          name: b.name ?? b.buildingname ?? b.Name,
+          nrdName: b.nrdName ?? b.nrdname ?? ''
+        }))
+      ];
+
+      if (!this.filter.building) this.filter.building = 'ALL';
+    },
+    error: (err) => {
+      console.error('Failed to load buildings:', err);
+      this.allBuildings = [];
+      this.buildings = [{ name: 'ALL' }];
+    }
+  });
+}
+
+  // onNeighbourhoodChange(): void { this.filter.building = 'ALL'; }
+
+  onNeighbourhoodChange(): void {
+  this.filter.building = 'ALL';
+
+  if (this.filter.neighbourhood === 'ALL') {
     this.buildings = [
       { name: 'ALL' },
-      { name: 'Falcon-A' }, { name: 'Falcon-B' }, { name: 'Falcon-C' },
-      { name: 'Falcon-D' }, { name: 'Falcon-E' }, { name: 'Falcon-F' },
-      { name: 'Falcon-G' }
+      ...this.allBuildings
+    ];
+  } else {
+    this.buildings = [
+      { name: 'ALL' },
+      ...this.allBuildings.filter(
+        (b: any) => b.nrdName === this.filter.neighbourhood
+      )
     ];
   }
+}
 
-  onNeighbourhoodChange(): void { this.filter.building = 'ALL'; }
-
-  search(): void {
-    let result = [...this.rawData];
-    if (this.filter.neighbourhood !== 'ALL')
-      result = result.filter(c => c.neighbourhood === this.filter.neighbourhood);
-    if (this.filter.building !== 'ALL')
-      result = result.filter(c => c.building === this.filter.building);
-    if (!this.filter.showAll) {
-      if (this.filter.showNonPrinted)      result = result.filter(c => !c.isPrinted);
-      if (this.filter.showNonPersonalised) result = result.filter(c => !c.isPersonalised);
-    }
-    if (this.filter.searchValue) {
-      const val = this.filter.searchValue.toLowerCase();
-      result = result.filter(c => {
-        switch (this.filter.searchBy) {
-          case 'Name':         return c.name.toLowerCase().includes(val);
-          case 'IDnumber':     return c.idNumber.includes(val);
-          case 'flatnumber':   return c.flatNumber.toLowerCase().includes(val);
-          case 'Building_NRD': return c.building.toLowerCase().includes(val);
-          case 'CardCSN':      return c.cardDetails.includes(val);
-          default:             return true;
-        }
-      });
-    }
-    this.cardHolders = result;
+ search(): void {
+  let result = [...this.rawData];
+  if (this.filter.neighbourhood !== 'ALL')
+    result = result.filter(c => c.neighbourhood === this.filter.neighbourhood);
+  if (this.filter.building !== 'ALL')
+    result = result.filter(c => c.building === this.filter.building);
+  if (!this.filter.showAll) {
+    if (this.filter.showNonPrinted)      result = result.filter(c => !c.isPrinted);
+    if (this.filter.showNonPersonalised) result = result.filter(c => !c.isPersonalised);
   }
+  if (this.filter.searchValue) {
+    const val = this.filter.searchValue.toLowerCase();
+    result = result.filter(c => {
+      switch (this.filter.searchBy) {
+        case 'Name':         return c.name.toLowerCase().includes(val);
+        case 'IDnumber':     return c.idNumber.includes(val);
+        case 'flatnumber':   return c.flatNumber.toLowerCase().includes(val);
+        case 'Building_NRD': return c.building.toLowerCase().includes(val);
+        case 'CardCSN':      return c.cardDetails.includes(val);
+        default:             return true;
+      }
+    });
+  }
+  this.cardHolders   = result;
+  this.totalRecords  = result.length;
+  this.currentPage   = 1;          // reset to page 1 on new search
+  this.applyPaging();
+}
+
+applyPaging(): void {
+  const start = (this.currentPage - 1) * this.pageSize;
+  const end   = start + this.pageSize;
+  this.pagedCardHolders = this.cardHolders.slice(start, end);
+}
+
+goToPage(page: number): void {
+  const maxPage = Math.ceil(this.totalRecords / this.pageSize);
+  if (page < 1 || page > maxPage) return;
+  this.currentPage = page;
+  this.applyPaging();
+}
+
+get totalPages(): number {
+  return Math.ceil(this.totalRecords / this.pageSize);
+}
+
+toggleIssueForm(): void {
+  if (!this.selectedCard) return;
+  this.showIssueForm = !this.showIssueForm;
+}
 
   onRowClick(card: CardPrintEnroll): void {
     this.selectedCard         = card;
@@ -439,7 +376,6 @@ get currentCardPhotoStyle(): any {
     this.uploadedImagePreview = '';
   }
 
-  // ── Read / Issue Card ─────────────────────────────────────────
   readCard(): void {
     if (!this.cardCSN) { alert('Please enter a Card CSN first!'); return; }
     alert(`Reading Card CSN: ${this.cardCSN}`);
@@ -451,749 +387,184 @@ get currentCardPhotoStyle(): any {
     alert(`✅ Card Issued!\nHolder: ${this.cardHolderName}\nCSN: ${this.cardCSN}`);
   }
 
-  // ── Print using actual card template images ───────────────────
-//   print(): void {
-//   if (!this.selectedCard) { alert('Please select a member first!'); return; }
-//   const card = this.selectedCard;
-//   const tmpl = (this.cardTemplates as any)[card.holderType ?? 'Resident']
-//              ?? this.cardTemplates['Resident'];
+  print(): void {
+    if (!this.selectedCard) { alert('Please select a member first!'); return; }
+    const card = this.selectedCard;
+    const tmpl = (this.cardTemplates as any)[card.holderType ?? 'Resident']
+               ?? this.cardTemplates['Resident'];
 
-//   // ── Step 1: Load FRONT template ───────────────────────────
-//   const cardImg       = new Image();
-//   cardImg.crossOrigin = 'anonymous';
+    if (this.cardType === 'blank') {
+      const photo = card.photoUrl
+        ? `<img src="${card.photoUrl}" style="width:100%;height:100%;object-fit:cover;" />`
+        : `<div style="width:100%;height:100%;background:#f0f0f0;display:flex;align-items:center;justify-content:center;color:#aaa;font-size:24px;">👤</div>`;
 
-//   cardImg.onload = () => {
-//     const canvas  = document.createElement('canvas');
-//     canvas.width  = cardImg.naturalWidth;
-//     canvas.height = cardImg.naturalHeight;
-//     const ctx     = canvas.getContext('2d')!;
-//     ctx.drawImage(cardImg, 0, 0);
+      const w = window.open('', '_blank', 'width=420,height=760');
+      if (!w) return;
+      w.document.write(`
+        <!DOCTYPE html><html><head>
+        <title>ID Card — ${card.name}</title>
+        <style>
+          *{margin:0;padding:0;box-sizing:border-box;}
+          body{background:#ccc;display:flex;flex-direction:column;align-items:center;padding:20px;gap:14px;font-family:'Segoe UI',sans-serif;}
+          @page{size:54mm 86mm;margin:0;}
+          @media print{
+            html{width:54mm;margin:0;padding:0;}
+            body{width:54mm;margin:0;padding:0;background:white!important;display:block!important;}
+            .no-print{display:none!important;}
+            .blank-front{display:block;width:54mm;height:86mm;overflow:hidden;page-break-after:always;break-after:page;}
+          }
+          .label{font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.1em;align-self:flex-start;}
+          .blank-front{display:flex;flex-direction:column;align-items:center;gap:6px;width:100%;}
+          .blank-preview{width:185px;background:#fff;border:1px solid #ddd;border-radius:8px;overflow:hidden;box-shadow:0 6px 20px rgba(0,0,0,0.2);display:flex;flex-direction:column;align-items:center;padding:16px 12px 12px;gap:10px;}
+          .blank-photo{width:100px;height:120px;border:1.5px solid #ddd;border-radius:4px;overflow:hidden;background:#f5f5f5;}
+          .blank-info{width:100%;text-align:center;border-top:1px solid #eee;padding-top:6px;}
+          .blank-name{font-size:11px;font-weight:700;color:#111;}
+          .blank-flat{font-size:9px;color:#444;margin-top:2px;}
+          .blank-id{font-size:8px;color:#777;font-family:monospace;margin-top:2px;}
+          .info{font-size:11px;color:#555;text-align:center;line-height:1.6;}
+          .btn-row{display:flex;gap:10px;margin-top:8px;}
+          .btn{padding:10px 24px;border:none;border-radius:7px;cursor:pointer;font-size:13px;font-weight:700;}
+          .btn-print{background:#00c9a7;color:#061520;}
+          .btn-close{background:#3d8ef8;color:#fff;}
+        </style></head><body>
+        <div class="blank-front">
+          <span class="label no-print">Front Side (Blank)</span>
+          <div class="blank-preview">
+            <div class="blank-photo">${photo}</div>
+            <div class="blank-info">
+              <div class="blank-name">${card.name}</div>
+              <div class="blank-flat">${card.building} - ${card.flatNumber}</div>
+              <div class="blank-id">ID: ${card.idNumber}</div>
+            </div>
+          </div>
+        </div>
+        <div class="info no-print"><strong>${card.name}</strong><br/>${card.building} - ${card.flatNumber} | ID: ${card.idNumber}</div>
+        <div class="btn-row no-print">
+          <button class="btn btn-print" onclick="window.print()">🖨️ Print Card</button>
+          <button class="btn btn-close" onclick="window.close()">✕ Close</button>
+        </div>
+        </body></html>
+      `);
+      w.document.close();
+      return;
+    }
 
-//     const addTextAndGenerateFront = () => {
-//       const cw    = canvas.width;
-//       const ch    = canvas.height;
-//       const nameY = ch * 0.655;
+    const cardImg       = new Image();
+    cardImg.crossOrigin = 'anonymous';
 
-//       ctx.fillStyle = '#111111';
-//       ctx.font      = `bold ${Math.round(cw * 0.045)}px Segoe UI, sans-serif`;
-//       ctx.textAlign = 'center';
-//       ctx.fillText(card.name, cw / 2, nameY);
+    cardImg.onload = () => {
+      const canvas  = document.createElement('canvas');
+      canvas.width  = cardImg.naturalWidth;
+      canvas.height = cardImg.naturalHeight;
+      const ctx     = canvas.getContext('2d')!;
+      ctx.drawImage(cardImg, 0, 0);
 
-//       ctx.fillStyle = '#333333';
-//       ctx.font      = `${Math.round(cw * 0.035)}px Segoe UI, sans-serif`;
-//       ctx.fillText(`${card.building} - ${card.flatNumber}`, cw / 2, nameY + cw * 0.055);
+      const addTextAndGenerateFront = () => {
+        const cw    = canvas.width;
+        const ch    = canvas.height;
+        const nameY = ch * 0.655;
 
-//       ctx.fillStyle = '#555555';
-//       ctx.font      = `${Math.round(cw * 0.03)}px Courier New, monospace`;
-//       ctx.fillText(`ID: ${card.idNumber}`, cw / 2, nameY + cw * 0.105);
+        ctx.fillStyle = '#111111';
+        ctx.font      = `bold ${Math.round(cw * 0.045)}px Segoe UI, sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.fillText(card.name, cw / 2, nameY);
 
-//       const frontBase64 = canvas.toDataURL('image/jpeg', 0.95);
+        ctx.fillStyle = '#333333';
+        ctx.font      = `${Math.round(cw * 0.035)}px Segoe UI, sans-serif`;
+        ctx.fillText(`${card.building} - ${card.flatNumber}`, cw / 2, nameY + cw * 0.055);
 
-//       // ── Step 2: Load BACK template as base64 too ──────────
-//       const backImg       = new Image();
-//       backImg.crossOrigin = 'anonymous';
+        ctx.fillStyle = '#555555';
+        ctx.font      = `${Math.round(cw * 0.03)}px Courier New, monospace`;
+        ctx.fillText(`ID: ${card.idNumber}`, cw / 2, nameY + cw * 0.105);
 
-//       backImg.onload = () => {
-//         const backCanvas  = document.createElement('canvas');
-//         backCanvas.width  = backImg.naturalWidth;
-//         backCanvas.height = backImg.naturalHeight;
-//         backCanvas.getContext('2d')!.drawImage(backImg, 0, 0);
-//         const backBase64 = backCanvas.toDataURL('image/jpeg', 0.95);
-//         this.openPrintWindow(frontBase64, backBase64, card);
-//       };
+        const frontBase64 = canvas.toDataURL('image/jpeg', 0.95);
 
-//       backImg.onerror = () => {
-//         // if back fails, use front as fallback
-//         this.openPrintWindow(frontBase64, frontBase64, card);
-//       };
+        const backImg       = new Image();
+        backImg.crossOrigin = 'anonymous';
 
-//       // Use absolute URL for back image
-//       backImg.src = window.location.origin + '/' + tmpl.back;
-//     };
+        backImg.onload = () => {
+          const backCanvas  = document.createElement('canvas');
+          backCanvas.width  = backImg.naturalWidth;
+          backCanvas.height = backImg.naturalHeight;
+          backCanvas.getContext('2d')!.drawImage(backImg, 0, 0);
+          const backBase64 = backCanvas.toDataURL('image/jpeg', 0.95);
+          this.openPrintWindow(frontBase64, backBase64, card);
+        };
 
-//     if (card.photoUrl) {
-//       const photoImg       = new Image();
-//       photoImg.crossOrigin = 'anonymous';
-//       photoImg.onload      = () => {
-//         const px = canvas.width  * (tmpl.photoLeft   / 100);
-//         const py = canvas.height * (tmpl.photoTop    / 100);
-//         const pw = canvas.width  * (tmpl.photoWidth  / 100);
-//         const ph = canvas.height * (tmpl.photoHeight / 100);
-//         ctx.drawImage(photoImg, px, py, pw, ph);
-//         addTextAndGenerateFront();
-//       };
-//       photoImg.onerror = () => addTextAndGenerateFront();
-//       photoImg.src     = card.photoUrl;
-//     } else {
-//       addTextAndGenerateFront();
-//     }
-//   };
+        backImg.onerror = () => { this.openPrintWindow(frontBase64, frontBase64, card); };
+        backImg.src = window.location.origin + '/' + tmpl.back;
+      };
 
-//   cardImg.onerror = () =>
-//     alert('Card template image not found!\nCheck: src/assets/cards/ folder');
+      if (card.photoUrl) {
+        const photoImg       = new Image();
+        photoImg.crossOrigin = 'anonymous';
+        photoImg.onload      = () => {
+          const px = canvas.width  * (tmpl.photoLeft   / 100);
+          const py = canvas.height * (tmpl.photoTop    / 100);
+          const pw = canvas.width  * (tmpl.photoWidth  / 100);
+          const ph = canvas.height * (tmpl.photoHeight / 100);
+          ctx.drawImage(photoImg, px, py, pw, ph);
+          addTextAndGenerateFront();
+        };
+        photoImg.onerror = () => addTextAndGenerateFront();
+        photoImg.src     = card.photoUrl;
+      } else {
+        addTextAndGenerateFront();
+      }
+    };
 
-//   // Use absolute URL for front image
-//   cardImg.src = window.location.origin + '/' + tmpl.front;
-// }
+    cardImg.onerror = () => alert('Card template image not found!\nCheck: src/assets/cards/ folder');
+    cardImg.src = window.location.origin + '/' + tmpl.front;
+  }
 
-
-// print(): void {
-//   if (!this.selectedCard) { alert('Please select a member first!'); return; }
-//   const card = this.selectedCard;
-//   const tmpl = (this.cardTemplates as any)[card.holderType ?? 'Resident']
-//              ?? this.cardTemplates['Resident'];
-
-//   // ── BLANK CARD ────────────────────────────────────────────
-//   if (this.cardType === 'blank') {
-//     const photo = card.photoUrl
-//       ? `<img src="${card.photoUrl}" style="width:100%;height:100%;object-fit:cover;" />`
-//       : `<div style="width:100%;height:100%;background:#f0f0f0;display:flex;align-items:center;justify-content:center;color:#aaa;font-size:24px;">👤</div>`;
-
-//     const w = window.open('', '_blank', 'width=420,height=760');
-//     if (!w) return;
-//     w.document.write(`
-//       <!DOCTYPE html><html><head>
-//       <title>ID Card — ${card.name}</title>
-//       <style>
-//         *{margin:0;padding:0;box-sizing:border-box;}
-//         body{background:#ccc;display:flex;flex-direction:column;align-items:center;padding:20px;gap:14px;font-family:'Segoe UI',sans-serif;}
-//         @page{size:54mm 86mm;margin:0;}
-//         @media print{
-//           html{width:54mm;margin:0;padding:0;}
-//           body{width:54mm;margin:0;padding:0;background:white!important;display:block!important;}
-//           .no-print{display:none!important;}
-//           .blank-front{display:block;width:54mm;height:86mm;overflow:hidden;page-break-after:always;break-after:page;}
-//           .blank-back{display:block;width:54mm;height:86mm;overflow:hidden;page-break-before:always;break-before:page;}
-//         }
-//         .label{font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.1em;align-self:flex-start;}
-//         .blank-front,.blank-back{display:flex;flex-direction:column;align-items:center;gap:6px;width:100%;}
-//         .blank-preview{width:185px;background:#fff;border:1px solid #ddd;border-radius:8px;overflow:hidden;box-shadow:0 6px 20px rgba(0,0,0,0.2);display:flex;flex-direction:column;align-items:center;padding:16px 12px 12px;gap:10px;}
-//         .blank-photo{width:100px;height:120px;border:1.5px solid #ddd;border-radius:4px;overflow:hidden;background:#f5f5f5;}
-//         .blank-info{width:100%;text-align:center;border-top:1px solid #eee;padding-top:6px;}
-//         .blank-name{font-size:11px;font-weight:700;color:#111;}
-//         .blank-flat{font-size:9px;color:#444;margin-top:2px;}
-//         .blank-id{font-size:8px;color:#777;font-family:monospace;margin-top:2px;}
-//         .divider{width:270px;border:none;border-top:1px dashed #bbb;margin:4px 0;}
-//         .info{font-size:11px;color:#555;text-align:center;line-height:1.6;}
-//         .btn-row{display:flex;gap:10px;margin-top:8px;}
-//         .btn{padding:10px 24px;border:none;border-radius:7px;cursor:pointer;font-size:13px;font-weight:700;}
-//         .btn-print{background:#00c9a7;color:#061520;}
-//         .btn-close{background:#3d8ef8;color:#fff;}
-//       </style></head><body>
-
-//       <div class="blank-front">
-//         <span class="label no-print">Front Side (Blank)</span>
-//         <div class="blank-preview">
-//           <div class="blank-photo">${photo}</div>
-//           <div class="blank-info">
-//             <div class="blank-name">${card.name}</div>
-//             <div class="blank-flat">${card.building} - ${card.flatNumber}</div>
-//             <div class="blank-id">ID: ${card.idNumber}</div>
-//           </div>
-//         </div>
-//       </div>
-
-//       <hr class="divider no-print"/>
-
-//       <div class="blank-back">
-//         <span class="label no-print">Back Side (Blank)</span>
-//         <div class="blank-preview" style="justify-content:center;min-height:240px;">
-//           <div style="font-size:9px;color:#aaa;text-align:center;padding:20px;">Blank Card Back</div>
-//         </div>
-//       </div>
-
-//       <div class="info no-print"><strong>${card.name}</strong><br/>${card.building} - ${card.flatNumber} | ID: ${card.idNumber}</div>
-//       <div class="btn-row no-print">
-//         <button class="btn btn-print" onclick="window.print()">🖨️ Print Card</button>
-//         <button class="btn btn-close" onclick="window.close()">✕ Close</button>
-//       </div>
-//       </body></html>
-//     `);
-//     w.document.close();
-//     return; // ← stop here, skip pre-printed logic below
-//   }
-
-//   // ── Step 1: Load FRONT template ───────────────────────────
-//   const cardImg       = new Image();
-//   cardImg.crossOrigin = 'anonymous';
-
-//   cardImg.onload = () => {
-//     const canvas  = document.createElement('canvas');
-//     canvas.width  = cardImg.naturalWidth;
-//     canvas.height = cardImg.naturalHeight;
-//     const ctx     = canvas.getContext('2d')!;
-//     ctx.drawImage(cardImg, 0, 0);
-
-//     const addTextAndGenerateFront = () => {
-//       const cw    = canvas.width;
-//       const ch    = canvas.height;
-//       const nameY = ch * 0.655;
-
-//       ctx.fillStyle = '#111111';
-//       ctx.font      = `bold ${Math.round(cw * 0.045)}px Segoe UI, sans-serif`;
-//       ctx.textAlign = 'center';
-//       ctx.fillText(card.name, cw / 2, nameY);
-
-//       ctx.fillStyle = '#333333';
-//       ctx.font      = `${Math.round(cw * 0.035)}px Segoe UI, sans-serif`;
-//       ctx.fillText(`${card.building} - ${card.flatNumber}`, cw / 2, nameY + cw * 0.055);
-
-//       ctx.fillStyle = '#555555';
-//       ctx.font      = `${Math.round(cw * 0.03)}px Courier New, monospace`;
-//       ctx.fillText(`ID: ${card.idNumber}`, cw / 2, nameY + cw * 0.105);
-
-//       const frontBase64 = canvas.toDataURL('image/jpeg', 0.95);
-
-//       // ── Step 2: Load BACK template as base64 too ──────────
-//       const backImg       = new Image();
-//       backImg.crossOrigin = 'anonymous';
-
-//       backImg.onload = () => {
-//         const backCanvas  = document.createElement('canvas');
-//         backCanvas.width  = backImg.naturalWidth;
-//         backCanvas.height = backImg.naturalHeight;
-//         backCanvas.getContext('2d')!.drawImage(backImg, 0, 0);
-//         const backBase64 = backCanvas.toDataURL('image/jpeg', 0.95);
-//         this.openPrintWindow(frontBase64, backBase64, card);
-//       };
-
-//       backImg.onerror = () => {
-//         this.openPrintWindow(frontBase64, frontBase64, card);
-//       };
-
-//       backImg.src = window.location.origin + '/' + tmpl.back;
-//     };
-
-//     if (card.photoUrl) {
-//       const photoImg       = new Image();
-//       photoImg.crossOrigin = 'anonymous';
-//       photoImg.onload      = () => {
-//         const px = canvas.width  * (tmpl.photoLeft   / 100);
-//         const py = canvas.height * (tmpl.photoTop    / 100);
-//         const pw = canvas.width  * (tmpl.photoWidth  / 100);
-//         const ph = canvas.height * (tmpl.photoHeight / 100);
-//         ctx.drawImage(photoImg, px, py, pw, ph);
-//         addTextAndGenerateFront();
-//       };
-//       photoImg.onerror = () => addTextAndGenerateFront();
-//       photoImg.src     = card.photoUrl;
-//     } else {
-//       addTextAndGenerateFront();
-//     }
-//   };
-
-//   cardImg.onerror = () =>
-//     alert('Card template image not found!\nCheck: src/assets/cards/ folder');
-
-//   cardImg.src = window.location.origin + '/' + tmpl.front;
-// }
-
-//without back side
-print(): void {
-  if (!this.selectedCard) { alert('Please select a member first!'); return; }
-  const card = this.selectedCard;
-  const tmpl = (this.cardTemplates as any)[card.holderType ?? 'Resident']
-             ?? this.cardTemplates['Resident'];
-
-  // ── BLANK CARD ────────────────────────────────────────────
-  if (this.cardType === 'blank') {
-    const photo = card.photoUrl
-      ? `<img src="${card.photoUrl}" style="width:100%;height:100%;object-fit:cover;" />`
-      : `<div style="width:100%;height:100%;background:#f0f0f0;display:flex;align-items:center;justify-content:center;color:#aaa;font-size:24px;">👤</div>`;
-
-    const w = window.open('', '_blank', 'width=420,height=760');
+  private openPrintWindow(frontBase64: string, backBase64: string, card: CardPrintEnroll): void {
+    const w = window.open('', '_blank', 'width=420,height=720');
     if (!w) return;
+
     w.document.write(`
       <!DOCTYPE html><html><head>
       <title>ID Card — ${card.name}</title>
       <style>
-        *{margin:0;padding:0;box-sizing:border-box;}
-        body{background:#ccc;display:flex;flex-direction:column;align-items:center;padding:20px;gap:14px;font-family:'Segoe UI',sans-serif;}
-        @page{size:54mm 86mm;margin:0;}
-        @media print{
-          html{width:54mm;margin:0;padding:0;}
-          body{width:54mm;margin:0;padding:0;background:white!important;display:block!important;}
-          .no-print{display:none!important;}
-          .blank-front{display:block;width:54mm;height:86mm;overflow:hidden;page-break-after:always;break-after:page;}
-          /* .blank-back{display:block;width:54mm;height:86mm;overflow:hidden;page-break-before:always;break-before:page;} */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #ccc; display: flex; flex-direction: column; align-items: center; padding: 20px; gap: 14px; font-family: 'Segoe UI', sans-serif; }
+        @page { size: 54mm 86mm; margin: 0; }
+        @media print {
+          html { width: 54mm; margin: 0; padding: 0; }
+          body { width: 54mm; margin: 0; padding: 0; background: white !important; display: block !important; }
+          .no-print, .section-label, .divider, .info, .btn-row { display: none !important; }
+          .front-page { display: block; width: 54mm; height: 86mm; overflow: hidden; page-break-after: always; break-after: page; }
+          .card-img { display: block !important; width: 54mm !important; height: 86mm !important; object-fit: fill !important; border-radius: 0 !important; box-shadow: none !important; }
         }
-        .label{font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.1em;align-self:flex-start;}
-        .blank-front,.blank-back{display:flex;flex-direction:column;align-items:center;gap:6px;width:100%;}
-        .blank-preview{width:185px;background:#fff;border:1px solid #ddd;border-radius:8px;overflow:hidden;box-shadow:0 6px 20px rgba(0,0,0,0.2);display:flex;flex-direction:column;align-items:center;padding:16px 12px 12px;gap:10px;}
-        .blank-photo{width:100px;height:120px;border:1.5px solid #ddd;border-radius:4px;overflow:hidden;background:#f5f5f5;}
-        .blank-info{width:100%;text-align:center;border-top:1px solid #eee;padding-top:6px;}
-        .blank-name{font-size:11px;font-weight:700;color:#111;}
-        .blank-flat{font-size:9px;color:#444;margin-top:2px;}
-        .blank-id{font-size:8px;color:#777;font-family:monospace;margin-top:2px;}
-        .divider{width:270px;border:none;border-top:1px dashed #bbb;margin:4px 0;}
-        .info{font-size:11px;color:#555;text-align:center;line-height:1.6;}
-        .btn-row{display:flex;gap:10px;margin-top:8px;}
-        .btn{padding:10px 24px;border:none;border-radius:7px;cursor:pointer;font-size:13px;font-weight:700;}
-        .btn-print{background:#00c9a7;color:#061520;}
-        .btn-close{background:#3d8ef8;color:#fff;}
-      </style></head><body>
-
-      <div class="blank-front">
-        <span class="label no-print">Front Side (Blank)</span>
-        <div class="blank-preview">
-          <div class="blank-photo">${photo}</div>
-          <div class="blank-info">
-            <div class="blank-name">${card.name}</div>
-            <div class="blank-flat">${card.building} - ${card.flatNumber}</div>
-            <div class="blank-id">ID: ${card.idNumber}</div>
-          </div>
+        .section-label { font-size: 10px; font-weight: 700; color: #888; text-transform: uppercase; letter-spacing: 0.1em; align-self: flex-start; }
+        .front-page { display: flex; flex-direction: column; align-items: center; gap: 6px; width: 100%; }
+        .card-img { width: 270px; border-radius: 8px; box-shadow: 0 6px 20px rgba(0,0,0,0.3); display: block; }
+        .info { font-size: 11px; color: #666; text-align: center; line-height: 1.6; max-width: 270px; }
+        .btn-row { display: flex; gap: 10px; margin-top: 6px; }
+        .btn { padding: 10px 24px; border: none; border-radius: 7px; cursor: pointer; font-size: 13px; font-weight: 700; }
+        .btn-print { background: #00c9a7; color: #061520; }
+        .btn-close  { background: #3d8ef8; color: #fff; }
+      </style>
+      </head>
+      <body>
+        <div class="front-page">
+          <span class="section-label no-print">Front Side</span>
+          <img class="card-img" src="${frontBase64}" alt="Card Front" />
         </div>
-      </div>
-
-      <!-- <hr class="divider no-print"/>
-
-      <div class="blank-back">
-        <span class="label no-print">Back Side (Blank)</span>
-        <div class="blank-preview" style="justify-content:center;min-height:240px;">
-          <div style="font-size:9px;color:#aaa;text-align:center;padding:20px;">Blank Card Back</div>
+        <div class="info no-print">
+          <strong>${card.name}</strong><br/>
+          ${card.building} - ${card.flatNumber} &nbsp;|&nbsp; ID: ${card.idNumber}
         </div>
-      </div> -->
-
-      <div class="info no-print"><strong>${card.name}</strong><br/>${card.building} - ${card.flatNumber} | ID: ${card.idNumber}</div>
-      <div class="btn-row no-print">
-        <button class="btn btn-print" onclick="window.print()">🖨️ Print Card</button>
-        <button class="btn btn-close" onclick="window.close()">✕ Close</button>
-      </div>
+        <div class="btn-row no-print">
+          <button class="btn btn-print" onclick="window.print()">🖨️ Print Card</button>
+          <button class="btn btn-close" onclick="window.close()">✕ Close</button>
+        </div>
       </body></html>
     `);
     w.document.close();
-    return;
   }
 
-  // ── Step 1: Load FRONT template ───────────────────────────
-  const cardImg       = new Image();
-  cardImg.crossOrigin = 'anonymous';
-
-  cardImg.onload = () => {
-    const canvas  = document.createElement('canvas');
-    canvas.width  = cardImg.naturalWidth;
-    canvas.height = cardImg.naturalHeight;
-    const ctx     = canvas.getContext('2d')!;
-    ctx.drawImage(cardImg, 0, 0);
-
-    const addTextAndGenerateFront = () => {
-      const cw    = canvas.width;
-      const ch    = canvas.height;
-      const nameY = ch * 0.655;
-
-      ctx.fillStyle = '#111111';
-      ctx.font      = `bold ${Math.round(cw * 0.045)}px Segoe UI, sans-serif`;
-      ctx.textAlign = 'center';
-      ctx.fillText(card.name, cw / 2, nameY);
-
-      ctx.fillStyle = '#333333';
-      ctx.font      = `${Math.round(cw * 0.035)}px Segoe UI, sans-serif`;
-      ctx.fillText(`${card.building} - ${card.flatNumber}`, cw / 2, nameY + cw * 0.055);
-
-      ctx.fillStyle = '#555555';
-      ctx.font      = `${Math.round(cw * 0.03)}px Courier New, monospace`;
-      ctx.fillText(`ID: ${card.idNumber}`, cw / 2, nameY + cw * 0.105);
-
-      const frontBase64 = canvas.toDataURL('image/jpeg', 0.95);
-
-      // ── Step 2: Load BACK template as base64 too ──────────
-      const backImg       = new Image();
-      backImg.crossOrigin = 'anonymous';
-
-      backImg.onload = () => {
-        const backCanvas  = document.createElement('canvas');
-        backCanvas.width  = backImg.naturalWidth;
-        backCanvas.height = backImg.naturalHeight;
-        backCanvas.getContext('2d')!.drawImage(backImg, 0, 0);
-        const backBase64 = backCanvas.toDataURL('image/jpeg', 0.95);
-        this.openPrintWindow(frontBase64, backBase64, card);
-      };
-
-      backImg.onerror = () => {
-        this.openPrintWindow(frontBase64, frontBase64, card);
-      };
-
-      backImg.src = window.location.origin + '/' + tmpl.back;
-    };
-
-    if (card.photoUrl) {
-      const photoImg       = new Image();
-      photoImg.crossOrigin = 'anonymous';
-      photoImg.onload      = () => {
-        const px = canvas.width  * (tmpl.photoLeft   / 100);
-        const py = canvas.height * (tmpl.photoTop    / 100);
-        const pw = canvas.width  * (tmpl.photoWidth  / 100);
-        const ph = canvas.height * (tmpl.photoHeight / 100);
-        ctx.drawImage(photoImg, px, py, pw, ph);
-        addTextAndGenerateFront();
-      };
-      photoImg.onerror = () => addTextAndGenerateFront();
-      photoImg.src     = card.photoUrl;
-    } else {
-      addTextAndGenerateFront();
-    }
-  };
-
-  cardImg.onerror = () =>
-    alert('Card template image not found!\nCheck: src/assets/cards/ folder');
-
-  cardImg.src = window.location.origin + '/' + tmpl.front;
-}
-
-// private openPrintWindow(
-//   frontBase64: string,
-//   backBase64: string,
-//   card: CardPrintEnroll
-// ): void {
-//   const w = window.open('', '_blank', 'width=420,height=720');
-//   if (!w) return;
-
-//   w.document.write(`
-//     <!DOCTYPE html><html><head>
-//     <title>ID Card — ${card.name}</title>
-//     <style>
-//       * { margin: 0; padding: 0; box-sizing: border-box; }
-
-//       body {
-//         background: #ccc;
-//         display: flex;
-//         flex-direction: column;
-//         align-items: center;
-//         padding: 20px;
-//         gap: 14px;
-//         font-family: 'Segoe UI', sans-serif;
-//       }
-
-//       /* ─── PRINT RULES ─────────────────────────────── */
-//       @page {
-//         size: 54mm 86mm;
-//         margin: 0;
-//       }
-
-//       @media print {
-
-//         /* Reset body — NO height, NO overflow, NO flex */
-//         html {
-//           width: 54mm;
-//           margin: 0;
-//           padding: 0;
-//         }
-
-//         body {
-//           width: 54mm;
-//           margin: 0;
-//           padding: 0;
-//           background: white !important;
-//           display: block !important; /* block NOT flex in print */
-//         }
-
-//         /* Hide every screen-only element */
-//         .no-print,
-//         .section-label,
-//         .divider,
-//         .info,
-//         .btn-row {
-//           display: none !important;
-//         }
-
-//         /* Each page = exactly one card */
-//         .front-page {
-//           display: block;
-//           width: 54mm;
-//           height: 86mm;
-//           overflow: hidden;
-//           page-break-after: always;  /* old syntax */
-//           break-after: page;          /* new syntax */
-//         }
-
-//         .back-page {
-//           display: block;
-//           width: 54mm;
-//           height: 86mm;
-//           overflow: hidden;
-//           page-break-before: always; /* old syntax */
-//           break-before: page;         /* new syntax */
-//           page-break-after: avoid;
-//           break-after: avoid;
-//         }
-
-//         /* Card image fills entire page exactly */
-//         .card-img {
-//           display: block !important;
-//           width: 54mm !important;
-//           height: 86mm !important;
-//           object-fit: fill !important;
-//           border-radius: 0 !important;
-//           box-shadow: none !important;
-//         }
-//       }
-
-//       /* ─── SCREEN PREVIEW STYLES ──────────────────── */
-//       .section-label {
-//         font-size: 10px;
-//         font-weight: 700;
-//         color: #888;
-//         text-transform: uppercase;
-//         letter-spacing: 0.1em;
-//         align-self: flex-start;
-//       }
-
-//       .front-page,
-//       .back-page {
-//         display: flex;
-//         flex-direction: column;
-//         align-items: center;
-//         gap: 6px;
-//         width: 100%;
-//       }
-
-//       .card-img {
-//         width: 270px;
-//         border-radius: 8px;
-//         box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-//         display: block;
-//       }
-
-//       .divider {
-//         width: 270px;
-//         border: none;
-//         border-top: 1px dashed #bbb;
-//         margin: 2px 0;
-//       }
-
-//       .info {
-//         font-size: 11px;
-//         color: #666;
-//         text-align: center;
-//         line-height: 1.6;
-//         max-width: 270px;
-//       }
-
-//       .btn-row {
-//         display: flex;
-//         gap: 10px;
-//         margin-top: 6px;
-//       }
-
-//       .btn {
-//         padding: 10px 24px;
-//         border: none;
-//         border-radius: 7px;
-//         cursor: pointer;
-//         font-size: 13px;
-//         font-weight: 700;
-//       }
-//       .btn-print { background: #00c9a7; color: #061520; }
-//       .btn-close  { background: #3d8ef8; color: #fff; }
-//     </style>
-//     </head>
-//     <body>
-
-//       <!-- PAGE 1: FRONT -->
-//       <div class="front-page">
-//         <span class="section-label no-print">Front Side</span>
-//         <img class="card-img" src="${frontBase64}" alt="Card Front" />
-//       </div>
-
-//       <hr class="divider no-print" />
-
-//       <!-- PAGE 2: BACK -->
-//       <div class="back-page">
-//         <span class="section-label no-print">Back Side</span>
-//         <img class="card-img" src="${backBase64}" alt="Card Back" />
-//       </div>
-
-//       <!-- Screen only info -->
-//       <div class="info no-print">
-//         <strong>${card.name}</strong><br/>
-//         ${card.building} - ${card.flatNumber} &nbsp;|&nbsp; ID: ${card.idNumber}
-//       </div>
-
-//       <div class="btn-row no-print">
-//         <button class="btn btn-print" onclick="window.print()">🖨️ Print Card</button>
-//         <button class="btn btn-close" onclick="window.close()">✕ Close</button>
-//       </div>
-
-//     </body></html>
-//   `);
-//   w.document.close();
-// }
-
-//without back side
-private openPrintWindow(
-  frontBase64: string,
-  backBase64: string,
-  card: CardPrintEnroll
-): void {
-  const w = window.open('', '_blank', 'width=420,height=720');
-  if (!w) return;
-
-  w.document.write(`
-    <!DOCTYPE html><html><head>
-    <title>ID Card — ${card.name}</title>
-    <style>
-      * { margin: 0; padding: 0; box-sizing: border-box; }
-
-      body {
-        background: #ccc;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        padding: 20px;
-        gap: 14px;
-        font-family: 'Segoe UI', sans-serif;
-      }
-
-      @page {
-        size: 54mm 86mm;
-        margin: 0;
-      }
-
-      @media print {
-
-        html {
-          width: 54mm;
-          margin: 0;
-          padding: 0;
-        }
-
-        body {
-          width: 54mm;
-          margin: 0;
-          padding: 0;
-          background: white !important;
-          display: block !important;
-        }
-
-        .no-print,
-        .section-label,
-        .divider,
-        .info,
-        .btn-row {
-          display: none !important;
-        }
-
-        .front-page {
-          display: block;
-          width: 54mm;
-          height: 86mm;
-          overflow: hidden;
-          page-break-after: always;
-          break-after: page;
-        }
-
-        /* .back-page {
-          display: block;
-          width: 54mm;
-          height: 86mm;
-          overflow: hidden;
-          page-break-before: always;
-          break-before: page;
-          page-break-after: avoid;
-          break-after: avoid;
-        } */
-
-        .card-img {
-          display: block !important;
-          width: 54mm !important;
-          height: 86mm !important;
-          object-fit: fill !important;
-          border-radius: 0 !important;
-          box-shadow: none !important;
-        }
-      }
-
-      .section-label {
-        font-size: 10px;
-        font-weight: 700;
-        color: #888;
-        text-transform: uppercase;
-        letter-spacing: 0.1em;
-        align-self: flex-start;
-      }
-
-      .front-page,
-      .back-page {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 6px;
-        width: 100%;
-      }
-
-      .card-img {
-        width: 270px;
-        border-radius: 8px;
-        box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-        display: block;
-      }
-
-      .divider {
-        width: 270px;
-        border: none;
-        border-top: 1px dashed #bbb;
-        margin: 2px 0;
-      }
-
-      .info {
-        font-size: 11px;
-        color: #666;
-        text-align: center;
-        line-height: 1.6;
-        max-width: 270px;
-      }
-
-      .btn-row {
-        display: flex;
-        gap: 10px;
-        margin-top: 6px;
-      }
-
-      .btn {
-        padding: 10px 24px;
-        border: none;
-        border-radius: 7px;
-        cursor: pointer;
-        font-size: 13px;
-        font-weight: 700;
-      }
-      .btn-print { background: #00c9a7; color: #061520; }
-      .btn-close  { background: #3d8ef8; color: #fff; }
-    </style>
-    </head>
-    <body>
-
-      <!-- PAGE 1: FRONT -->
-      <div class="front-page">
-        <span class="section-label no-print">Front Side</span>
-        <img class="card-img" src="${frontBase64}" alt="Card Front" />
-      </div>
-
-      <!-- <hr class="divider no-print" /> -->
-
-      <!-- PAGE 2: BACK -->
-      <!-- <div class="back-page">
-        <span class="section-label no-print">Back Side</span>
-        <img class="card-img" src="${backBase64}" alt="Card Back" />
-      </div> -->
-
-      <div class="info no-print">
-        <strong>${card.name}</strong><br/>
-        ${card.building} - ${card.flatNumber} &nbsp;|&nbsp; ID: ${card.idNumber}
-      </div>
-
-      <div class="btn-row no-print">
-        <button class="btn btn-print" onclick="window.print()">🖨️ Print Card</button>
-        <button class="btn btn-close" onclick="window.close()">✕ Close</button>
-      </div>
-
-    </body></html>
-  `);
-  w.document.close();
-}
-
-printExport(): void {
-  if (!this.selectedCard) { alert('Please select a member first!'); return; }
-  this.print();
-}
+  printExport(): void {
+    if (!this.selectedCard) { alert('Please select a member first!'); return; }
+    this.print();
+  }
 }

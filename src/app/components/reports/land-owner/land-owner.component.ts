@@ -268,7 +268,7 @@ if (toDate) {
       return;
     }
     const text = searchText.trim().toLowerCase();
-    filtered = filtered.filter(x => x[searchBy]?.toString().toLowerCase().startsWith(text));
+    filtered = filtered.filter(x => x[searchBy]?.toString().toLowerCase().includes(text));
   }
 
   this.filteredData = filtered; // ✅ Save full filtered data
