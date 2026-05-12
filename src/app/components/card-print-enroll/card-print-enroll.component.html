@@ -77,57 +77,92 @@
           <p>Select a member<br/>to preview card</p>
         </div>
 
-        <div class="real-card" *ngIf="selectedCard">
+       <div class="real-card" *ngIf="selectedCard">
 
-          <ng-container *ngIf="cardType === 'pre-printed'">
-            <img class="real-card__bg" [src]="currentCardTemplate" alt="card template" />
-            <div class="real-card__photo-overlay"
-                 [style.top]="currentCardPhotoStyle['top']"
-                 [style.left]="currentCardPhotoStyle['left']"
-                 [style.width]="currentCardPhotoStyle['width']"
-                 [style.height]="currentCardPhotoStyle['height']"
-                 [style.position]="'absolute'">
-              <img *ngIf="selectedCard?.photoUrl"
-                   [src]="selectedCard?.photoUrl"
-                   class="real-card__photo-img"
-                   alt="member photo" />
-              <div *ngIf="!selectedCard?.photoUrl" class="real-card__photo-placeholder">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="1">
-                  <circle cx="12" cy="8" r="4"/>
-                  <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
-                </svg>
-              </div>
-            </div>
-            <div class="real-card__text-overlay">
-              <div class="real-card__name">{{ selectedCard?.name }}</div>
-              <div class="real-card__flat">{{ selectedCard?.building }} - {{ selectedCard?.flatNumber }}</div>
-              <div class="real-card__id">ID: {{ selectedCard?.idNumber }}</div>
-            </div>
-          </ng-container>
+  <!-- CONTRACTOR DYNAMIC CARD -->
+  <ng-container *ngIf="selectedCard?.holderType === 'Contractor'">
+  <div class="contractor-card">
+    <div class="contractor-card__bg"></div>
 
-          <ng-container *ngIf="cardType === 'blank'">
-            <div class="blank-card">
-              <div class="blank-card__photo-wrap">
-                <img *ngIf="selectedCard?.photoUrl"
-                     [src]="selectedCard?.photoUrl"
-                     class="blank-card__photo"
-                     alt="member photo" />
-                <div *ngIf="!selectedCard?.photoUrl" class="blank-card__photo-placeholder">
-                  <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1">
-                    <circle cx="12" cy="8" r="4"/>
-                    <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
-                  </svg>
-                </div>
-              </div>
-              <div class="blank-card__info">
-                <div class="blank-card__name">{{ selectedCard?.name }}</div>
-                <div class="blank-card__flat">{{ selectedCard?.building }} - {{ selectedCard?.flatNumber }}</div>
-                <div class="blank-card__id">ID: {{ selectedCard?.idNumber }}</div>
-              </div>
-            </div>
-          </ng-container>
+    <div class="contractor-card__header">
+      <div class="company-title">{{ selectedCard?.company || 'Company Name' }}</div>
+      <div class="company-subtitle">&#64; Riverview City, Pune</div>
+    </div>
 
+    <div class="contractor-card__photo-wrap">
+      <img *ngIf="selectedCard?.photoUrl" [src]="selectedCard?.photoUrl" alt="photo" />
+      <div *ngIf="!selectedCard?.photoUrl" class="photo-placeholder">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="1">
+          <circle cx="12" cy="8" r="4"/>
+          <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+        </svg>
+      </div>
+    </div>
+
+    <div class="contractor-card__details">
+      <div class="detail-name">{{ selectedCard?.name }}</div>
+      <div class="detail-row">Validity - {{ selectedCard?.validTill ? (selectedCard?.validTill | date:'d/M/yyyy') : '—' }}</div>
+      <div class="detail-row">Company - {{ selectedCard?.company || '—' }}</div>
+      <div class="detail-row">Card No - {{ selectedCard?.cardCSN || '—' }}</div>
+      <div class="detail-row">Agency - {{ selectedCard?.agency || '—' }}</div>
+    </div>
+
+    <div class="contractor-card__footer">
+      <div class="footer-brand">
+        <span class="footer-bird">🕊️</span>
+        <span class="footer-logo">Nanded City</span>
+      </div>
+      <div class="footer-tagline">My City. My World.</div>
+      <div class="footer-url">www.nandedcitypune.com</div>
+    </div>
+  </div>
+</ng-container>
+
+  <!-- PRE-PRINTED for non-contractor -->
+  <ng-container *ngIf="cardType === 'pre-printed' && selectedCard?.holderType !== 'Contractor'">
+    <img class="real-card__bg" [src]="currentCardTemplate" alt="card template" />
+    <div class="real-card__photo-overlay"
+         [style.top]="currentCardPhotoStyle['top']"
+         [style.left]="currentCardPhotoStyle['left']"
+         [style.width]="currentCardPhotoStyle['width']"
+         [style.height]="currentCardPhotoStyle['height']"
+         [style.position]="'absolute'">
+      <img *ngIf="selectedCard?.photoUrl" [src]="selectedCard?.photoUrl" class="real-card__photo-img" alt="member photo" />
+      <div *ngIf="!selectedCard?.photoUrl" class="real-card__photo-placeholder">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="1">
+          <circle cx="12" cy="8" r="4"/>
+          <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+        </svg>
+      </div>
+    </div>
+    <div class="real-card__text-overlay">
+      <div class="real-card__name">{{ selectedCard?.name }}</div>
+      <div class="real-card__flat">{{ selectedCard?.building }} - {{ selectedCard?.flatNumber }}</div>
+      <div class="real-card__id">ID: {{ selectedCard?.idNumber }}</div>
+    </div>
+  </ng-container>
+
+  <!-- BLANK CARD -->
+  <ng-container *ngIf="cardType === 'blank'">
+    <div class="blank-card">
+      <div class="blank-card__photo-wrap">
+        <img *ngIf="selectedCard?.photoUrl" [src]="selectedCard?.photoUrl" class="blank-card__photo" alt="member photo" />
+        <div *ngIf="!selectedCard?.photoUrl" class="blank-card__photo-placeholder">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1">
+            <circle cx="12" cy="8" r="4"/>
+            <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+          </svg>
         </div>
+      </div>
+      <div class="blank-card__info">
+        <div class="blank-card__name">{{ selectedCard?.name }}</div>
+        <div class="blank-card__flat">{{ selectedCard?.building }} - {{ selectedCard?.flatNumber }}</div>
+        <div class="blank-card__id">ID: {{ selectedCard?.idNumber }}</div>
+      </div>
+    </div>
+  </ng-container>
+
+</div>
       </div>
 
       <!-- Card Type -->

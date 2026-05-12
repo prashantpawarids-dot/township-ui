@@ -2371,3 +2371,156 @@ $shadow-hover: 0 4px 20px rgba(0,0,0,0.12);
     transform: none;
   }
 }
+
+
+
+// ── Contractor Card ──────────────────────────────────────────
+.contractor-card {
+  width: 100%;
+  height: 100%;
+  background: #f0f4f8;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  font-family: 'Segoe UI', sans-serif;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+
+  // Building silhouette background
+  &__bg {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: 
+      linear-gradient(180deg, #dce8f5 0%, #eaf2fb 40%, #f5f8fc 70%, #e8eef5 100%);
+    z-index: 0;
+
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 60px;
+      left: 0; right: 0;
+      height: 140px;
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 140'%3E%3Crect x='10' y='20' width='40' height='120' fill='%23c5d8ea' opacity='0.4'/%3E%3Crect x='20' y='30' width='8' height='10' fill='%23a8c4d8' opacity='0.5'/%3E%3Crect x='32' y='30' width='8' height='10' fill='%23a8c4d8' opacity='0.5'/%3E%3Crect x='20' y='45' width='8' height='10' fill='%23a8c4d8' opacity='0.5'/%3E%3Crect x='32' y='45' width='8' height='10' fill='%23a8c4d8' opacity='0.5'/%3E%3Crect x='70' y='0' width='60' height='140' fill='%23b8cfe0' opacity='0.35'/%3E%3Crect x='78' y='10' width='10' height='14' fill='%2396b8cc' opacity='0.5'/%3E%3Crect x='94' y='10' width='10' height='14' fill='%2396b8cc' opacity='0.5'/%3E%3Crect x='78' y='30' width='10' height='14' fill='%2396b8cc' opacity='0.5'/%3E%3Crect x='94' y='30' width='10' height='14' fill='%2396b8cc' opacity='0.5'/%3E%3Crect x='78' y='50' width='10' height='14' fill='%2396b8cc' opacity='0.5'/%3E%3Crect x='94' y='50' width='10' height='14' fill='%2396b8cc' opacity='0.5'/%3E%3Crect x='150' y='30' width='50' height='110' fill='%23c8d8e8' opacity='0.3'/%3E%3Crect x='220' y='10' width='70' height='130' fill='%23b5cad8' opacity='0.32'/%3E%3Crect x='230' y='20' width='12' height='16' fill='%2390b0c8' opacity='0.5'/%3E%3Crect x='248' y='20' width='12' height='16' fill='%2390b0c8' opacity='0.5'/%3E%3Crect x='266' y='20' width='12' height='16' fill='%2390b0c8' opacity='0.5'/%3E%3Crect x='310' y='40' width='45' height='100' fill='%23c0d4e4' opacity='0.3'/%3E%3Crect x='360' y='20' width='35' height='120' fill='%23b8ccdc' opacity='0.3'/%3E%3C/svg%3E") bottom/cover no-repeat;
+    }
+  }
+
+  &__header {
+    width: 100%;
+    text-align: center;
+    padding: 10px 8px 4px;
+    position: relative;
+    z-index: 2;
+
+    .company-title {
+      font-size: 15px;
+      font-weight: 900;
+      color: #1a2a3a;
+      letter-spacing: 1px;
+      font-style: italic;
+      text-transform: uppercase;
+    }
+
+    .company-subtitle {
+      font-size: 8px;
+      color: #4a6880;
+      margin-top: 1px;
+      font-style: italic;
+    }
+  }
+
+  &__photo-wrap {
+    width: 92px;
+    height: 108px;
+    border: 3px solid #fff;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    overflow: hidden;
+    background: #dce8f0;
+    position: relative;
+    z-index: 2;
+    margin: 6px 0 4px;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .photo-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #aaa;
+    }
+  }
+
+  &__details {
+    width: 100%;
+    text-align: center;
+    padding: 2px 8px;
+    position: relative;
+    z-index: 2;
+
+    .detail-name {
+      font-size: 14px;
+      font-weight: 800;
+      color: #0d1f2d;
+      margin-bottom: 5px;
+    }
+
+    .detail-row {
+      font-size: 10px;
+      color: #1a2a3a;
+      font-weight: 600;
+      margin: 3px 0;
+      letter-spacing: 0.2px;
+    }
+  }
+
+  &__footer {
+    width: 100%;
+    margin-top: auto;
+    background: linear-gradient(135deg, #2d6a4f 0%, #52b788 100%);
+    padding: 5px 8px 4px;
+    text-align: center;
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    .footer-brand {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      justify-content: center;
+    }
+
+    .footer-bird {
+      font-size: 14px;
+    }
+
+    .footer-logo {
+      font-size: 12px;
+      font-weight: 900;
+      color: #fff;
+      letter-spacing: 0.5px;
+    }
+
+    .footer-tagline {
+      font-size: 7px;
+      color: #d0f0e0;
+      font-style: italic;
+      margin-top: 1px;
+    }
+
+    .footer-url {
+      font-size: 7px;
+      color: #a8e6c8;
+      margin-top: 1px;
+    }
+  }
+}

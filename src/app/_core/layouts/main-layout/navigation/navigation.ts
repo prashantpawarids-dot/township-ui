@@ -282,6 +282,7 @@ export const NavigationItems: NavigationItem[] = [
           { id: 'vechileInOutLog', title: 'Vehicle In Out Log', type: 'item', url: '/reports/vechileInOutLog', icon: 'ant-design' },
           { id: 'vechileInOutRegister', title: 'Vehicle In-Out Register', type: 'item', url: '/reports/vechileInOutRegister', icon: 'ant-design' },
           { id: 'visitorInOutLog', title: 'Visitor In Out Log', type: 'item', url: '/reports/visitorInOutLog', icon: 'ant-design' },
+           { id: '', title: 'Unauthorized Vehicle Register', type: 'item', url: '/reports/unauthorized', icon: 'ant-design' },
           { id: 'cardEncodingLog', title: 'Card Encoding Log', type: 'item', url: '/reports/cardEncodingLog', icon: 'ant-design' },
           { id: 'cardPrintingLog', title: 'Card Printing Log', type: 'item', url: '/reports/cardPrintingLog', icon: 'ant-design' },
           { id: 'cardLostDamaged', title: 'Card LostDamage', type: 'item', url: '/reports/cardLostDamaged', icon: 'ant-design' },
@@ -291,7 +292,7 @@ export const NavigationItems: NavigationItem[] = [
           // { id: 'tagLostDamage', title: 'Tag Lost Damage', type: 'item', url: '/reports/tagLostDamage', icon: 'ant-design' },
           // { id: 'tagBlockRemove', title: 'Card Revoke/Block', type: 'item', url: '/reports/tagBlockRemove', icon: 'ant-design' },
           { id: 'resident', title: 'Resident', type: 'item', url: '/reports/resident', icon: 'ant-design' },
-          { id: '', title: 'Unauthorized Vehicle Register', type: 'item', url: '/reports/unauthorized', icon: 'ant-design' },
+         
           { id: 'tenant', title: 'Tenant', type: 'item', url: '/reports/tenant', icon: 'ant-design' },
           { id: 'serviceProvider', title: 'Service Provider', type: 'item', url: '/reports/serviceProvider', icon: 'ant-design' },
           // { id: 'riverViewCityEmployee', title: 'RiverView City Employee', type: 'item', url: '/reports/riverViewCityEmployee', icon: 'ant-design' },

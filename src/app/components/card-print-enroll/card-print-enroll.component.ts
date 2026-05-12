@@ -16,6 +16,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { CardPrintEnroll, CardSearchFilter } from '../../models/common.model';
 import { CardEditDialogComponent } from './card-edit-dialog/card-edit-dialog.component';
 import { AuthService } from '../../services/auth.service'; // ← ADDED
+import { DatePipe } from '@angular/common';
+import { environment } from 'src/environments/environment.prod';
 
 @Component({
   selector: 'app-card-print-enroll',
@@ -114,32 +116,35 @@ showIssueForm: boolean = false;
   }
 
   // ── Hardcoded Card Holder Data (API not yet available) ────────
-  private rawData: CardPrintEnroll[] = [
-    { idNumber: '100001', name: 'Dilip Shendge',     building: 'Falcon-B', flatNumber: 'B-906',  cardDetails: '6074271',        cardCSN: '6074271',        neighbourhood: 'Falcon Towers', isPrinted: true,  isPersonalised: true,  photoUrl: '', holderType: 'Resident'        },
-    { idNumber: '100002', name: 'Ntrial Trial',       building: 'Falcon-E', flatNumber: '1102',   cardDetails: '10049530072345', cardCSN: '10049530072345', neighbourhood: 'Falcon Towers', isPrinted: false, isPersonalised: false, photoUrl: '', holderType: 'LandOwner'       },
-    { idNumber: '100003', name: 'Rajendra Shinde',    building: 'Falcon-A', flatNumber: 'A-1806', cardDetails: '3466786',        cardCSN: '3466786',        neighbourhood: 'Falcon Towers', isPrinted: true,  isPersonalised: true,  photoUrl: '', holderType: 'Tenant'          },
-    { idNumber: '100004', name: 'Maheshkumar Jadhav', building: 'Falcon-D', flatNumber: 'D-804',  cardDetails: '5150607',        cardCSN: '5150607',        neighbourhood: 'Falcon Towers', isPrinted: true,  isPersonalised: false, photoUrl: '', holderType: 'Employee'        },
-    { idNumber: '100005', name: 'Kaka Thorat',        building: 'Falcon-F', flatNumber: 'F-908',  cardDetails: '16598543',       cardCSN: '16598543',       neighbourhood: 'Falcon Towers', isPrinted: false, isPersonalised: false, photoUrl: '', holderType: 'Guest'           },
-    { idNumber: '100006', name: 'Saurabh Sharma',     building: 'Falcon-C', flatNumber: 'C-1808', cardDetails: '36575',          cardCSN: '36575',          neighbourhood: 'Falcon Towers', isPrinted: true,  isPersonalised: true,  photoUrl: '', holderType: 'DResident'       },
-    { idNumber: '100007', name: 'Shantilal Jain',     building: 'Falcon-D', flatNumber: 'D-904',  cardDetails: '',              cardCSN: '',               neighbourhood: 'Falcon Towers', isPrinted: false, isPersonalised: false, photoUrl: '', holderType: 'Resident'        },
-    { idNumber: '100008', name: 'Prashant Singh',     building: 'Falcon-B', flatNumber: 'B-1804', cardDetails: '4135967',        cardCSN: '4135967',        neighbourhood: 'Falcon Towers', isPrinted: true,  isPersonalised: true,  photoUrl: '', holderType: 'ServiceProvider' },
-    { idNumber: '100009', name: 'Dattatray Deokar',   building: 'Falcon-E', flatNumber: 'E-503',  cardDetails: '33935',          cardCSN: '33935',          neighbourhood: 'Falcon Towers', isPrinted: false, isPersonalised: false, photoUrl: '', holderType: 'Tenant'          },
-    { idNumber: '100010', name: 'Himanshu Tyagi',     building: 'Falcon-E', flatNumber: 'E-1003', cardDetails: '2133567',        cardCSN: '2133567',        neighbourhood: 'Falcon Towers', isPrinted: true,  isPersonalised: true,  photoUrl: '', holderType: 'LandOwner'       },
-    { idNumber: '100011', name: 'Deepak Shrivastava', building: 'Falcon-G', flatNumber: 'G-2006', cardDetails: '7256095',        cardCSN: '7256095',        neighbourhood: 'Falcon Towers', isPrinted: false, isPersonalised: false, photoUrl: '', holderType: 'Employee'        },
-    { idNumber: '100012', name: 'Somnath Holkar',     building: 'Falcon-A', flatNumber: 'A-407',  cardDetails: '6444591',        cardCSN: '6444591',        neighbourhood: 'Falcon Towers', isPrinted: true,  isPersonalised: true,  photoUrl: '', holderType: 'Resident'        },
-    { idNumber: '100013', name: 'Parmeshwar Chavan',  building: 'Falcon-G', flatNumber: 'G-305',  cardDetails: '6528031',        cardCSN: '6528031',        neighbourhood: 'Falcon Towers', isPrinted: true,  isPersonalised: false, photoUrl: '', holderType: 'DTenant'         },
-    { idNumber: '100014', name: 'Soudamini Patra',    building: 'Falcon-G', flatNumber: 'G-901',  cardDetails: '4114767',        cardCSN: '4114767',        neighbourhood: 'Falcon Towers', isPrinted: false, isPersonalised: false, photoUrl: '', holderType: 'Guest'           },
-    { idNumber: '100015', name: 'Nagesh Bogar',       building: 'Falcon-C', flatNumber: 'C-1007', cardDetails: '224767',         cardCSN: '224767',         neighbourhood: 'Falcon Towers', isPrinted: true,  isPersonalised: true,  photoUrl: '', holderType: 'Resident'        },
-  ];
+  // private rawData: CardPrintEnroll[] = [
+  //   { idNumber: '100001', name: 'Dilip Shendge',     building: 'Falcon-B', flatNumber: 'B-906',  cardDetails: '6074271',        cardCSN: '6074271',        neighbourhood: 'Falcon Towers', isPrinted: true,  isPersonalised: true,  photoUrl: '', holderType: 'Resident'        },
+  //   { idNumber: '100002', name: 'Ntrial Trial',       building: 'Falcon-E', flatNumber: '1102',   cardDetails: '10049530072345', cardCSN: '10049530072345', neighbourhood: 'Falcon Towers', isPrinted: false, isPersonalised: false, photoUrl: '', holderType: 'LandOwner'       },
+  //   { idNumber: '100003', name: 'Rajendra Shinde',    building: 'Falcon-A', flatNumber: 'A-1806', cardDetails: '3466786',        cardCSN: '3466786',        neighbourhood: 'Falcon Towers', isPrinted: true,  isPersonalised: true,  photoUrl: '', holderType: 'Tenant'          },
+  //   { idNumber: '100004', name: 'Maheshkumar Jadhav', building: 'Falcon-D', flatNumber: 'D-804',  cardDetails: '5150607',        cardCSN: '5150607',        neighbourhood: 'Falcon Towers', isPrinted: true,  isPersonalised: false, photoUrl: '', holderType: 'Employee'        },
+  //   { idNumber: '100005', name: 'Kaka Thorat',        building: 'Falcon-F', flatNumber: 'F-908',  cardDetails: '16598543',       cardCSN: '16598543',       neighbourhood: 'Falcon Towers', isPrinted: false, isPersonalised: false, photoUrl: '', holderType: 'Guest'           },
+  //   { idNumber: '100006', name: 'Saurabh Sharma',     building: 'Falcon-C', flatNumber: 'C-1808', cardDetails: '36575',          cardCSN: '36575',          neighbourhood: 'Falcon Towers', isPrinted: true,  isPersonalised: true,  photoUrl: '', holderType: 'DResident'       },
+  //   { idNumber: '100007', name: 'Shantilal Jain',     building: 'Falcon-D', flatNumber: 'D-904',  cardDetails: '',              cardCSN: '',               neighbourhood: 'Falcon Towers', isPrinted: false, isPersonalised: false, photoUrl: '', holderType: 'Resident'        },
+  //   { idNumber: '100008', name: 'Prashant Singh',     building: 'Falcon-B', flatNumber: 'B-1804', cardDetails: '4135967',        cardCSN: '4135967',        neighbourhood: 'Falcon Towers', isPrinted: true,  isPersonalised: true,  photoUrl: '', holderType: 'ServiceProvider' },
+  //   { idNumber: '100009', name: 'Dattatray Deokar',   building: 'Falcon-E', flatNumber: 'E-503',  cardDetails: '33935',          cardCSN: '33935',          neighbourhood: 'Falcon Towers', isPrinted: false, isPersonalised: false, photoUrl: '', holderType: 'Tenant'          },
+  //   { idNumber: '100010', name: 'Himanshu Tyagi',     building: 'Falcon-E', flatNumber: 'E-1003', cardDetails: '2133567',        cardCSN: '2133567',        neighbourhood: 'Falcon Towers', isPrinted: true,  isPersonalised: true,  photoUrl: '', holderType: 'LandOwner'       },
+  //   { idNumber: '100011', name: 'Deepak Shrivastava', building: 'Falcon-G', flatNumber: 'G-2006', cardDetails: '7256095',        cardCSN: '7256095',        neighbourhood: 'Falcon Towers', isPrinted: false, isPersonalised: false, photoUrl: '', holderType: 'Employee'        },
+  //   { idNumber: '100012', name: 'Somnath Holkar',     building: 'Falcon-A', flatNumber: 'A-407',  cardDetails: '6444591',        cardCSN: '6444591',        neighbourhood: 'Falcon Towers', isPrinted: true,  isPersonalised: true,  photoUrl: '', holderType: 'Resident'        },
+  //   { idNumber: '100013', name: 'Parmeshwar Chavan',  building: 'Falcon-G', flatNumber: 'G-305',  cardDetails: '6528031',        cardCSN: '6528031',        neighbourhood: 'Falcon Towers', isPrinted: true,  isPersonalised: false, photoUrl: '', holderType: 'DTenant'         },
+  //   { idNumber: '100014', name: 'Soudamini Patra',    building: 'Falcon-G', flatNumber: 'G-901',  cardDetails: '4114767',        cardCSN: '4114767',        neighbourhood: 'Falcon Towers', isPrinted: false, isPersonalised: false, photoUrl: '', holderType: 'Guest'           },
+  //   { idNumber: '100015', name: 'Nagesh Bogar',       building: 'Falcon-C', flatNumber: 'C-1007', cardDetails: '224767',         cardCSN: '224767',         neighbourhood: 'Falcon Towers', isPrinted: true,  isPersonalised: true,  photoUrl: '', holderType: 'Resident'        },
+  // ];
+
+
+  private allData: CardPrintEnroll[] = [];
 
   // ← CHANGED: injected AuthService
   constructor(private dialog: MatDialog, private authService: AuthService) {}
 
   ngOnInit(): void {
-    this.loadNeighbourhoods();
-    this.loadBuildings();
-    this.search();
-  }
+  this.loadNeighbourhoods();
+  this.loadBuildings();
+  this.loadAllCardHolders();
+}
 
   
   loadNeighbourhoods(): void {
@@ -182,16 +187,64 @@ loadBuildings(): void {
   });
 }
 
+// loadAllCardHolders(): void {
+//   this.authService.getCardHolders().subscribe({
+//     next: (res) => {
+//       this.allData = res.map(item => this.mapCard(item));
+//       this.search();
+//     },
+//     error: (err) => {
+//       console.error('Failed to load card holders:', err);
+//       this.allData = [];
+//       this.search();
+//     }
+//   });
+// }
+
+loadAllCardHolders(): void {
+  const nrd      = this.filter.neighbourhood ?? 'ALL';
+  const building = this.filter.building ?? 'ALL';
+
+  this.authService.getCardHolders(nrd, building).subscribe({
+    next: (res) => {
+      this.allData = Array.isArray(res) 
+        ? res.map(item => this.mapCard(item)) 
+        : [];
+      this.search();
+    },
+    error: (err) => {
+      console.error('Failed to load card holders:', err);
+      this.allData = [];
+      this.search();
+    }
+  });
+}
+
   // onNeighbourhoodChange(): void { this.filter.building = 'ALL'; }
 
-  onNeighbourhoodChange(): void {
-  this.filter.building = 'ALL';
+//   onNeighbourhoodChange(): void {
+//   this.filter.building = 'ALL';
 
+//   if (this.filter.neighbourhood === 'ALL') {
+//     this.buildings = [
+//       { name: 'ALL' },
+//       ...this.allBuildings
+//     ];
+//   } else {
+//     this.buildings = [
+//       { name: 'ALL' },
+//       ...this.allBuildings.filter(
+//         (b: any) => b.nrdName === this.filter.neighbourhood
+//       )
+//     ];
+//   }
+// }
+
+
+onNeighbourhoodChange(): void {
+  this.filter.building = 'ALL';
   if (this.filter.neighbourhood === 'ALL') {
-    this.buildings = [
-      { name: 'ALL' },
-      ...this.allBuildings
-    ];
+    this.buildings = [{ name: 'ALL' }, ...this.allBuildings];
   } else {
     this.buildings = [
       { name: 'ALL' },
@@ -200,34 +253,74 @@ loadBuildings(): void {
       )
     ];
   }
+  this.loadAllCardHolders(); // reload on NRD change
 }
+// private mapCard(item: any): CardPrintEnroll {
+//   return {
+//     idNumber:      item.idNumber,
+//     name:          item.shortname,
+//     building:      item.bld,
+//     flatNumber:    item.flatNumber,
+//     cardDetails:   item.csn,
+//     cardCSN:       item.csn,
+//     neighbourhood: item.nrd,
+//     holderType:    item.templateName,
+//     isPrinted:     item.cardPrintingDate !== '1900-01-01T00:00:00',
+//     isPersonalised:item.cardIssueDate   !== '1900-01-01T00:00:00',
+//     // photoUrl:      ''
+//     photoUrl: `http://localhost:5555/cardholderimages/${item.idNumber}.jpg`,
+//      validTill:      item.validTill  ?? '',
+//     company:        item.company    ?? '',
+//     agency:         item.agency     ?? ''
+//   };
+// }
 
- search(): void {
-  let result = [...this.rawData];
-  if (this.filter.neighbourhood !== 'ALL')
-    result = result.filter(c => c.neighbourhood === this.filter.neighbourhood);
-  if (this.filter.building !== 'ALL')
-    result = result.filter(c => c.building === this.filter.building);
+
+private mapCard(item: any): CardPrintEnroll {
+  return {
+    idNumber:       item.idNumber,
+    name:           item.shortname,
+    building:       item.bld,
+    flatNumber:     item.flatNumber,
+    cardDetails:    item.csn,
+    cardCSN:        item.csn,
+    neighbourhood:  item.nrd,
+    holderType:     item.templateName,
+    isPrinted:      item.cardPrintingDate !== '1900-01-01T00:00:00',
+    isPersonalised: item.cardIssueDate    !== '1900-01-01T00:00:00',
+    photoUrl:       `${environment.apiurl.replace('api/', '')}cardholderimages/${item.idNumber}.jpg`,
+    validTill:      item.validTill  ?? '',
+    company:        item.company    ?? '',
+    agency:         item.agency     ?? ''
+  };
+}
+search(): void {
+  let result = [...this.allData];
+
+  // Checkbox filters
   if (!this.filter.showAll) {
     if (this.filter.showNonPrinted)      result = result.filter(c => !c.isPrinted);
     if (this.filter.showNonPersonalised) result = result.filter(c => !c.isPersonalised);
   }
+
+  // Search value filter
   if (this.filter.searchValue) {
     const val = this.filter.searchValue.toLowerCase();
     result = result.filter(c => {
       switch (this.filter.searchBy) {
-        case 'Name':         return c.name.toLowerCase().includes(val);
-        case 'IDnumber':     return c.idNumber.includes(val);
-        case 'flatnumber':   return c.flatNumber.toLowerCase().includes(val);
-        case 'Building_NRD': return c.building.toLowerCase().includes(val);
-        case 'CardCSN':      return c.cardDetails.includes(val);
+        case 'Name':         return c.name?.toLowerCase().includes(val);
+        case 'IDnumber':     return c.idNumber?.includes(val);
+        case 'flatnumber':   return c.flatNumber?.toLowerCase().includes(val);
+        case 'Building_NRD': return c.building?.toLowerCase().includes(val);
+        case 'CardCSN':      return c.cardDetails?.includes(val);
         default:             return true;
       }
     });
   }
-  this.cardHolders   = result;
-  this.totalRecords  = result.length;
-  this.currentPage   = 1;          // reset to page 1 on new search
+
+  this.cardHolders  = result;
+  this.totalRecords = result.length;
+  this.currentPage  = 1;
   this.applyPaging();
 }
 
@@ -263,21 +356,46 @@ toggleIssueForm(): void {
   }
 
   openViewDialog(card: CardPrintEnroll): void {
-    this.onRowClick(card);
-    this.dialog.open(CardEditDialogComponent, {
-      width: '520px',
-      disableClose: false,
-      data: {
-        cardHolder:   card.name,
-        cardDetails:  card.cardDetails,
-        cardCSN:      card.cardCSN,
-        accessPoints: [
-          { id: 92, accessPoint: 'Falcon Towers Main Gate' },
-          { id: 93, accessPoint: 'Falcon Tower B Entrance' }
-        ]
-      }
-    }).afterClosed().subscribe(result => { if (result) this.search(); });
-  }
+  this.onRowClick(card);
+
+  this.authService.getNRDCardAccess().subscribe({
+    next: (res) => {
+      // Filter access points for this card holder
+      const accessPoints = res
+        .filter((a: any) => a.cardHolderID?.toString() === card.idNumber?.toString())
+        .map((a: any) => ({
+          id:          a.id,
+          accessPoint: a.moduleName
+        }));
+
+      this.dialog.open(CardEditDialogComponent, {
+        width: '520px',
+        disableClose: false,
+        data: {
+          cardHolder:   card.name,
+          cardDetails:  card.cardDetails,
+          cardCSN:      card.cardCSN,
+          idNumber:     card.idNumber,
+          accessPoints: accessPoints
+        }
+      }).afterClosed().subscribe(result => { if (result) this.search(); });
+    },
+    error: () => {
+      // fallback — open dialog with empty access points
+      this.dialog.open(CardEditDialogComponent, {
+        width: '520px',
+        disableClose: false,
+        data: {
+          cardHolder:   card.name,
+          cardDetails:  card.cardDetails,
+          cardCSN:      card.cardCSN,
+          idNumber:     card.idNumber,
+          accessPoints: []
+        }
+      }).afterClosed().subscribe(result => { if (result) this.search(); });
+    }
+  });
+}
 
   // ── Camera Modal ──────────────────────────────────────────────
   takePhoto(): void {
@@ -354,16 +472,45 @@ toggleIssueForm(): void {
     this.imageChangedEvent = null;
   }
 
+  // saveAndExit(): void {
+  //   const photoToSave = this.croppedResult || this.capturedImage;
+  //   if (!photoToSave) { alert('Please capture or upload a photo first!'); return; }
+  //   if (this.selectedCard) {
+  //     this.selectedCard.photoUrl = photoToSave;
+  //     const found = this.allData.find(r => r.idNumber === this.selectedCard!.idNumber);
+  //     if (found) found.photoUrl = photoToSave;
+  //   }
+  //   this.closeCameraModal();
+  // }
+
+
   saveAndExit(): void {
-    const photoToSave = this.croppedResult || this.capturedImage;
-    if (!photoToSave) { alert('Please capture or upload a photo first!'); return; }
-    if (this.selectedCard) {
-      this.selectedCard.photoUrl = photoToSave;
-      const found = this.rawData.find(r => r.idNumber === this.selectedCard!.idNumber);
-      if (found) found.photoUrl = photoToSave;
+  const photoToSave = this.croppedResult || this.capturedImage;
+  if (!photoToSave) { alert('Please capture or upload a photo first!'); return; }
+  if (!this.selectedCard) { alert('No card selected!'); return; }
+
+  // Save to API
+  this.authService.updateCardCSN({
+    IDNumber:    this.selectedCard.idNumber,
+    CardCSN:     this.selectedCard.cardCSN ?? '',
+    ImageBase64: photoToSave,
+    ContentType: 'image/jpeg'
+  }).subscribe({
+   next: (res) => {
+  const serverPhotoUrl = res?.photoUrl 
+    ? `http://localhost:5555${res.photoUrl}` 
+    : photoToSave;
+  this.selectedCard = { ...this.selectedCard!, photoUrl: serverPhotoUrl };
+  const found = this.allData.find(r => r.idNumber === this.selectedCard!.idNumber);
+  if (found) found.photoUrl = serverPhotoUrl;
+  this.closeCameraModal();
+  alert('✅ Photo saved successfully!');
+},
+    error: (err) => {
+      alert('❌ Failed to save photo: ' + err.message);
     }
-    this.closeCameraModal();
-  }
+  });
+}
 
   closeCameraModal(): void {
     this.stopCamera();
@@ -381,141 +528,414 @@ toggleIssueForm(): void {
     alert(`Reading Card CSN: ${this.cardCSN}`);
   }
 
-  issueCard(): void {
-    if (!this.cardHolderNo) { alert('Please select a card holder first!'); return; }
-    if (!this.cardCSN)      { alert('Please enter Card CSN first!'); return; }
-    alert(`✅ Card Issued!\nHolder: ${this.cardHolderName}\nCSN: ${this.cardCSN}`);
+  // issueCard(): void {
+  //   if (!this.cardHolderNo) { alert('Please select a card holder first!'); return; }
+  //   if (!this.cardCSN)      { alert('Please enter Card CSN first!'); return; }
+  //   alert(`✅ Card Issued!\nHolder: ${this.cardHolderName}\nCSN: ${this.cardCSN}`);
+  // }
+issueCard(): void {
+  if (!this.cardHolderNo) { alert('Please select a card holder first!'); return; }
+  if (!this.cardCSN)      { alert('Please enter Card CSN first!'); return; }
+
+  this.authService.updateCardCSN({
+    IDNumber: this.cardHolderNo,
+    CardCSN:  this.cardCSN
+  }).subscribe({
+    next: () => {
+      alert(`✅ Card Issued!\nHolder: ${this.cardHolderName}\nCSN: ${this.cardCSN}`);
+      this.loadAllCardHolders(); // refresh table
+    },
+    error: (err) => {
+      alert('❌ Failed to issue card: ' + err.message);
+    }
+  });
+}
+
+
+
+private fetchImageAsBase64(url: string): Promise<string> {
+  return fetch(url)
+    .then(res => res.blob())
+    .then(blob => new Promise<string>((resolve) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result as string);
+      reader.readAsDataURL(blob);
+    }))
+    .catch(() => '');
+}
+
+//   print(): void {
+//     if (!this.selectedCard) { alert('Please select a member first!'); return; }
+//     const card = this.selectedCard;
+//     const tmpl = (this.cardTemplates as any)[card.holderType ?? 'Resident']
+//                ?? this.cardTemplates['Resident'];
+
+//     if (this.cardType === 'blank') {
+//       const photo = card.photoUrl
+//         ? `<img src="${card.photoUrl}" style="width:100%;height:100%;object-fit:cover;" />`
+//         : `<div style="width:100%;height:100%;background:#f0f0f0;display:flex;align-items:center;justify-content:center;color:#aaa;font-size:24px;">👤</div>`;
+
+//       const w = window.open('', '_blank', 'width=420,height=760');
+//       if (!w) return;
+//       w.document.write(`
+//         <!DOCTYPE html><html><head>
+//         <title>ID Card — ${card.name}</title>
+//         <style>
+//           *{margin:0;padding:0;box-sizing:border-box;}
+//           body{background:#ccc;display:flex;flex-direction:column;align-items:center;padding:20px;gap:14px;font-family:'Segoe UI',sans-serif;}
+//           @page{size:54mm 86mm;margin:0;}
+//           @media print{
+//             html{width:54mm;margin:0;padding:0;}
+//             body{width:54mm;margin:0;padding:0;background:white!important;display:block!important;}
+//             .no-print{display:none!important;}
+//             .blank-front{display:block;width:54mm;height:86mm;overflow:hidden;page-break-after:always;break-after:page;}
+//           }
+//           .label{font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.1em;align-self:flex-start;}
+//           .blank-front{display:flex;flex-direction:column;align-items:center;gap:6px;width:100%;}
+//           .blank-preview{width:185px;background:#fff;border:1px solid #ddd;border-radius:8px;overflow:hidden;box-shadow:0 6px 20px rgba(0,0,0,0.2);display:flex;flex-direction:column;align-items:center;padding:16px 12px 12px;gap:10px;}
+//           .blank-photo{width:100px;height:120px;border:1.5px solid #ddd;border-radius:4px;overflow:hidden;background:#f5f5f5;}
+//           .blank-info{width:100%;text-align:center;border-top:1px solid #eee;padding-top:6px;}
+//           .blank-name{font-size:11px;font-weight:700;color:#111;}
+//           .blank-flat{font-size:9px;color:#444;margin-top:2px;}
+//           .blank-id{font-size:8px;color:#777;font-family:monospace;margin-top:2px;}
+//           .info{font-size:11px;color:#555;text-align:center;line-height:1.6;}
+//           .btn-row{display:flex;gap:10px;margin-top:8px;}
+//           .btn{padding:10px 24px;border:none;border-radius:7px;cursor:pointer;font-size:13px;font-weight:700;}
+//           .btn-print{background:#00c9a7;color:#061520;}
+//           .btn-close{background:#3d8ef8;color:#fff;}
+//         </style></head><body>
+//         <div class="blank-front">
+//           <span class="label no-print">Front Side (Blank)</span>
+//           <div class="blank-preview">
+//             <div class="blank-photo">${photo}</div>
+//             <div class="blank-info">
+//               <div class="blank-name">${card.name}</div>
+//               <div class="blank-flat">${card.building} - ${card.flatNumber}</div>
+//               <div class="blank-id">ID: ${card.idNumber}</div>
+//             </div>
+//           </div>
+//         </div>
+//         <div class="info no-print"><strong>${card.name}</strong><br/>${card.building} - ${card.flatNumber} | ID: ${card.idNumber}</div>
+//         <div class="btn-row no-print">
+//           <button class="btn btn-print" onclick="window.print()">🖨️ Print Card</button>
+//           <button class="btn btn-close" onclick="window.close()">✕ Close</button>
+//         </div>
+//         </body></html>
+//       `);
+//       w.document.close();
+//       return;
+//     }
+
+//     const cardImg       = new Image();
+//     cardImg.crossOrigin = 'anonymous';
+
+//     cardImg.onload = () => {
+//       const canvas  = document.createElement('canvas');
+//       canvas.width  = cardImg.naturalWidth;
+//       canvas.height = cardImg.naturalHeight;
+//       const ctx     = canvas.getContext('2d')!;
+//       ctx.drawImage(cardImg, 0, 0);
+
+//       const addTextAndGenerateFront = () => {
+//         const cw    = canvas.width;
+//         const ch    = canvas.height;
+//         const nameY = ch * 0.655;
+
+//         ctx.fillStyle = '#111111';
+//         ctx.font      = `bold ${Math.round(cw * 0.045)}px Segoe UI, sans-serif`;
+//         ctx.textAlign = 'center';
+//         ctx.fillText(card.name, cw / 2, nameY);
+
+//         ctx.fillStyle = '#333333';
+//         ctx.font      = `${Math.round(cw * 0.035)}px Segoe UI, sans-serif`;
+//         ctx.fillText(`${card.building} - ${card.flatNumber}`, cw / 2, nameY + cw * 0.055);
+
+//         ctx.fillStyle = '#555555';
+//         ctx.font      = `${Math.round(cw * 0.03)}px Courier New, monospace`;
+//         ctx.fillText(`ID: ${card.idNumber}`, cw / 2, nameY + cw * 0.105);
+
+//         const frontBase64 = canvas.toDataURL('image/jpeg', 0.95);
+
+//         const backImg       = new Image();
+//         backImg.crossOrigin = 'anonymous';
+
+//         backImg.onload = () => {
+//           const backCanvas  = document.createElement('canvas');
+//           backCanvas.width  = backImg.naturalWidth;
+//           backCanvas.height = backImg.naturalHeight;
+//           backCanvas.getContext('2d')!.drawImage(backImg, 0, 0);
+//           const backBase64 = backCanvas.toDataURL('image/jpeg', 0.95);
+//           this.openPrintWindow(frontBase64, backBase64, card);
+//         };
+
+//         backImg.onerror = () => { this.openPrintWindow(frontBase64, frontBase64, card); };
+//         backImg.src = window.location.origin + '/' + tmpl.back;
+//       };
+
+//       if (card.photoUrl) {
+//   this.fetchImageAsBase64(card.photoUrl).then(base64 => {
+//     if (base64) {
+//       const photoImg  = new Image();
+//       photoImg.onload = () => {
+//         const px = canvas.width  * (tmpl.photoLeft   / 100);
+//         const py = canvas.height * (tmpl.photoTop    / 100);
+//         const pw = canvas.width  * (tmpl.photoWidth  / 100);
+//         const ph = canvas.height * (tmpl.photoHeight / 100);
+//         ctx.drawImage(photoImg, px, py, pw, ph);
+//         addTextAndGenerateFront();
+//       };
+//       photoImg.onerror = () => addTextAndGenerateFront();
+//       photoImg.src     = base64;
+//     } else {
+//       addTextAndGenerateFront();
+//     }
+//   });
+// } else {
+//   addTextAndGenerateFront();
+// }
+//     };
+
+//     cardImg.onerror = () => alert('Card template image not found!\nCheck: src/assets/cards/ folder');
+//     cardImg.src = window.location.origin + '/' + tmpl.front;
+//   }
+
+
+
+print(): void {
+  if (!this.selectedCard) { alert('Please select a member first!'); return; }
+  const card = this.selectedCard;
+
+  // ── Contractor card — HTML print ──────────────────────────
+  if (card.holderType === 'Contractor') {
+    const validDate = card.validTill
+      ? new Date(card.validTill).toLocaleDateString('en-IN')
+      : '—';
+    const photo = card.photoUrl
+      ? `<img src="${card.photoUrl}" style="width:100%;height:100%;object-fit:cover;" />`
+      : `<div style="width:100%;height:100%;background:#e0e8f0;display:flex;align-items:center;justify-content:center;font-size:28px;">👤</div>`;
+
+    const w = window.open('', '_blank', 'width=420,height=760');
+    if (!w) return;
+    w.document.write(`
+      <!DOCTYPE html><html><head>
+      <title>ID Card — ${card.name}</title>
+      <style>
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{background:#ccc;display:flex;flex-direction:column;align-items:center;padding:20px;gap:14px;font-family:'Segoe UI',sans-serif;}
+        @page{size:54mm 86mm;margin:0;}
+@media print{
+  html{width:54mm;height:86mm;margin:0;padding:0;}
+  body{width:54mm;height:86mm;margin:0;padding:0;background:white!important;display:flex;justify-content:center;}
+  .no-print{display:none!important;}
+  .contractor-print{
+    width:54mm!important;
+    height:86mm!important;
+    border-radius:0!important;
+    box-shadow:none!important;
+    margin:0!important;
+    padding:0!important;
   }
+  .c-title{font-size:9px!important;}
+  .c-subtitle{font-size:6px!important;}
+  .c-photo{width:58px!important;height:70px!important;}
+  .c-name{font-size:9px!important;}
+  .c-row{font-size:7px!important;margin:1px 0!important;}
+  .c-logo{font-size:8px!important;}
+  .c-tagline,.c-url{font-size:6px!important;}
+}
+        .contractor-print{width:200px;height:320px;background:linear-gradient(180deg,#dce8f5 0%,#eaf2fb 40%,#f5f8fc 70%,#e8eef5 100%);border-radius:10px;display:flex;flex-direction:column;align-items:center;overflow:hidden;font-family:'Segoe UI',sans-serif;box-shadow:0 4px 16px rgba(0,0,0,0.2);}
+        .c-header{width:100%;text-align:center;padding:10px 8px 4px;}
+        .c-title{font-size:13px;font-weight:900;color:#1a2a3a;font-style:italic;text-transform:uppercase;}
+        .c-subtitle{font-size:8px;color:#4a6880;font-style:italic;}
+        .c-photo{width:88px;height:104px;border:3px solid #fff;overflow:hidden;background:#dce8f0;margin:6px 0 4px;box-shadow:0 2px 8px rgba(0,0,0,0.15);}
+        .c-details{width:100%;text-align:center;padding:2px 8px;}
+        .c-name{font-size:13px;font-weight:800;color:#0d1f2d;margin-bottom:5px;}
+        .c-row{font-size:10px;color:#1a2a3a;font-weight:600;margin:3px 0;}
+        .c-footer{width:100%;margin-top:auto;background:linear-gradient(135deg,#2d6a4f 0%,#52b788 100%);padding:5px 8px 4px;text-align:center;}
+        .c-brand{display:flex;align-items:center;gap:4px;justify-content:center;}
+        .c-logo{font-size:12px;font-weight:900;color:#fff;}
+        .c-tagline{font-size:7px;color:#d0f0e0;font-style:italic;margin-top:1px;}
+        .c-url{font-size:7px;color:#a8e6c8;margin-top:1px;}
+        .btn-row{display:flex;gap:10px;margin-top:8px;}
+        .btn{padding:10px 24px;border:none;border-radius:7px;cursor:pointer;font-size:13px;font-weight:700;}
+        .btn-print{background:#00c9a7;color:#061520;}
+        .btn-close{background:#3d8ef8;color:#fff;}
+      </style></head><body>
+      <div class="contractor-print">
+        <div class="c-header">
+          <div class="c-title">${card.company || 'Company'}</div>
+          <div class="c-subtitle">@ Riverview City, Pune</div>
+        </div>
+        <div class="c-photo">${photo}</div>
+        <div class="c-details">
+          <div class="c-name">${card.name}</div>
+          <div class="c-row">Validity - ${validDate}</div>
+          <div class="c-row">Company - ${card.company || '—'}</div>
+          <div class="c-row">Card No - ${card.cardCSN || '—'}</div>
+          <div class="c-row">Agency - ${card.agency || '—'}</div>
+        </div>
+        <div class="c-footer">
+          <div class="c-brand"><span>🕊️</span><span class="c-logo">Nanded City</span></div>
+          <div class="c-tagline">My City. My World.</div>
+          <div class="c-url">www.nandedcitypune.com</div>
+        </div>
+      </div>
+      <div class="btn-row no-print">
+        <button class="btn btn-print" onclick="window.print()">🖨️ Print Card</button>
+        <button class="btn btn-close" onclick="window.close()">✕ Close</button>
+      </div>
+      </body></html>
+    `);
+    w.document.close();
+    return;
+  }
+  // ── End Contractor ─────────────────────────────────────────
 
-  print(): void {
-    if (!this.selectedCard) { alert('Please select a member first!'); return; }
-    const card = this.selectedCard;
-    const tmpl = (this.cardTemplates as any)[card.holderType ?? 'Resident']
-               ?? this.cardTemplates['Resident'];
+  const tmpl = (this.cardTemplates as any)[card.holderType ?? 'Resident']
+             ?? this.cardTemplates['Resident'];
 
-    if (this.cardType === 'blank') {
-      const photo = card.photoUrl
-        ? `<img src="${card.photoUrl}" style="width:100%;height:100%;object-fit:cover;" />`
-        : `<div style="width:100%;height:100%;background:#f0f0f0;display:flex;align-items:center;justify-content:center;color:#aaa;font-size:24px;">👤</div>`;
+  if (this.cardType === 'blank') {
+    const photo = card.photoUrl
+      ? `<img src="${card.photoUrl}" style="width:100%;height:100%;object-fit:cover;" />`
+      : `<div style="width:100%;height:100%;background:#f0f0f0;display:flex;align-items:center;justify-content:center;color:#aaa;font-size:24px;">👤</div>`;
 
-      const w = window.open('', '_blank', 'width=420,height=760');
-      if (!w) return;
-      w.document.write(`
-        <!DOCTYPE html><html><head>
-        <title>ID Card — ${card.name}</title>
-        <style>
-          *{margin:0;padding:0;box-sizing:border-box;}
-          body{background:#ccc;display:flex;flex-direction:column;align-items:center;padding:20px;gap:14px;font-family:'Segoe UI',sans-serif;}
-          @page{size:54mm 86mm;margin:0;}
-          @media print{
-            html{width:54mm;margin:0;padding:0;}
-            body{width:54mm;margin:0;padding:0;background:white!important;display:block!important;}
-            .no-print{display:none!important;}
-            .blank-front{display:block;width:54mm;height:86mm;overflow:hidden;page-break-after:always;break-after:page;}
-          }
-          .label{font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.1em;align-self:flex-start;}
-          .blank-front{display:flex;flex-direction:column;align-items:center;gap:6px;width:100%;}
-          .blank-preview{width:185px;background:#fff;border:1px solid #ddd;border-radius:8px;overflow:hidden;box-shadow:0 6px 20px rgba(0,0,0,0.2);display:flex;flex-direction:column;align-items:center;padding:16px 12px 12px;gap:10px;}
-          .blank-photo{width:100px;height:120px;border:1.5px solid #ddd;border-radius:4px;overflow:hidden;background:#f5f5f5;}
-          .blank-info{width:100%;text-align:center;border-top:1px solid #eee;padding-top:6px;}
-          .blank-name{font-size:11px;font-weight:700;color:#111;}
-          .blank-flat{font-size:9px;color:#444;margin-top:2px;}
-          .blank-id{font-size:8px;color:#777;font-family:monospace;margin-top:2px;}
-          .info{font-size:11px;color:#555;text-align:center;line-height:1.6;}
-          .btn-row{display:flex;gap:10px;margin-top:8px;}
-          .btn{padding:10px 24px;border:none;border-radius:7px;cursor:pointer;font-size:13px;font-weight:700;}
-          .btn-print{background:#00c9a7;color:#061520;}
-          .btn-close{background:#3d8ef8;color:#fff;}
-        </style></head><body>
-        <div class="blank-front">
-          <span class="label no-print">Front Side (Blank)</span>
-          <div class="blank-preview">
-            <div class="blank-photo">${photo}</div>
-            <div class="blank-info">
-              <div class="blank-name">${card.name}</div>
-              <div class="blank-flat">${card.building} - ${card.flatNumber}</div>
-              <div class="blank-id">ID: ${card.idNumber}</div>
-            </div>
+    const w = window.open('', '_blank', 'width=420,height=760');
+    if (!w) return;
+    w.document.write(`
+      <!DOCTYPE html><html><head>
+      <title>ID Card — ${card.name}</title>
+      <style>
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{background:#ccc;display:flex;flex-direction:column;align-items:center;padding:20px;gap:14px;font-family:'Segoe UI',sans-serif;}
+       @page{size:54mm 86mm;margin:0;}
+@media print{
+  html{width:54mm;height:86mm;margin:0;padding:0;}
+  body{width:54mm;height:86mm;margin:0;padding:0;background:white!important;display:flex;justify-content:center;}
+  .no-print{display:none!important;}
+  .contractor-print{
+    width:54mm!important;
+    height:86mm!important;
+    border-radius:0!important;
+    box-shadow:none!important;
+    margin:0!important;
+    padding:0!important;
+  }
+  .c-title{font-size:9px!important;}
+  .c-subtitle{font-size:6px!important;}
+  .c-photo{width:58px!important;height:70px!important;}
+  .c-name{font-size:9px!important;}
+  .c-row{font-size:7px!important;margin:1px 0!important;}
+  .c-logo{font-size:8px!important;}
+  .c-tagline,.c-url{font-size:6px!important;}
+}
+        .label{font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.1em;align-self:flex-start;}
+        .blank-front{display:flex;flex-direction:column;align-items:center;gap:6px;width:100%;}
+        .blank-preview{width:185px;background:#fff;border:1px solid #ddd;border-radius:8px;overflow:hidden;box-shadow:0 6px 20px rgba(0,0,0,0.2);display:flex;flex-direction:column;align-items:center;padding:16px 12px 12px;gap:10px;}
+        .blank-photo{width:100px;height:120px;border:1.5px solid #ddd;border-radius:4px;overflow:hidden;background:#f5f5f5;}
+        .blank-info{width:100%;text-align:center;border-top:1px solid #eee;padding-top:6px;}
+        .blank-name{font-size:11px;font-weight:700;color:#111;}
+        .blank-flat{font-size:9px;color:#444;margin-top:2px;}
+        .blank-id{font-size:8px;color:#777;font-family:monospace;margin-top:2px;}
+        .info{font-size:11px;color:#555;text-align:center;line-height:1.6;}
+        .btn-row{display:flex;gap:10px;margin-top:8px;}
+        .btn{padding:10px 24px;border:none;border-radius:7px;cursor:pointer;font-size:13px;font-weight:700;}
+        .btn-print{background:#00c9a7;color:#061520;}
+        .btn-close{background:#3d8ef8;color:#fff;}
+      </style></head><body>
+      <div class="blank-front">
+        <span class="label no-print">Front Side (Blank)</span>
+        <div class="blank-preview">
+          <div class="blank-photo">${photo}</div>
+          <div class="blank-info">
+            <div class="blank-name">${card.name}</div>
+            <div class="blank-flat">${card.building} - ${card.flatNumber}</div>
+            <div class="blank-id">ID: ${card.idNumber}</div>
           </div>
         </div>
-        <div class="info no-print"><strong>${card.name}</strong><br/>${card.building} - ${card.flatNumber} | ID: ${card.idNumber}</div>
-        <div class="btn-row no-print">
-          <button class="btn btn-print" onclick="window.print()">🖨️ Print Card</button>
-          <button class="btn btn-close" onclick="window.close()">✕ Close</button>
-        </div>
-        </body></html>
-      `);
-      w.document.close();
-      return;
-    }
+      </div>
+      <div class="info no-print"><strong>${card.name}</strong><br/>${card.building} - ${card.flatNumber} | ID: ${card.idNumber}</div>
+      <div class="btn-row no-print">
+        <button class="btn btn-print" onclick="window.print()">🖨️ Print Card</button>
+        <button class="btn btn-close" onclick="window.close()">✕ Close</button>
+      </div>
+      </body></html>
+    `);
+    w.document.close();
+    return;
+  }
 
-    const cardImg       = new Image();
-    cardImg.crossOrigin = 'anonymous';
+  const cardImg       = new Image();
+  cardImg.crossOrigin = 'anonymous';
 
-    cardImg.onload = () => {
-      const canvas  = document.createElement('canvas');
-      canvas.width  = cardImg.naturalWidth;
-      canvas.height = cardImg.naturalHeight;
-      const ctx     = canvas.getContext('2d')!;
-      ctx.drawImage(cardImg, 0, 0);
+  cardImg.onload = () => {
+    const canvas  = document.createElement('canvas');
+    canvas.width  = cardImg.naturalWidth;
+    canvas.height = cardImg.naturalHeight;
+    const ctx     = canvas.getContext('2d')!;
+    ctx.drawImage(cardImg, 0, 0);
 
-      const addTextAndGenerateFront = () => {
-        const cw    = canvas.width;
-        const ch    = canvas.height;
-        const nameY = ch * 0.655;
+    const addTextAndGenerateFront = () => {
+      const cw    = canvas.width;
+      const ch    = canvas.height;
+      const nameY = ch * 0.655;
 
-        ctx.fillStyle = '#111111';
-        ctx.font      = `bold ${Math.round(cw * 0.045)}px Segoe UI, sans-serif`;
-        ctx.textAlign = 'center';
-        ctx.fillText(card.name, cw / 2, nameY);
+      ctx.fillStyle = '#111111';
+      ctx.font      = `bold ${Math.round(cw * 0.045)}px Segoe UI, sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.fillText(card.name, cw / 2, nameY);
 
-        ctx.fillStyle = '#333333';
-        ctx.font      = `${Math.round(cw * 0.035)}px Segoe UI, sans-serif`;
-        ctx.fillText(`${card.building} - ${card.flatNumber}`, cw / 2, nameY + cw * 0.055);
+      ctx.fillStyle = '#333333';
+      ctx.font      = `${Math.round(cw * 0.035)}px Segoe UI, sans-serif`;
+      ctx.fillText(`${card.building} - ${card.flatNumber}`, cw / 2, nameY + cw * 0.055);
 
-        ctx.fillStyle = '#555555';
-        ctx.font      = `${Math.round(cw * 0.03)}px Courier New, monospace`;
-        ctx.fillText(`ID: ${card.idNumber}`, cw / 2, nameY + cw * 0.105);
+      ctx.fillStyle = '#555555';
+      ctx.font      = `${Math.round(cw * 0.03)}px Courier New, monospace`;
+      ctx.fillText(`ID: ${card.idNumber}`, cw / 2, nameY + cw * 0.105);
 
-        const frontBase64 = canvas.toDataURL('image/jpeg', 0.95);
+      const frontBase64 = canvas.toDataURL('image/jpeg', 0.95);
 
-        const backImg       = new Image();
-        backImg.crossOrigin = 'anonymous';
+      const backImg       = new Image();
+      backImg.crossOrigin = 'anonymous';
 
-        backImg.onload = () => {
-          const backCanvas  = document.createElement('canvas');
-          backCanvas.width  = backImg.naturalWidth;
-          backCanvas.height = backImg.naturalHeight;
-          backCanvas.getContext('2d')!.drawImage(backImg, 0, 0);
-          const backBase64 = backCanvas.toDataURL('image/jpeg', 0.95);
-          this.openPrintWindow(frontBase64, backBase64, card);
-        };
-
-        backImg.onerror = () => { this.openPrintWindow(frontBase64, frontBase64, card); };
-        backImg.src = window.location.origin + '/' + tmpl.back;
+      backImg.onload = () => {
+        const backCanvas  = document.createElement('canvas');
+        backCanvas.width  = backImg.naturalWidth;
+        backCanvas.height = backImg.naturalHeight;
+        backCanvas.getContext('2d')!.drawImage(backImg, 0, 0);
+        const backBase64 = backCanvas.toDataURL('image/jpeg', 0.95);
+        this.openPrintWindow(frontBase64, backBase64, card);
       };
 
-      if (card.photoUrl) {
-        const photoImg       = new Image();
-        photoImg.crossOrigin = 'anonymous';
-        photoImg.onload      = () => {
-          const px = canvas.width  * (tmpl.photoLeft   / 100);
-          const py = canvas.height * (tmpl.photoTop    / 100);
-          const pw = canvas.width  * (tmpl.photoWidth  / 100);
-          const ph = canvas.height * (tmpl.photoHeight / 100);
-          ctx.drawImage(photoImg, px, py, pw, ph);
-          addTextAndGenerateFront();
-        };
-        photoImg.onerror = () => addTextAndGenerateFront();
-        photoImg.src     = card.photoUrl;
-      } else {
-        addTextAndGenerateFront();
-      }
+      backImg.onerror = () => { this.openPrintWindow(frontBase64, frontBase64, card); };
+      backImg.src = window.location.origin + '/' + tmpl.back;
     };
 
-    cardImg.onerror = () => alert('Card template image not found!\nCheck: src/assets/cards/ folder');
-    cardImg.src = window.location.origin + '/' + tmpl.front;
-  }
+    if (card.photoUrl) {
+      this.fetchImageAsBase64(card.photoUrl).then(base64 => {
+        if (base64) {
+          const photoImg  = new Image();
+          photoImg.onload = () => {
+            const px = canvas.width  * (tmpl.photoLeft   / 100);
+            const py = canvas.height * (tmpl.photoTop    / 100);
+            const pw = canvas.width  * (tmpl.photoWidth  / 100);
+            const ph = canvas.height * (tmpl.photoHeight / 100);
+            ctx.drawImage(photoImg, px, py, pw, ph);
+            addTextAndGenerateFront();
+          };
+          photoImg.onerror = () => addTextAndGenerateFront();
+          photoImg.src     = base64;
+        } else {
+          addTextAndGenerateFront();
+        }
+      });
+    } else {
+      addTextAndGenerateFront();
+    }
+  };
+
+  cardImg.onerror = () => alert('Card template image not found!\nCheck: src/assets/cards/ folder');
+  cardImg.src = window.location.origin + '/' + tmpl.front;
+}
 
   private openPrintWindow(frontBase64: string, backBase64: string, card: CardPrintEnroll): void {
     const w = window.open('', '_blank', 'width=420,height=720');

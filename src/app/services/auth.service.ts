@@ -184,14 +184,24 @@ get roleId(): string | null {
       catchError(this.handleError));
   }
 
-  postNeighbourhood(payload: any): Observable<any> {
-    let url = this.baseUrl + 'NRD/AddNRD';
-    return this.http.post(url, payload).pipe(map(res => {
-      return res;
-    }),
-      catchError(this.handleError));
-  }
+  // postNeighbourhood(payload: any): Observable<any> {
+  //   let url = this.baseUrl + 'NRD/AddNRD';
+  //   return this.http.post(url, payload).pipe(map(res => {
+  //     return res;
+  //   }),
+  //     catchError(this.handleError));
+  // }
 
+postNeighbourhood(payload: any): Observable<any> {
+  const url = this.baseUrl + 'NRD/AddNRD';
+  return this.http.post(url, {
+    ...payload,
+    parentID: payload.parentID !== "" ? Number(payload.parentID) : 1
+  }).pipe(
+    map(res => res),
+    catchError(this.handleError)
+  );
+}
   updateNeighbourhood(payload: any): Observable<any> {
     let url = this.baseUrl + 'NRD/UpdateNRD/' + payload.id
     return this.http.post(url, payload).pipe(map(res => {
@@ -1959,48 +1969,58 @@ searchCardHolder(searchValue: string): Observable<any> {
 
   // ─── Card Print & Enroll ─────────────────────────────────────────────────────
 
-getCardHolders(neighbourhood: string, building: string, searchBy: string,
-               searchValue: string, showAll: boolean, showNonPrinted: boolean,
-               showNonPersonalised: boolean): Observable<any[]> {
-  const url = `${this.baseUrl}CardPrint/GetCardHolders?neighbourhood=${neighbourhood}`
-    + `&building=${building}&searchBy=${searchBy}&searchValue=${searchValue}`
-    + `&showAll=${showAll}&showNonPrinted=${showNonPrinted}&showNonPersonalised=${showNonPersonalised}`;
+getCardHolders(nrd: string = '', building: string = ''): Observable<any[]> {
+  let url = `${this.baseUrl}A_IDCardPrint/CardHolders`;
+  const params: string[] = [];
+  if (nrd && nrd !== 'ALL')      params.push(`NRD=${encodeURIComponent(nrd)}`);
+  if (building && building !== 'ALL') params.push(`Building=${encodeURIComponent(building)}`);
+  if (params.length > 0) url += '?' + params.join('&');
   return this.http.get<any[]>(url).pipe(
     map(res => res),
     catchError(this.handleError)
   );
 }
 
-getCardEditDetail(idNumber: string): Observable<any> {
-  return this.http.get(`${this.baseUrl}CardPrint/GetCardDetail/${idNumber}`).pipe(
+getIDCardData(idNumber: string): Observable<any> {
+  const url = `${this.baseUrl}A_IDCardPrint/IDCardData?idNumber=${idNumber}`;
+  return this.http.get(url).pipe(
     map(res => res),
     catchError(this.handleError)
   );
 }
 
-saveAndPrintCard(payload: any): Observable<any> {
-  return this.http.post(`${this.baseUrl}CardPrint/SaveAndPrint`, payload).pipe(
+getNRDCardAccess(): Observable<any[]> {
+  const url = `${this.baseUrl}A_IDCardPrint/GetNRDCardAccess`;
+  return this.http.get<any[]>(url).pipe(
     map(res => res),
     catchError(this.handleError)
   );
 }
 
-issueCard(idNumber: string, cardCSN: string): Observable<any> {
-  return this.http.post(`${this.baseUrl}CardPrint/IssueCard`, { idNumber, cardCSN }).pipe(
-    map(res => res),
-    catchError(this.handleError)
-  );
-}
+// updateCardCSN(payload: { idNumber: string; cardCSN: string }): Observable<any> {
+//   const url = `${this.baseUrl}A_IDCardPrint/UpdateCardCSN`;
+//   return this.http.post(url, payload).pipe(
+//     map(res => res),
+//     catchError(this.handleError)
+//   );
+// }
 
-readCard(cardCSN: string): Observable<any> {
-  return this.http.get(`${this.baseUrl}CardPrint/ReadCard/${cardCSN}`).pipe(
-    map(res => res),
-    catchError(this.handleError)
-  );
-}
 
-blockCardAccessPoint(id: number): Observable<any> {
-  return this.http.post(`${this.baseUrl}CardPrint/BlockAccessPoint/${id}`, {}).pipe(
+updateCardCSN(payload: {
+  IDNumber: string;
+  CardCSN?: string;
+  VehicleCSN?: string;
+  ImageBase64?: string;
+  ContentType?: string;
+}): Observable<any> {
+  const url = `${this.baseUrl}A_IDCardPrint/UpdateCardCSN`;
+  return this.http.post(url, {
+    IDNumber:    payload.IDNumber,
+    CardCSN:     payload.CardCSN    ?? '',
+    VehicleCSN:  payload.VehicleCSN ?? '',
+    ImageBase64: payload.ImageBase64 ?? '',
+    ContentType: payload.ContentType ?? ''
+  }).pipe(
     map(res => res),
     catchError(this.handleError)
   );

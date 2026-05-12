@@ -285,6 +285,9 @@ export class CardPrintEnroll {
     isPrinted: boolean;
     isPersonalised: boolean;
     holderType: string = 'Resident';
+    validTill?:  string;
+company?:    string;
+agency?:     string;
 }
 
 export class CardAccessPoint {

@@ -516,15 +516,36 @@ setContractorType() {
   //   });
   // }
 
+// setReaderRelay() {
+//   this.title = 'Reader Relay';
+  
+//   this.authService.getReader().subscribe(res => {
+//     this.dataToDisplay = [...res];
+//     this.dataSource.data = this.dataToDisplay;
+
+//     // Only show srno, readerLocation, actions
+//     this.displayedColumns = ['srno', 'readerLocation', 'actions'];
+//   });
+// }
+
+
+
 setReaderRelay() {
   this.title = 'Reader Relay';
-  
+
   this.authService.getReader().subscribe(res => {
     this.dataToDisplay = [...res];
     this.dataSource.data = this.dataToDisplay;
 
-    // Only show srno, readerLocation, actions
-    this.displayedColumns = ['srno', 'readerLocation', 'actions'];
+    this.displayedColumns = [
+      'srno',
+      'readerip',
+      'readerport',
+      'readermode',
+      'readerLocation',
+      'readertype',
+      'actions'
+    ];
   });
 }
 
