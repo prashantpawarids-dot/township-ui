@@ -1997,13 +1997,29 @@ getNRDCardAccess(): Observable<any[]> {
   );
 }
 
-// updateCardCSN(payload: { idNumber: string; cardCSN: string }): Observable<any> {
+
+
+
+// updateCardCSN(payload: {
+//   IDNumber: string;
+//   CardCSN?: string;
+//   VehicleCSN?: string;
+//   ImageBase64?: string;
+//   ContentType?: string;
+// }): Observable<any> {
 //   const url = `${this.baseUrl}A_IDCardPrint/UpdateCardCSN`;
-//   return this.http.post(url, payload).pipe(
+//   return this.http.post(url, {
+//     IDNumber:    payload.IDNumber,
+//     CardCSN:     payload.CardCSN    ?? '',
+//     VehicleCSN:  payload.VehicleCSN ?? '',
+//     ImageBase64: payload.ImageBase64 ?? '',
+//     ContentType: payload.ContentType ?? ''
+//   }).pipe(
 //     map(res => res),
 //     catchError(this.handleError)
 //   );
 // }
+
 
 
 updateCardCSN(payload: {
@@ -2013,17 +2029,37 @@ updateCardCSN(payload: {
   ImageBase64?: string;
   ContentType?: string;
 }): Observable<any> {
-  const url = `${this.baseUrl}A_IDCardPrint/UpdateCardCSN`;
-  return this.http.post(url, {
-    IDNumber:    payload.IDNumber,
-    CardCSN:     payload.CardCSN    ?? '',
-    VehicleCSN:  payload.VehicleCSN ?? '',
-    ImageBase64: payload.ImageBase64 ?? '',
-    ContentType: payload.ContentType ?? ''
-  }).pipe(
+  let url = `${this.baseUrl}A_IDCardPrint/UpdateCardCSN`
+    + `?IDNumber=${encodeURIComponent(payload.IDNumber)}`
+    + `&CardCSN=${encodeURIComponent(payload.CardCSN ?? '')}`
+    + `&VehicleCSN=${encodeURIComponent(payload.VehicleCSN ?? '')}`;
+
+  return this.http.post(url, null).pipe(
     map(res => res),
     catchError(this.handleError)
   );
+}
+
+
+uploadCardPhoto(idNumber: string, base64: string): Observable<any> {
+  const blob = this.base64ToBlob(base64);
+  const formData = new FormData();
+  formData.append('file', blob, `${idNumber}`);
+  return this.http.post(`${this.baseUrl}Auth/upload`, formData).pipe(
+    map(res => res),
+    catchError(this.handleError)
+  );
+}
+
+private base64ToBlob(base64: string): Blob {
+  const base64Data = base64.includes(',') ? base64.split(',')[1] : base64;
+  const byteString = atob(base64Data);
+  const ab = new ArrayBuffer(byteString.length);
+  const ia = new Uint8Array(ab);
+  for (let i = 0; i < byteString.length; i++) {
+    ia[i] = byteString.charCodeAt(i);
+  }
+  return new Blob([ab], { type: 'image/jpeg' });
 }
   
 }

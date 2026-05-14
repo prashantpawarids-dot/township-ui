@@ -103,7 +103,7 @@
       <div class="detail-name">{{ selectedCard?.name }}</div>
       <div class="detail-row">Validity - {{ selectedCard?.validTill ? (selectedCard?.validTill | date:'d/M/yyyy') : '—' }}</div>
       <div class="detail-row">Company - {{ selectedCard?.company || '—' }}</div>
-      <div class="detail-row">Card No - {{ selectedCard?.cardCSN || '—' }}</div>
+      <div class="detail-row">Card No - {{ selectedCard?.idNumber  || '—' }}</div>
       <div class="detail-row">Agency - {{ selectedCard?.agency || '—' }}</div>
     </div>
 
@@ -120,6 +120,7 @@
 
   <!-- PRE-PRINTED for non-contractor -->
   <ng-container *ngIf="cardType === 'pre-printed' && selectedCard?.holderType !== 'Contractor'">
+    <!-- <ng-container *ngIf="cardType === 'pre-printed'"> -->
     <img class="real-card__bg" [src]="currentCardTemplate" alt="card template" />
     <div class="real-card__photo-overlay"
          [style.top]="currentCardPhotoStyle['top']"
@@ -183,6 +184,7 @@
       <div class="print-actions">
         <button class="btn-print"  (click)="print()">🖨️ Print</button>
         <button class="btn-export" (click)="printExport()">⬇️ Print Export</button>
+         <button class="btn-preview" (click)="openPreviewCard()" [disabled]="!selectedCard">👁️ Preview Card</button>
       </div>
     </div>
     <!-- END LEFT PANEL -->
@@ -399,5 +401,123 @@
     </div>
   </div>
   <!-- END CAMERA MODAL -->
+
+
+
+  <!-- PREVIEW CARD MODAL -->
+<div class="preview-overlay" *ngIf="showPreviewModal" (click)="closePreviewModal()">
+  <div class="preview-modal" (click)="$event.stopPropagation()">
+
+    <div class="preview-modal__header">
+      <span>👁️ Preview Card — {{ selectedCard?.name }}</span>
+      <button class="preview-close-btn" (click)="closePreviewModal()">✕</button>
+    </div>
+
+    <div class="preview-modal__body">
+      <div class="preview-card-wrap">
+       <div class="preview-card-container" #previewContainer>
+
+  <!-- Card Template -->
+  <!-- <img class="preview-card-bg"
+       [src]="currentCardTemplate"
+       alt="card template"
+       (load)="onPreviewTemplateLoad()" /> -->
+
+
+       <!-- Card Template -->
+<ng-container *ngIf="selectedCard?.holderType === 'Contractor'; else normalTemplate">
+  <div class="contractor-card">
+    <div class="contractor-card__bg"></div>
+    <div class="contractor-card__header">
+      <div class="company-title">{{ selectedCard?.company || 'Company Name' }}</div>
+      <div class="company-subtitle">&#64; Riverview City, Pune</div>
+    </div>
+    <div class="contractor-card__photo-wrap">
+      <img *ngIf="selectedCard?.photoUrl" [src]="selectedCard?.photoUrl" alt="photo" />
+      <div *ngIf="!selectedCard?.photoUrl" class="photo-placeholder">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="1">
+          <circle cx="12" cy="8" r="4"/>
+          <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+        </svg>
+      </div>
+    </div>
+    <div class="contractor-card__details">
+      <div class="detail-name">{{ selectedCard?.name }}</div>
+      <div class="detail-row">Validity - {{ selectedCard?.validTill ? (selectedCard?.validTill | date:'d/M/yyyy') : '—' }}</div>
+      <div class="detail-row">Company - {{ selectedCard?.company || '—' }}</div>
+      <div class="detail-row">Card No - {{ selectedCard?.idNumber || '—' }}</div>
+      <div class="detail-row">Agency - {{ selectedCard?.agency || '—' }}</div>
+    </div>
+    <div class="contractor-card__footer">
+      <div class="footer-brand">
+        <span class="footer-bird">🕊️</span>
+        <span class="footer-logo">Nanded City</span>
+      </div>
+      <div class="footer-tagline">My City. My World.</div>
+      <div class="footer-url">www.nandedcitypune.com</div>
+    </div>
+  </div>
+</ng-container>
+<ng-template #normalTemplate>
+  <img class="preview-card-bg"
+       [src]="currentCardTemplate"
+       alt="card template"
+       (load)="onPreviewTemplateLoad()" />
+</ng-template>
+
+  <!-- Draggable Resizable Photo -->
+  <div class="preview-photo-drag"
+       *ngIf="selectedCard?.photoUrl"
+       [style.top.px]="previewPhoto.top"
+       [style.left.px]="previewPhoto.left"
+       [style.width.px]="previewPhoto.width"
+       [style.height.px]="previewPhoto.height"
+       (mousedown)="onPhotoDragStart($event)">
+    <img [src]="selectedCard?.photoUrl" alt="photo" 
+         (error)="onPreviewImgError($event)" />
+    <div class="resize-handle resize-handle--se"
+         (mousedown)="onPhotoResizeStart($event, 'se')"></div>
+    <div class="resize-handle resize-handle--sw"
+         (mousedown)="onPhotoResizeStart($event, 'sw')"></div>
+    <div class="resize-handle resize-handle--ne"
+         (mousedown)="onPhotoResizeStart($event, 'ne')"></div>
+    <div class="resize-handle resize-handle--nw"
+         (mousedown)="onPhotoResizeStart($event, 'nw')"></div>
+  </div>
+
+  <!-- No Photo Placeholder -->
+  <div class="preview-no-photo" *ngIf="!selectedCard?.photoUrl">
+    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="1">
+      <circle cx="12" cy="8" r="4"/>
+      <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+    </svg>
+    <p>No photo</p>
+  </div>
+
+  <!-- ✅ ADD HERE -->
+  <div class="preview-text-overlay">
+    <div class="preview-name">{{ selectedCard?.name }}</div>
+    <div class="preview-flat">{{ selectedCard?.building }} - {{ selectedCard?.flatNumber }}</div>
+    <div class="preview-id">ID: {{ selectedCard?.idNumber }}</div>
+  </div>
+
+</div>
+      </div>
+
+      <div class="preview-controls">
+        <div class="preview-info">
+          <span>📐 Position: {{ previewPhoto.left }}px, {{ previewPhoto.top }}px</span>
+          <span>📏 Size: {{ previewPhoto.width }}px × {{ previewPhoto.height }}px</span>
+        </div>
+        <div class="preview-actions">
+          <button class="btn-reset-preview" (click)="resetPreviewPhoto()">↺ Reset</button>
+          <button class="btn-save-preview"  (click)="savePreviewAndClose()">✅ Apply & Close</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+<!-- END PREVIEW CARD MODAL -->
 
 </div>

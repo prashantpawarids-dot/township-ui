@@ -2524,3 +2524,217 @@ $shadow-hover: 0 4px 20px rgba(0,0,0,0.12);
     }
   }
 }
+
+
+// ── Preview Card Modal ──────────────────────────────────────
+.btn-preview {
+  background: #7c3aed;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 14px;
+  font-size: 12px;
+  cursor: pointer;
+  font-weight: 600;
+  margin-top: 6px;
+  width: 100%;
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
+}
+
+.preview-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.preview-modal {
+  background: #1a2332;
+  border-radius: 12px;
+  width: 520px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 18px;
+    background: #0f1923;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  &__body {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+}
+
+.preview-close-btn {
+  background: none;
+  border: none;
+  color: #aaa;
+  cursor: pointer;
+  font-size: 16px;
+  &:hover { color: #fff; }
+}
+
+.preview-card-wrap {
+  display: flex;
+  justify-content: center;
+}
+
+.preview-card-container {
+  position: relative;
+  width: 200px;
+  height: 320px;
+  overflow: hidden;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+  user-select: none;
+}
+
+.preview-card-bg {
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  display: block;
+}
+
+.preview-photo-drag {
+  position: absolute;
+  cursor: move;
+  border: 2px dashed rgba(255,255,255,0.6);
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    pointer-events: none;
+  }
+}
+
+.resize-handle {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: #fff;
+  border: 1px solid #333;
+  border-radius: 2px;
+  z-index: 10;
+
+  &--se { bottom: -5px; right: -5px;  cursor: se-resize; }
+  &--sw { bottom: -5px; left: -5px;   cursor: sw-resize; }
+  &--ne { top: -5px;    right: -5px;  cursor: ne-resize; }
+  &--nw { top: -5px;    left: -5px;   cursor: nw-resize; }
+}
+
+.preview-no-photo {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #aaa;
+  font-size: 11px;
+  gap: 6px;
+}
+
+.preview-controls {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.preview-info {
+  display: flex;
+  gap: 16px;
+  font-size: 11px;
+  color: #8899aa;
+}
+
+.preview-actions {
+  display: flex;
+  gap: 10px;
+
+  .btn-reset-preview {
+    flex: 1;
+    padding: 8px;
+    background: #2d3748;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px;
+    &:hover { background: #3d4a5c; }
+  }
+
+  .btn-save-preview {
+    flex: 2;
+    padding: 8px;
+    background: #00c9a7;
+    color: #061520;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 700;
+    &:hover { background: #00b096; }
+  }
+}
+
+.preview-text-overlay {
+  position: absolute;
+  bottom: 60px;
+  left: 0; right: 0;
+  text-align: center;
+  pointer-events: none;
+
+  .preview-name {
+    font-size: 9px;
+    font-weight: 700;
+    color: #111;
+  }
+  .preview-flat {
+    font-size: 7px;
+    color: #333;
+    margin-top: 2px;
+  }
+  .preview-id {
+    font-size: 7px;
+    color: #555;
+    font-family: monospace;
+    margin-top: 2px;
+  }
+}
+
+.preview-contractor-html {
+  width: 100%; height: 100%;
+  background: linear-gradient(180deg,#dce8f5 0%,#eaf2fb 40%,#f5f8fc 70%,#e8eef5 100%);
+  display: flex; flex-direction: column;
+  .pch-header { text-align: center; padding: 8px 6px 4px;
+    .pch-title { font-size: 11px; font-weight: 900; color: #1a2a3a; text-transform: uppercase; }
+    .pch-subtitle { font-size: 7px; color: #4a6880; font-style: italic; }
+  }
+  .pch-details { text-align: center; padding: 80px 6px 4px;
+    .pch-name { font-size: 11px; font-weight: 800; color: #0d1f2d; margin-bottom: 4px; }
+    .pch-row { font-size: 8px; color: #1a2a3a; font-weight: 600; margin: 2px 0; }
+  }
+  .pch-footer { margin-top: auto; background: linear-gradient(135deg,#2d6a4f,#52b788);
+    padding: 5px; text-align: center; display: flex; align-items: center; justify-content: center; gap: 4px;
+    .pch-logo { font-size: 10px; font-weight: 900; color: #fff; }
+  }
+}

@@ -1,5 +1,3 @@
-// CHANGES: Added AuthService import + injection, updated loadNeighbourhoods() and loadBuildings() to use real API
-
 import { ImageCropperComponent, ImageCroppedEvent } from 'ngx-image-cropper';
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -79,6 +77,25 @@ showIssueForm: boolean = false;
   croppedResult: string = '';
   showCropper: boolean = false;
 
+  // ── Preview Card Modal ────────────────────────────────────────
+showPreviewModal: boolean = false;
+previewPhoto = { top: 50, left: 40, width: 120, height: 100 };
+private isDragging: boolean = false;
+private isResizing: boolean = false;
+private resizeDir: string = '';
+private dragStartX: number = 0;
+private dragStartY: number = 0;
+private dragStartTop: number = 0;
+private dragStartLeft: number = 0;
+private resizeStartW: number = 0;
+private resizeStartH: number = 0;
+private resizeStartX: number = 0;
+private resizeStartY: number = 0;
+private resizeStartTop: number = 0;
+private resizeStartLeft: number = 0;
+private boundMouseMove: any;
+private boundMouseUp: any;
+
   // ── Card Template Config ──────────────────────────────────────
   private cardTemplates: Record<string, {
     front: string; back: string;
@@ -93,6 +110,7 @@ showIssueForm: boolean = false;
     'Employee':        { front: 'assets/cards/Employee.jpg',          back: 'assets/cards/EmployeeBack.jpg', photoTop: 20, photoLeft: 18, photoWidth: 56, photoHeight: 34 },
     'ServiceProvider': { front: 'assets/cards/ServiceProvider.jpeg',  back: 'assets/cards/SProvider.jpg',    photoTop: 20, photoLeft: 18, photoWidth: 56, photoHeight: 34 },
     'Guest':           { front: 'assets/cards/Guest.jpeg',            back: 'assets/cards/CardBorder.png',   photoTop: 21, photoLeft: 22, photoWidth: 54, photoHeight: 34 },
+    'Contractor': { front: 'assets/cards/CONTRACTOR.jpeg', back: 'assets/cards/CardBorder.png', photoTop: 18, photoLeft: 22, photoWidth: 54, photoHeight: 38 },
   };
 
   get currentCardTemplate(): string {
@@ -115,24 +133,7 @@ showIssueForm: boolean = false;
     };
   }
 
-  // ── Hardcoded Card Holder Data (API not yet available) ────────
-  // private rawData: CardPrintEnroll[] = [
-  //   { idNumber: '100001', name: 'Dilip Shendge',     building: 'Falcon-B', flatNumber: 'B-906',  cardDetails: '6074271',        cardCSN: '6074271',        neighbourhood: 'Falcon Towers', isPrinted: true,  isPersonalised: true,  photoUrl: '', holderType: 'Resident'        },
-  //   { idNumber: '100002', name: 'Ntrial Trial',       building: 'Falcon-E', flatNumber: '1102',   cardDetails: '10049530072345', cardCSN: '10049530072345', neighbourhood: 'Falcon Towers', isPrinted: false, isPersonalised: false, photoUrl: '', holderType: 'LandOwner'       },
-  //   { idNumber: '100003', name: 'Rajendra Shinde',    building: 'Falcon-A', flatNumber: 'A-1806', cardDetails: '3466786',        cardCSN: '3466786',        neighbourhood: 'Falcon Towers', isPrinted: true,  isPersonalised: true,  photoUrl: '', holderType: 'Tenant'          },
-  //   { idNumber: '100004', name: 'Maheshkumar Jadhav', building: 'Falcon-D', flatNumber: 'D-804',  cardDetails: '5150607',        cardCSN: '5150607',        neighbourhood: 'Falcon Towers', isPrinted: true,  isPersonalised: false, photoUrl: '', holderType: 'Employee'        },
-  //   { idNumber: '100005', name: 'Kaka Thorat',        building: 'Falcon-F', flatNumber: 'F-908',  cardDetails: '16598543',       cardCSN: '16598543',       neighbourhood: 'Falcon Towers', isPrinted: false, isPersonalised: false, photoUrl: '', holderType: 'Guest'           },
-  //   { idNumber: '100006', name: 'Saurabh Sharma',     building: 'Falcon-C', flatNumber: 'C-1808', cardDetails: '36575',          cardCSN: '36575',          neighbourhood: 'Falcon Towers', isPrinted: true,  isPersonalised: true,  photoUrl: '', holderType: 'DResident'       },
-  //   { idNumber: '100007', name: 'Shantilal Jain',     building: 'Falcon-D', flatNumber: 'D-904',  cardDetails: '',              cardCSN: '',               neighbourhood: 'Falcon Towers', isPrinted: false, isPersonalised: false, photoUrl: '', holderType: 'Resident'        },
-  //   { idNumber: '100008', name: 'Prashant Singh',     building: 'Falcon-B', flatNumber: 'B-1804', cardDetails: '4135967',        cardCSN: '4135967',        neighbourhood: 'Falcon Towers', isPrinted: true,  isPersonalised: true,  photoUrl: '', holderType: 'ServiceProvider' },
-  //   { idNumber: '100009', name: 'Dattatray Deokar',   building: 'Falcon-E', flatNumber: 'E-503',  cardDetails: '33935',          cardCSN: '33935',          neighbourhood: 'Falcon Towers', isPrinted: false, isPersonalised: false, photoUrl: '', holderType: 'Tenant'          },
-  //   { idNumber: '100010', name: 'Himanshu Tyagi',     building: 'Falcon-E', flatNumber: 'E-1003', cardDetails: '2133567',        cardCSN: '2133567',        neighbourhood: 'Falcon Towers', isPrinted: true,  isPersonalised: true,  photoUrl: '', holderType: 'LandOwner'       },
-  //   { idNumber: '100011', name: 'Deepak Shrivastava', building: 'Falcon-G', flatNumber: 'G-2006', cardDetails: '7256095',        cardCSN: '7256095',        neighbourhood: 'Falcon Towers', isPrinted: false, isPersonalised: false, photoUrl: '', holderType: 'Employee'        },
-  //   { idNumber: '100012', name: 'Somnath Holkar',     building: 'Falcon-A', flatNumber: 'A-407',  cardDetails: '6444591',        cardCSN: '6444591',        neighbourhood: 'Falcon Towers', isPrinted: true,  isPersonalised: true,  photoUrl: '', holderType: 'Resident'        },
-  //   { idNumber: '100013', name: 'Parmeshwar Chavan',  building: 'Falcon-G', flatNumber: 'G-305',  cardDetails: '6528031',        cardCSN: '6528031',        neighbourhood: 'Falcon Towers', isPrinted: true,  isPersonalised: false, photoUrl: '', holderType: 'DTenant'         },
-  //   { idNumber: '100014', name: 'Soudamini Patra',    building: 'Falcon-G', flatNumber: 'G-901',  cardDetails: '4114767',        cardCSN: '4114767',        neighbourhood: 'Falcon Towers', isPrinted: false, isPersonalised: false, photoUrl: '', holderType: 'Guest'           },
-  //   { idNumber: '100015', name: 'Nagesh Bogar',       building: 'Falcon-C', flatNumber: 'C-1007', cardDetails: '224767',         cardCSN: '224767',         neighbourhood: 'Falcon Towers', isPrinted: true,  isPersonalised: true,  photoUrl: '', holderType: 'Resident'        },
-  // ];
+  
 
 
   private allData: CardPrintEnroll[] = [];
@@ -187,19 +188,6 @@ loadBuildings(): void {
   });
 }
 
-// loadAllCardHolders(): void {
-//   this.authService.getCardHolders().subscribe({
-//     next: (res) => {
-//       this.allData = res.map(item => this.mapCard(item));
-//       this.search();
-//     },
-//     error: (err) => {
-//       console.error('Failed to load card holders:', err);
-//       this.allData = [];
-//       this.search();
-//     }
-//   });
-// }
 
 loadAllCardHolders(): void {
   const nrd      = this.filter.neighbourhood ?? 'ALL';
@@ -220,25 +208,7 @@ loadAllCardHolders(): void {
   });
 }
 
-  // onNeighbourhoodChange(): void { this.filter.building = 'ALL'; }
-
-//   onNeighbourhoodChange(): void {
-//   this.filter.building = 'ALL';
-
-//   if (this.filter.neighbourhood === 'ALL') {
-//     this.buildings = [
-//       { name: 'ALL' },
-//       ...this.allBuildings
-//     ];
-//   } else {
-//     this.buildings = [
-//       { name: 'ALL' },
-//       ...this.allBuildings.filter(
-//         (b: any) => b.nrdName === this.filter.neighbourhood
-//       )
-//     ];
-//   }
-// }
+ 
 
 
 onNeighbourhoodChange(): void {
@@ -255,28 +225,10 @@ onNeighbourhoodChange(): void {
   }
   this.loadAllCardHolders(); // reload on NRD change
 }
-// private mapCard(item: any): CardPrintEnroll {
-//   return {
-//     idNumber:      item.idNumber,
-//     name:          item.shortname,
-//     building:      item.bld,
-//     flatNumber:    item.flatNumber,
-//     cardDetails:   item.csn,
-//     cardCSN:       item.csn,
-//     neighbourhood: item.nrd,
-//     holderType:    item.templateName,
-//     isPrinted:     item.cardPrintingDate !== '1900-01-01T00:00:00',
-//     isPersonalised:item.cardIssueDate   !== '1900-01-01T00:00:00',
-//     // photoUrl:      ''
-//     photoUrl: `http://localhost:5555/cardholderimages/${item.idNumber}.jpg`,
-//      validTill:      item.validTill  ?? '',
-//     company:        item.company    ?? '',
-//     agency:         item.agency     ?? ''
-//   };
-// }
 
 
 private mapCard(item: any): CardPrintEnroll {
+  // console.log('templateName:', item.templateName, '| cardType:', item.cardType, '| IDNumber:', item.idNumber);
   return {
     idNumber:       item.idNumber,
     name:           item.shortname,
@@ -286,14 +238,20 @@ private mapCard(item: any): CardPrintEnroll {
     cardCSN:        item.csn,
     neighbourhood:  item.nrd,
     holderType:     item.templateName,
+    
     isPrinted:      item.cardPrintingDate !== '1900-01-01T00:00:00',
     isPersonalised: item.cardIssueDate    !== '1900-01-01T00:00:00',
-    photoUrl:       `${environment.apiurl.replace('api/', '')}cardholderimages/${item.idNumber}.jpg`,
+    // photoUrl:       `${environment.apiurl.replace('api/', '')}cardholderimages/${item.idNumber}.jpg`,
+    // photoUrl: `${environment.apiurl}Auth/GetImage/${item.idNumber}`,
+    photoUrl: '',
     validTill:      item.validTill  ?? '',
-    company:        item.company    ?? '',
-    agency:         item.agency     ?? ''
+    // company:        item.company    ?? '',
+    // agency:         item.agency     ?? ''
+    company:  item.custom1 ?? '',
+agency:   item.custom2 ?? ''
   };
 }
+
 search(): void {
   let result = [...this.allData];
 
@@ -346,14 +304,26 @@ toggleIssueForm(): void {
   this.showIssueForm = !this.showIssueForm;
 }
 
-  onRowClick(card: CardPrintEnroll): void {
-    this.selectedCard         = card;
-    this.cardHolderNo         = card.idNumber;
-    this.cardCSN              = card.cardDetails;
-    this.cardHolderName       = card.name;
-    this.buildingFlatNo       = `${card.building}/${card.flatNumber}`;
-    this.neighbourhoodDisplay = card.neighbourhood;
-  }
+onRowClick(card: CardPrintEnroll): void {
+  this.selectedCard         = card;
+  this.cardHolderNo         = card.idNumber;
+  this.cardCSN              = card.cardDetails;
+  this.cardHolderName       = card.name;
+  this.buildingFlatNo       = `${card.building}/${card.flatNumber}`;
+  this.neighbourhoodDisplay = card.neighbourhood;
+
+  this.authService.getImage(card.idNumber).subscribe({
+    next: (res: any) => {
+      const photoUrl = res?.Base64 ?? res?.base64 ?? '';
+      if (photoUrl) {
+        this.selectedCard = { ...this.selectedCard!, photoUrl };
+        const found = this.allData.find(r => r.idNumber === card.idNumber);
+        if (found) found.photoUrl = photoUrl;
+      }
+    },
+    error: () => {}
+  });
+}
 
   openViewDialog(card: CardPrintEnroll): void {
   this.onRowClick(card);
@@ -472,39 +442,58 @@ toggleIssueForm(): void {
     this.imageChangedEvent = null;
   }
 
-  // saveAndExit(): void {
-  //   const photoToSave = this.croppedResult || this.capturedImage;
-  //   if (!photoToSave) { alert('Please capture or upload a photo first!'); return; }
-  //   if (this.selectedCard) {
-  //     this.selectedCard.photoUrl = photoToSave;
-  //     const found = this.allData.find(r => r.idNumber === this.selectedCard!.idNumber);
-  //     if (found) found.photoUrl = photoToSave;
-  //   }
-  //   this.closeCameraModal();
-  // }
+//  saveAndExit(): void {
+//   const photoToSave = this.croppedResult || this.capturedImage;
+//   if (!photoToSave) { alert('Please capture or upload a photo first!'); return; }
+//   if (!this.selectedCard) { alert('No card selected!'); return; }
+
+//   // Save to API
+//   this.authService.updateCardCSN({
+//     IDNumber:    this.selectedCard.idNumber,
+//     CardCSN:     this.selectedCard.cardCSN ?? '',
+//     ImageBase64: photoToSave,
+//     ContentType: 'image/jpeg'
+//   }).subscribe({
+//    next: (res) => {
+//   const serverPhotoUrl = res?.photoUrl 
+//     ? `http://localhost:5555${res.photoUrl}` 
+//     : photoToSave;
+//   this.selectedCard = { ...this.selectedCard!, photoUrl: serverPhotoUrl };
+//   const found = this.allData.find(r => r.idNumber === this.selectedCard!.idNumber);
+//   if (found) found.photoUrl = serverPhotoUrl;
+//   this.closeCameraModal();
+//   alert('✅ Photo saved successfully!');
+// },
+//     error: (err) => {
+//       alert('❌ Failed to save photo: ' + err.message);
+//     }
+//   });
+// }
 
 
-  saveAndExit(): void {
+
+saveAndExit(): void {
   const photoToSave = this.croppedResult || this.capturedImage;
   if (!photoToSave) { alert('Please capture or upload a photo first!'); return; }
   if (!this.selectedCard) { alert('No card selected!'); return; }
 
-  // Save to API
-  this.authService.updateCardCSN({
-    IDNumber:    this.selectedCard.idNumber,
-    CardCSN:     this.selectedCard.cardCSN ?? '',
-    ImageBase64: photoToSave,
-    ContentType: 'image/jpeg'
-  }).subscribe({
-   next: (res) => {
-  const serverPhotoUrl = res?.photoUrl 
-    ? `http://localhost:5555${res.photoUrl}` 
-    : photoToSave;
-  this.selectedCard = { ...this.selectedCard!, photoUrl: serverPhotoUrl };
-  const found = this.allData.find(r => r.idNumber === this.selectedCard!.idNumber);
-  if (found) found.photoUrl = serverPhotoUrl;
-  this.closeCameraModal();
-  alert('✅ Photo saved successfully!');
+  this.authService.uploadCardPhoto(this.selectedCard.idNumber, photoToSave).subscribe({
+    next: () => {
+  this.authService.getImage(this.selectedCard!.idNumber).subscribe({
+    next: (res: any) => {
+      const photoUrl = res?.Base64 ?? photoToSave;
+      this.selectedCard = { ...this.selectedCard!, photoUrl };
+      const found = this.allData.find(r => r.idNumber === this.selectedCard!.idNumber);
+      if (found) found.photoUrl = photoUrl;
+      this.closeCameraModal();
+      alert('✅ Photo saved successfully!');
+    },
+    error: () => {
+      this.selectedCard = { ...this.selectedCard!, photoUrl: photoToSave };
+      this.closeCameraModal();
+      alert('✅ Photo saved successfully!');
+    }
+  });
 },
     error: (err) => {
       alert('❌ Failed to save photo: ' + err.message);
@@ -528,11 +517,6 @@ toggleIssueForm(): void {
     alert(`Reading Card CSN: ${this.cardCSN}`);
   }
 
-  // issueCard(): void {
-  //   if (!this.cardHolderNo) { alert('Please select a card holder first!'); return; }
-  //   if (!this.cardCSN)      { alert('Please enter Card CSN first!'); return; }
-  //   alert(`✅ Card Issued!\nHolder: ${this.cardHolderName}\nCSN: ${this.cardCSN}`);
-  // }
 issueCard(): void {
   if (!this.cardHolderNo) { alert('Please select a card holder first!'); return; }
   if (!this.cardCSN)      { alert('Please enter Card CSN first!'); return; }
@@ -564,142 +548,121 @@ private fetchImageAsBase64(url: string): Promise<string> {
     .catch(() => '');
 }
 
-//   print(): void {
-//     if (!this.selectedCard) { alert('Please select a member first!'); return; }
-//     const card = this.selectedCard;
-//     const tmpl = (this.cardTemplates as any)[card.holderType ?? 'Resident']
-//                ?? this.cardTemplates['Resident'];
-
-//     if (this.cardType === 'blank') {
-//       const photo = card.photoUrl
-//         ? `<img src="${card.photoUrl}" style="width:100%;height:100%;object-fit:cover;" />`
-//         : `<div style="width:100%;height:100%;background:#f0f0f0;display:flex;align-items:center;justify-content:center;color:#aaa;font-size:24px;">👤</div>`;
-
-//       const w = window.open('', '_blank', 'width=420,height=760');
-//       if (!w) return;
-//       w.document.write(`
-//         <!DOCTYPE html><html><head>
-//         <title>ID Card — ${card.name}</title>
-//         <style>
-//           *{margin:0;padding:0;box-sizing:border-box;}
-//           body{background:#ccc;display:flex;flex-direction:column;align-items:center;padding:20px;gap:14px;font-family:'Segoe UI',sans-serif;}
-//           @page{size:54mm 86mm;margin:0;}
-//           @media print{
-//             html{width:54mm;margin:0;padding:0;}
-//             body{width:54mm;margin:0;padding:0;background:white!important;display:block!important;}
-//             .no-print{display:none!important;}
-//             .blank-front{display:block;width:54mm;height:86mm;overflow:hidden;page-break-after:always;break-after:page;}
-//           }
-//           .label{font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.1em;align-self:flex-start;}
-//           .blank-front{display:flex;flex-direction:column;align-items:center;gap:6px;width:100%;}
-//           .blank-preview{width:185px;background:#fff;border:1px solid #ddd;border-radius:8px;overflow:hidden;box-shadow:0 6px 20px rgba(0,0,0,0.2);display:flex;flex-direction:column;align-items:center;padding:16px 12px 12px;gap:10px;}
-//           .blank-photo{width:100px;height:120px;border:1.5px solid #ddd;border-radius:4px;overflow:hidden;background:#f5f5f5;}
-//           .blank-info{width:100%;text-align:center;border-top:1px solid #eee;padding-top:6px;}
-//           .blank-name{font-size:11px;font-weight:700;color:#111;}
-//           .blank-flat{font-size:9px;color:#444;margin-top:2px;}
-//           .blank-id{font-size:8px;color:#777;font-family:monospace;margin-top:2px;}
-//           .info{font-size:11px;color:#555;text-align:center;line-height:1.6;}
-//           .btn-row{display:flex;gap:10px;margin-top:8px;}
-//           .btn{padding:10px 24px;border:none;border-radius:7px;cursor:pointer;font-size:13px;font-weight:700;}
-//           .btn-print{background:#00c9a7;color:#061520;}
-//           .btn-close{background:#3d8ef8;color:#fff;}
-//         </style></head><body>
-//         <div class="blank-front">
-//           <span class="label no-print">Front Side (Blank)</span>
-//           <div class="blank-preview">
-//             <div class="blank-photo">${photo}</div>
-//             <div class="blank-info">
-//               <div class="blank-name">${card.name}</div>
-//               <div class="blank-flat">${card.building} - ${card.flatNumber}</div>
-//               <div class="blank-id">ID: ${card.idNumber}</div>
-//             </div>
-//           </div>
-//         </div>
-//         <div class="info no-print"><strong>${card.name}</strong><br/>${card.building} - ${card.flatNumber} | ID: ${card.idNumber}</div>
-//         <div class="btn-row no-print">
-//           <button class="btn btn-print" onclick="window.print()">🖨️ Print Card</button>
-//           <button class="btn btn-close" onclick="window.close()">✕ Close</button>
-//         </div>
-//         </body></html>
-//       `);
-//       w.document.close();
-//       return;
-//     }
-
-//     const cardImg       = new Image();
-//     cardImg.crossOrigin = 'anonymous';
-
-//     cardImg.onload = () => {
-//       const canvas  = document.createElement('canvas');
-//       canvas.width  = cardImg.naturalWidth;
-//       canvas.height = cardImg.naturalHeight;
-//       const ctx     = canvas.getContext('2d')!;
-//       ctx.drawImage(cardImg, 0, 0);
-
-//       const addTextAndGenerateFront = () => {
-//         const cw    = canvas.width;
-//         const ch    = canvas.height;
-//         const nameY = ch * 0.655;
-
-//         ctx.fillStyle = '#111111';
-//         ctx.font      = `bold ${Math.round(cw * 0.045)}px Segoe UI, sans-serif`;
-//         ctx.textAlign = 'center';
-//         ctx.fillText(card.name, cw / 2, nameY);
-
-//         ctx.fillStyle = '#333333';
-//         ctx.font      = `${Math.round(cw * 0.035)}px Segoe UI, sans-serif`;
-//         ctx.fillText(`${card.building} - ${card.flatNumber}`, cw / 2, nameY + cw * 0.055);
-
-//         ctx.fillStyle = '#555555';
-//         ctx.font      = `${Math.round(cw * 0.03)}px Courier New, monospace`;
-//         ctx.fillText(`ID: ${card.idNumber}`, cw / 2, nameY + cw * 0.105);
-
-//         const frontBase64 = canvas.toDataURL('image/jpeg', 0.95);
-
-//         const backImg       = new Image();
-//         backImg.crossOrigin = 'anonymous';
-
-//         backImg.onload = () => {
-//           const backCanvas  = document.createElement('canvas');
-//           backCanvas.width  = backImg.naturalWidth;
-//           backCanvas.height = backImg.naturalHeight;
-//           backCanvas.getContext('2d')!.drawImage(backImg, 0, 0);
-//           const backBase64 = backCanvas.toDataURL('image/jpeg', 0.95);
-//           this.openPrintWindow(frontBase64, backBase64, card);
-//         };
-
-//         backImg.onerror = () => { this.openPrintWindow(frontBase64, frontBase64, card); };
-//         backImg.src = window.location.origin + '/' + tmpl.back;
-//       };
-
-//       if (card.photoUrl) {
-//   this.fetchImageAsBase64(card.photoUrl).then(base64 => {
-//     if (base64) {
-//       const photoImg  = new Image();
-//       photoImg.onload = () => {
-//         const px = canvas.width  * (tmpl.photoLeft   / 100);
-//         const py = canvas.height * (tmpl.photoTop    / 100);
-//         const pw = canvas.width  * (tmpl.photoWidth  / 100);
-//         const ph = canvas.height * (tmpl.photoHeight / 100);
-//         ctx.drawImage(photoImg, px, py, pw, ph);
-//         addTextAndGenerateFront();
-//       };
-//       photoImg.onerror = () => addTextAndGenerateFront();
-//       photoImg.src     = base64;
-//     } else {
-//       addTextAndGenerateFront();
-//     }
-//   });
-// } else {
-//   addTextAndGenerateFront();
-// }
-//     };
-
-//     cardImg.onerror = () => alert('Card template image not found!\nCheck: src/assets/cards/ folder');
-//     cardImg.src = window.location.origin + '/' + tmpl.front;
-//   }
 
 
+onPreviewImgError(e: Event): void {
+  (e.target as HTMLImageElement).style.display = 'none';
+}
+openPreviewCard(): void {
+  if (!this.selectedCard) return;
+  const tmpl = (this.cardTemplates as any)[this.selectedCard.holderType ?? 'Resident']
+             ?? this.cardTemplates['Resident'];
+  // Set initial photo position from template config
+  this.previewPhoto = {
+    top:    Math.round(320 * tmpl.photoTop    / 100),
+    left:   Math.round(200 * tmpl.photoLeft   / 100),
+    width:  Math.round(200 * tmpl.photoWidth  / 100),
+    height: Math.round(320 * tmpl.photoHeight / 100)
+  };
+  this.showPreviewModal = true;
+  this.boundMouseMove = this.onMouseMove.bind(this);
+  this.boundMouseUp   = this.onMouseUp.bind(this);
+  document.addEventListener('mousemove', this.boundMouseMove);
+  document.addEventListener('mouseup',   this.boundMouseUp);
+}
+
+closePreviewModal(): void {
+  this.showPreviewModal = false;
+  document.removeEventListener('mousemove', this.boundMouseMove);
+  document.removeEventListener('mouseup',   this.boundMouseUp);
+}
+
+onPreviewTemplateLoad(): void {}
+
+onPhotoDragStart(e: MouseEvent): void {
+  if ((e.target as HTMLElement).classList.contains('resize-handle')) return;
+  this.isDragging  = true;
+  this.dragStartX  = e.clientX;
+  this.dragStartY  = e.clientY;
+  this.dragStartTop  = this.previewPhoto.top;
+  this.dragStartLeft = this.previewPhoto.left;
+  e.preventDefault();
+}
+
+onPhotoResizeStart(e: MouseEvent, dir: string): void {
+  this.isResizing      = true;
+  this.resizeDir       = dir;
+  this.resizeStartX    = e.clientX;
+  this.resizeStartY    = e.clientY;
+  this.resizeStartW    = this.previewPhoto.width;
+  this.resizeStartH    = this.previewPhoto.height;
+  this.resizeStartTop  = this.previewPhoto.top;
+  this.resizeStartLeft = this.previewPhoto.left;
+  e.preventDefault();
+  e.stopPropagation();
+}
+
+onMouseMove(e: MouseEvent): void {
+  if (this.isDragging) {
+    const dx = e.clientX - this.dragStartX;
+    const dy = e.clientY - this.dragStartY;
+    this.previewPhoto.top  = Math.max(0, this.dragStartTop  + dy);
+    this.previewPhoto.left = Math.max(0, this.dragStartLeft + dx);
+  }
+  if (this.isResizing) {
+    const dx = e.clientX - this.resizeStartX;
+    const dy = e.clientY - this.resizeStartY;
+    if (this.resizeDir === 'se') {
+      this.previewPhoto.width  = Math.max(30, this.resizeStartW + dx);
+      this.previewPhoto.height = Math.max(30, this.resizeStartH + dy);
+    } else if (this.resizeDir === 'sw') {
+      this.previewPhoto.width  = Math.max(30, this.resizeStartW - dx);
+      this.previewPhoto.height = Math.max(30, this.resizeStartH + dy);
+      this.previewPhoto.left   = this.resizeStartLeft + dx;
+    } else if (this.resizeDir === 'ne') {
+      this.previewPhoto.width  = Math.max(30, this.resizeStartW + dx);
+      this.previewPhoto.height = Math.max(30, this.resizeStartH - dy);
+      this.previewPhoto.top    = this.resizeStartTop + dy;
+    } else if (this.resizeDir === 'nw') {
+      this.previewPhoto.width  = Math.max(30, this.resizeStartW - dx);
+      this.previewPhoto.height = Math.max(30, this.resizeStartH - dy);
+      this.previewPhoto.left   = this.resizeStartLeft + dx;
+      this.previewPhoto.top    = this.resizeStartTop  + dy;
+    }
+  }
+}
+
+onMouseUp(): void {
+  this.isDragging  = false;
+  this.isResizing  = false;
+}
+
+resetPreviewPhoto(): void {
+  if (!this.selectedCard) return;
+  const tmpl = (this.cardTemplates as any)[this.selectedCard.holderType ?? 'Resident']
+             ?? this.cardTemplates['Resident'];
+  this.previewPhoto = {
+    top:    Math.round(320 * tmpl.photoTop    / 100),
+    left:   Math.round(200 * tmpl.photoLeft   / 100),
+    width:  Math.round(200 * tmpl.photoWidth  / 100),
+    height: Math.round(320 * tmpl.photoHeight / 100)
+  };
+}
+
+savePreviewAndClose(): void {
+  if (!this.selectedCard) return;
+  const holderType = this.selectedCard.holderType ?? 'Resident';
+
+  // Convert px position back to % and save to cardTemplates
+  (this.cardTemplates as any)[holderType] = {
+    ...(this.cardTemplates as any)[holderType],
+    photoTop:    Math.round(this.previewPhoto.top    / 320 * 100),
+    photoLeft:   Math.round(this.previewPhoto.left   / 200 * 100),
+    photoWidth:  Math.round(this.previewPhoto.width  / 200 * 100),
+    photoHeight: Math.round(this.previewPhoto.height / 320 * 100)
+  };
+  this.closePreviewModal();
+}
 
 print(): void {
   if (!this.selectedCard) { alert('Please select a member first!'); return; }
@@ -771,7 +734,7 @@ print(): void {
           <div class="c-name">${card.name}</div>
           <div class="c-row">Validity - ${validDate}</div>
           <div class="c-row">Company - ${card.company || '—'}</div>
-          <div class="c-row">Card No - ${card.cardCSN || '—'}</div>
+          <div class="c-row">Card No - ${card.idNumber || '—'}</div>
           <div class="c-row">Agency - ${card.agency || '—'}</div>
         </div>
         <div class="c-footer">
