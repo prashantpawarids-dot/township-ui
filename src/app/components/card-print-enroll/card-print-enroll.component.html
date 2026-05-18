@@ -10,7 +10,7 @@
       </span>
       <h2>ID Card Print &amp; Enroll</h2>
     </div>
-    <div class="cpe-header__filters">
+    <!-- <div class="cpe-header__filters">
       <mat-form-field appearance="outline" class="filter-field">
         <mat-label>Neighbourhood</mat-label>
         <mat-select [(ngModel)]="filter.neighbourhood" (ngModelChange)="onNeighbourhoodChange()">
@@ -36,7 +36,83 @@
         <mat-icon matSuffix>search</mat-icon>
       </mat-form-field>
       <button class="btn-search" (click)="search()">Search</button>
+    </div> -->
+
+
+    <div class="cpe-header__filters">
+
+  <!-- CATEGORY -->
+  <div class="pro-filter-group">
+    <label class="pro-filter-label">Category</label>
+    <div class="pro-dropdown">
+      <div class="pro-dropdown__trigger">{{ getCategoryLabel() }}</div>
+      <div class="pro-dropdown__menu">
+        <label class="pro-option">
+          <input type="checkbox" [checked]="selectedCategories.includes('ALL')" (change)="onCategoryToggle('ALL')" />
+          <span class="pro-check"></span> All
+        </label>
+        <label class="pro-option" *ngFor="let cat of categoryOptions">
+          <input type="checkbox" [checked]="selectedCategories.includes(cat.value)" (change)="onCategoryToggle(cat.value)" />
+          <span class="pro-check"></span> {{ cat.label }}
+        </label>
+      </div>
     </div>
+  </div>
+
+  <!-- NEIGHBOURHOOD -->
+  <div class="pro-filter-group">
+    <label class="pro-filter-label">Neighbourhood</label>
+    <div class="pro-dropdown">
+      <div class="pro-dropdown__trigger">{{ getNRDLabel() }}</div>
+      <div class="pro-dropdown__menu">
+        <label class="pro-option">
+          <input type="checkbox" [checked]="selectedNeighbourhoods.includes('ALL')" (change)="onNeighbourhoodToggle('ALL')" />
+          <span class="pro-check"></span> All
+        </label>
+        <label class="pro-option" *ngFor="let n of neighbourhoods | slice:1">
+          <input type="checkbox" [checked]="selectedNeighbourhoods.includes(n.name)" (change)="onNeighbourhoodToggle(n.name)" />
+          <span class="pro-check"></span> {{ n.name }}
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <!-- BUILDING -->
+  <div class="pro-filter-group">
+    <label class="pro-filter-label">Building</label>
+    <div class="pro-dropdown">
+      <div class="pro-dropdown__trigger">{{ getBuildingLabel() }}</div>
+      <div class="pro-dropdown__menu">
+        <label class="pro-option">
+          <input type="checkbox" [checked]="selectedBuildings.includes('ALL')" (change)="onBuildingToggle('ALL')" />
+          <span class="pro-check"></span> All
+        </label>
+        <label class="pro-option" *ngFor="let b of buildings | slice:1">
+          <input type="checkbox" [checked]="selectedBuildings.includes(b.name)" (change)="onBuildingToggle(b.name)" />
+          <span class="pro-check"></span> {{ b.name }}
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <!-- SEARCH BY + SEARCH -->
+  <div class="pro-filter-group">
+    <label class="pro-filter-label">Search By</label>
+    <select class="pro-select" [(ngModel)]="filter.searchBy">
+      <option value="">-- Select --</option>
+      <option *ngFor="let opt of searchOptions" [value]="opt.value">{{ opt.label }}</option>
+    </select>
+  </div>
+
+  <div class="pro-filter-group pro-filter-group--search">
+    <label class="pro-filter-label">Search</label>
+    <div class="pro-search-wrap">
+      <input class="pro-search-input" [(ngModel)]="filter.searchValue" (keyup.enter)="search()" placeholder="Search..." />
+      <button class="pro-search-btn" (click)="search()">🔍</button>
+    </div>
+  </div>
+
+</div>
   </div>
 
   <!-- FILTER BAR -->

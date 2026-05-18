@@ -41,12 +41,28 @@ export class CardPrintEnrollComponent implements OnInit {
   filter: CardSearchFilter = new CardSearchFilter();
 
   searchOptions = [
-    { value: 'Name',         label: 'Name' },
-    { value: 'IDnumber',     label: 'IDnumber' },
-    { value: 'flatnumber',   label: 'flatnumber' },
-    { value: 'Building_NRD', label: 'Building, NRD' },
-    { value: 'CardCSN',      label: 'CardCSN' }
-  ];
+  { value: 'FirstName',  label: 'First Name' },
+  { value: 'MiddleName', label: 'Middle Name' },
+  { value: 'LastName',   label: 'Last Name' },
+  { value: 'FlatNumber', label: 'Flat Number' },
+  { value: 'PANNumber',  label: 'PAN Number' },
+  { value: 'IDNumber',   label: 'ID Number' },
+];
+
+
+  categoryOptions = [
+  { value: 'Resident',        label: 'Resident' },
+  { value: 'Tenant',          label: 'Tenant' },
+  { value: 'LandOwner',       label: 'Land Owner' },
+  { value: 'Employee',        label: 'Employee' },
+  { value: 'Contractor',      label: 'Contractor' },
+  { value: 'ServiceProvider', label: 'Service Provider' },
+  { value: 'Guest',           label: 'Guest' },
+];
+
+selectedCategories: string[] = ['ALL'];
+selectedNeighbourhoods: string[] = ['ALL'];
+selectedBuildings: string[] = ['ALL'];
 
   cardType: 'pre-printed' | 'blank' = 'pre-printed';
   cardHolderNo: string = '';
@@ -140,6 +156,82 @@ private boundMouseUp: any;
 
   // ← CHANGED: injected AuthService
   constructor(private dialog: MatDialog, private authService: AuthService) {}
+
+
+  onCategoryToggle(value: string): void {
+  if (value === 'ALL') {
+    this.selectedCategories = this.selectedCategories.includes('ALL') ? [] : ['ALL', ...this.categoryOptions.map(c => c.value)];
+  } else {
+    if (this.selectedCategories.includes(value)) {
+      this.selectedCategories = this.selectedCategories.filter(c => c !== value && c !== 'ALL');
+    } else {
+      this.selectedCategories.push(value);
+      if (this.selectedCategories.filter(c => c !== 'ALL').length === this.categoryOptions.length) {
+        this.selectedCategories = ['ALL', ...this.categoryOptions.map(c => c.value)];
+      }
+    }
+  }
+}
+
+onNeighbourhoodToggle(value: string): void {
+  if (value === 'ALL') {
+    this.selectedNeighbourhoods = this.selectedNeighbourhoods.includes('ALL') ? [] : ['ALL', ...this.neighbourhoods.filter(n => n.name !== 'ALL').map(n => n.name)];
+  } else {
+    if (this.selectedNeighbourhoods.includes(value)) {
+      this.selectedNeighbourhoods = this.selectedNeighbourhoods.filter(n => n !== value && n !== 'ALL');
+    } else {
+      this.selectedNeighbourhoods.push(value);
+      const allNrds = this.neighbourhoods.filter(n => n.name !== 'ALL').map(n => n.name);
+      if (this.selectedNeighbourhoods.filter(n => n !== 'ALL').length === allNrds.length) {
+        this.selectedNeighbourhoods = ['ALL', ...allNrds];
+      }
+    }
+  }
+  this.filterBuildingsByNRD();
+}
+
+onBuildingToggle(value: string): void {
+  if (value === 'ALL') {
+    this.selectedBuildings = this.selectedBuildings.includes('ALL') ? [] : ['ALL', ...this.buildings.filter(b => b.name !== 'ALL').map(b => b.name)];
+  } else {
+    if (this.selectedBuildings.includes(value)) {
+      this.selectedBuildings = this.selectedBuildings.filter(b => b !== value && b !== 'ALL');
+    } else {
+      this.selectedBuildings.push(value);
+      const allBlds = this.buildings.filter(b => b.name !== 'ALL').map(b => b.name);
+      if (this.selectedBuildings.filter(b => b !== 'ALL').length === allBlds.length) {
+        this.selectedBuildings = ['ALL', ...allBlds];
+      }
+    }
+  }
+}
+
+filterBuildingsByNRD(): void {
+  if (this.selectedNeighbourhoods.includes('ALL') || this.selectedNeighbourhoods.length === 0) {
+    this.buildings = [{ name: 'ALL' }, ...this.allBuildings.map((b: any) => ({ name: b.name ?? b.Name, nrdName: b.nrdName ?? '' }))];
+  } else {
+    this.buildings = [
+      { name: 'ALL' },
+      ...this.allBuildings.filter((b: any) => this.selectedNeighbourhoods.includes(b.nrdName ?? '')).map((b: any) => ({ name: b.name ?? b.Name, nrdName: b.nrdName ?? '' }))
+    ];
+  }
+  this.selectedBuildings = ['ALL'];
+}
+
+getCategoryLabel(): string {
+  if (this.selectedCategories.includes('ALL') || this.selectedCategories.length === 0) return 'All Categories';
+  return this.selectedCategories.filter(c => c !== 'ALL').join(', ');
+}
+
+getNRDLabel(): string {
+  if (this.selectedNeighbourhoods.includes('ALL') || this.selectedNeighbourhoods.length === 0) return 'All Neighbourhoods';
+  return this.selectedNeighbourhoods.filter(n => n !== 'ALL').join(', ');
+}
+
+getBuildingLabel(): string {
+  if (this.selectedBuildings.includes('ALL') || this.selectedBuildings.length === 0) return 'All Buildings';
+  return this.selectedBuildings.filter(b => b !== 'ALL').join(', ');
+}
 
   ngOnInit(): void {
   this.loadNeighbourhoods();
@@ -255,23 +347,40 @@ agency:   item.custom2 ?? ''
 search(): void {
   let result = [...this.allData];
 
+  // Category filter
+  if (!this.selectedCategories.includes('ALL') && this.selectedCategories.length > 0) {
+    result = result.filter(c => this.selectedCategories.includes(c.holderType ?? ''));
+  }
+
+  // Neighbourhood filter
+  if (!this.selectedNeighbourhoods.includes('ALL') && this.selectedNeighbourhoods.length > 0) {
+    result = result.filter(c => this.selectedNeighbourhoods.includes(c.neighbourhood ?? ''));
+  }
+
+  // Building filter
+  if (!this.selectedBuildings.includes('ALL') && this.selectedBuildings.length > 0) {
+    result = result.filter(c => this.selectedBuildings.includes(c.building ?? ''));
+  }
+
   // Checkbox filters
   if (!this.filter.showAll) {
     if (this.filter.showNonPrinted)      result = result.filter(c => !c.isPrinted);
     if (this.filter.showNonPersonalised) result = result.filter(c => !c.isPersonalised);
   }
 
-  // Search value filter
+  // Search filter
   if (this.filter.searchValue) {
     const val = this.filter.searchValue.toLowerCase();
     result = result.filter(c => {
+      const name = c.name?.toLowerCase() ?? '';
       switch (this.filter.searchBy) {
-        case 'Name':         return c.name?.toLowerCase().includes(val);
-        case 'IDnumber':     return c.idNumber?.includes(val);
-        case 'flatnumber':   return c.flatNumber?.toLowerCase().includes(val);
-        case 'Building_NRD': return c.building?.toLowerCase().includes(val);
-        case 'CardCSN':      return c.cardDetails?.includes(val);
-        default:             return true;
+        case 'FirstName':  return name.split(' ')[0]?.startsWith(val);
+        case 'MiddleName': return name.split(' ')[1]?.startsWith(val);
+        case 'LastName':   return name.split(' ').pop()?.startsWith(val);
+        case 'FlatNumber': return c.flatNumber?.toLowerCase().startsWith(val);
+        case 'PANNumber':  return false;
+        case 'IDNumber':   return c.idNumber?.startsWith(val);
+        default:           return name.startsWith(val);
       }
     });
   }
@@ -281,7 +390,6 @@ search(): void {
   this.currentPage  = 1;
   this.applyPaging();
 }
-
 applyPaging(): void {
   const start = (this.currentPage - 1) * this.pageSize;
   const end   = start + this.pageSize;
@@ -441,35 +549,6 @@ onRowClick(card: CardPrintEnroll): void {
     this.showCropper       = false;
     this.imageChangedEvent = null;
   }
-
-//  saveAndExit(): void {
-//   const photoToSave = this.croppedResult || this.capturedImage;
-//   if (!photoToSave) { alert('Please capture or upload a photo first!'); return; }
-//   if (!this.selectedCard) { alert('No card selected!'); return; }
-
-//   // Save to API
-//   this.authService.updateCardCSN({
-//     IDNumber:    this.selectedCard.idNumber,
-//     CardCSN:     this.selectedCard.cardCSN ?? '',
-//     ImageBase64: photoToSave,
-//     ContentType: 'image/jpeg'
-//   }).subscribe({
-//    next: (res) => {
-//   const serverPhotoUrl = res?.photoUrl 
-//     ? `http://localhost:5555${res.photoUrl}` 
-//     : photoToSave;
-//   this.selectedCard = { ...this.selectedCard!, photoUrl: serverPhotoUrl };
-//   const found = this.allData.find(r => r.idNumber === this.selectedCard!.idNumber);
-//   if (found) found.photoUrl = serverPhotoUrl;
-//   this.closeCameraModal();
-//   alert('✅ Photo saved successfully!');
-// },
-//     error: (err) => {
-//       alert('❌ Failed to save photo: ' + err.message);
-//     }
-//   });
-// }
-
 
 
 saveAndExit(): void {

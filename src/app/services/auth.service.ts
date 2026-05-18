@@ -5,7 +5,7 @@ import { landownerMapper, residentMapper, tenantMapper } from '../mapper/post-ma
 import { employeeMapperGet, landownerMapperGet } from '../mapper/get-mapper';
 import { environment } from 'src/environments/environment';
 import { BehaviorSubject } from 'rxjs';
-import { Console } from 'console';
+// import { Console } from 'console';
 
 //serevices/auth.service.ts
 

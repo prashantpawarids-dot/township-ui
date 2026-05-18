@@ -302,12 +302,25 @@ export class CardEditDetail {
     accessPoints: CardAccessPoint[] = [];
 }
 
+// export class CardSearchFilter {
+//     neighbourhood: string = 'ALL';
+//     building: string = 'ALL';
+//     searchBy: 'Name' | 'IDnumber' | 'flatnumber' | 'Building_NRD' | 'CardCSN' | '' = '';
+//     searchValue: string = '';
+//     showAll: boolean = true;
+//     showNonPrinted: boolean = false;
+//     showNonPersonalised: boolean = false;
+// }
+
+
+
 export class CardSearchFilter {
-    neighbourhood: string = 'ALL';
-    building: string = 'ALL';
-    searchBy: 'Name' | 'IDnumber' | 'flatnumber' | 'Building_NRD' | 'CardCSN' | '' = '';
-    searchValue: string = '';
-    showAll: boolean = true;
-    showNonPrinted: boolean = false;
-    showNonPersonalised: boolean = false;
+  categories: string[] = ['ALL'];
+  neighbourhood: string = 'ALL';
+  building: string = 'ALL';
+  searchBy: string = '';
+  searchValue: string = '';
+  showAll: boolean = true;
+  showNonPrinted: boolean = false;
+  showNonPersonalised: boolean = false;
 }
