@@ -63,6 +63,8 @@ export class VisitorInOutLogComponent implements OnInit, AfterViewInit {
   nrdList: string[] = [];
   buildingList: string[] = [];
 
+  buildingLabelMap: { [key: string]: string } = {};
+
   constructor(private fb: FormBuilder, private http: HttpClient ,private sortService: TableSortService) {
     let today=new Date();
     this.reportForm = this.fb.group({
@@ -98,10 +100,23 @@ loadNRDList() {
   });
 }
 
+// loadBuildingList() {
+//   this.http.get<any[]>(`${environment.apiurl}Building`).subscribe(res => {
+//     this.allBuildings = res.map(b => b.name);  // simple array of strings
+//     this.buildings = [...this.allBuildings];   // optionally filtered subset
+//   });
+// }
+
+
 loadBuildingList() {
   this.http.get<any[]>(`${environment.apiurl}Building`).subscribe(res => {
-    this.allBuildings = res.map(b => b.name);  // simple array of strings
-    this.buildings = [...this.allBuildings];   // optionally filtered subset
+    this.allBuildings = res.map(b => b.name);
+    this.buildings = [...this.allBuildings];
+    res.forEach(b => {
+      if (b.name && b.nrdName) {
+        this.buildingLabelMap[b.name] = `${b.name} - ${b.nrdName}`;
+      }
+    });
   });
 }
 
@@ -172,6 +187,12 @@ onBuildingSelect(event: any) {
           // Populate unique NRD and Building lists
           this.nrdList = Array.from(new Set(this.visitorData.map(v => v.nrdName))).filter(x => x);
           this.buildingList = Array.from(new Set(this.visitorData.map(v => v.buildingName))).filter(x => x);
+          this.buildingLabelMap = {};
+this.visitorData.forEach(v => {
+  if (v.buildingName && v.nrdName) {
+    this.buildingLabelMap[v.buildingName] = `${v.buildingName} - ${v.nrdName}`;
+  }
+});
 
           // Initially, show NO DATA
           this.filteredData = [];

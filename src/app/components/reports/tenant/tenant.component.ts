@@ -55,6 +55,8 @@ neighbourhoods: { value: string, label: string }[] = [];
 allBuildings: any[] = [];
 buildings: any[] = [];
 
+buildingLabelMap: { [key: string]: string } = {};
+
 
   // PAGINATION
   pageSize = 10;
@@ -123,6 +125,9 @@ loadBuildingList() {
     }));
     this.buildingList = this.allBuildings.map(b => b.value);
     this.buildings = [...this.allBuildings];
+    this.allBuildings.forEach(b => {
+  this.buildingLabelMap[b.value] = `${b.value} - ${b.nrdName}`;
+});
   });
 }
 filterBuildingsByNRD(selectedNRDs: string[]) {

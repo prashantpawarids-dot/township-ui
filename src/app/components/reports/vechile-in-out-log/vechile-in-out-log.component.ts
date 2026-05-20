@@ -108,6 +108,8 @@ export class VehicleInOutLogComponent implements OnInit, AfterViewInit {
     });
   }
 
+  buildingLabelMap: { [key: string]: string } = {};
+
   ngOnInit() {
     this.displayedData.data = [];
     this.pagedData = [];
@@ -196,10 +198,14 @@ export class VehicleInOutLogComponent implements OnInit, AfterViewInit {
   loadBuildingList() {
     this.http.get<any[]>(`${environment.apiurl}Building`).subscribe(res => {
       this.allBuildings = res.map(b => ({
+        
         name: b.name,
         nrdName: b.nrdName
       }));
       this.buildingList = [...new Set(this.allBuildings.map(b => b.name))];
+      this.allBuildings.forEach(b => {
+  this.buildingLabelMap[b.name] = `${b.name} - ${b.nrdName}`;
+});
     });
   }
 

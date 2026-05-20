@@ -41,7 +41,8 @@
         <mat-label>Building</mat-label>
         <mat-select formControlName="building" multiple (selectionChange)="onBuildingSelect($event)">
           <mat-option [value]="'ALL'">All</mat-option>
-          <mat-option *ngFor="let b of buildings" [value]="b">{{ b }}</mat-option>
+          <!-- <mat-option *ngFor="let b of buildings" [value]="b">{{ b }}</mat-option> -->
+           <mat-option *ngFor="let b of buildings" [value]="b">{{ buildingLabelMap[b] || b }}</mat-option>
         </mat-select>
       </mat-form-field>
     </div>

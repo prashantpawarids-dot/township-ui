@@ -53,6 +53,8 @@ neighbourhoods: any[] = [];
 allBuildings: any[] = [];
 buildings: any[] = [];
 
+buildingLabelMap: { [key: string]: string } = {};
+
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   searchType = [
@@ -123,7 +125,11 @@ loadBuildingList() {
     }));
 
     // Replace filteredBuildings with actual building API list
+    // this.filteredBuildings = this.allBuildings.map(b => b.buildingName);
     this.filteredBuildings = this.allBuildings.map(b => b.buildingName);
+this.allBuildings.forEach(b => {
+  this.buildingLabelMap[b.buildingName] = `${b.buildingName} - ${b.nrdName}`;
+});
   });
 }
 

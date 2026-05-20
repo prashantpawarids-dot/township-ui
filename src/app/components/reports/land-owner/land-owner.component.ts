@@ -48,6 +48,7 @@ uniqueProjects: string[] = [];
 allBuildings: any[] = [];
 filteredBuildings: string[] = [];
 filteredData: any[] = [];
+buildingLabelMap: { [key: string]: string } = {};
 
   searchByOptions = [
   { value: 'firstName', label: 'First Name' },
@@ -129,6 +130,9 @@ loadBuildingList() {
       buildingName: b.name
     }));
     this.filteredBuildings = this.allBuildings.map(b => b.buildingName);
+    this.allBuildings.forEach(b => {
+  this.buildingLabelMap[b.buildingName] = `${b.buildingName} - ${b.nrdName}`;
+});
   });
 }
 
