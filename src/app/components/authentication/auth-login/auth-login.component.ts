@@ -1,142 +1,4 @@
 
-
-
-// // project import
-// import { Component, OnInit } from '@angular/core';
-// import { Router, RouterLink } from '@angular/router';
-// //import { AuthService } from '../../../services/auth.service';  
-// import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-// import { AuthService } from 'src/app/services/auth.service';
-// import { ErrorHandlerService } from 'src/app/services/error-handler.service';
-// import Swal from 'sweetalert2';
-
-
-// @Component({
-//   selector: 'app-auth-login',
-//   imports: [RouterLink, FormsModule, ReactiveFormsModule],
-//   templateUrl: './auth-login.component.html',
-//   styleUrl: './auth-login.component.scss'
-// })
-// export class AuthLoginComponent implements OnInit{
-
-//   loginForm: FormGroup;
-
-//   constructor(
-//     private fb: FormBuilder,
-//     private router: Router,
-//     private authService: AuthService,
-//     private errorHandlerService: ErrorHandlerService
-//   ) {
-//     this.loginForm = this.fb.group({
-//       email: ['', [Validators.required]],
-//       password: ['', Validators.required]
-
-//     });
-//   }
-
-//   ngOnInit(): void {
-//     this.clearAllLocalStorage();
-//   }
-
-
-//   //submit button function added by NB
-
-//   onSubmit() {
-//   if (this.loginForm.valid) {
-//     this.authService.postAuthLogin(this.loginForm.value).subscribe({
-//       next: (res) => {
-//         if (res && res.length > 0) {
-//           this.setLocalstorage(res[0]);
-//           this.router.navigate(['/dashboard']);
-//           Swal.fire({
-//             icon: 'success',
-//             title: 'Login Successful',
-//             text: 'Welcome!',
-//             timer: 2000,
-//             showConfirmButton: false
-//           });
-//         } else {
-//           Swal.fire({
-//             icon: 'warning',
-//             title: 'Login Failed',
-//             text: 'Please enter correct credentials',
-//             confirmButtonColor: '#3085d6'
-//           });
-//           this.clearAllLocalStorage();
-//         }
-//       },
-//       error: (err: any) => {
-//         if (err.status === 401) {
-//           Swal.fire({
-//             icon: 'error',
-//             title: 'Unauthorized',
-//             text: 'Invalid User ID or Password',
-//             confirmButtonColor: '#d33'
-//           });
-//         } else if (err.error && typeof err.error === 'string') {
-//           const errorMessage = err.error.toLowerCase();
-//           if (errorMessage.includes('user') || errorMessage.includes('uid')) {
-//             Swal.fire({
-//               icon: 'error',
-//               title: 'Login Error',
-//               text: 'User ID is incorrect',
-//               confirmButtonColor: '#d33'
-//             });
-//           } else if (errorMessage.includes('password')) {
-//             Swal.fire({
-//               icon: 'error',
-//               title: 'Login Error',
-//               text: 'Password is incorrect',
-//               confirmButtonColor: '#d33'
-//             });
-//           } else {
-//             Swal.fire({
-//               icon: 'warning',
-//               title: 'Login Failed',
-//               text: 'Please enter correct credentials',
-//               confirmButtonColor: '#3085d6'
-//             });
-//           }
-//         } else {
-//           Swal.fire({
-//             icon: 'warning',
-//             title: 'Login Failed',
-//             text: 'Please enter correct credentials',
-//             confirmButtonColor: '#3085d6'
-//           });
-//         }
-//         this.clearAllLocalStorage();
-//       }
-//     });
-//   } else {
-//     Swal.fire({
-//       icon: 'info',
-//       title: 'Missing Information',
-//       text: 'Please fill in both User ID and Password',
-//       confirmButtonColor: '#3085d6'
-//     });
-//   }
-// }
-
-
-//   setLocalstorage(user) {
-//     localStorage.setItem("name", user.name);
-//     localStorage.setItem("companyID", user.companyID);
-//     localStorage.setItem("companyName", user.company);
-//     localStorage.setItem("email", user.email);
-//     localStorage.setItem("uid", user.uid);
-//     localStorage.setItem("loginTime", new Date().toISOString());
-//     localStorage.setItem("role", "true");
-//     localStorage.setItem("roleid",user.roleID);
-//   }
-
-//   clearAllLocalStorage() {
-//     localStorage.clear()
-//   }
-// }
-
-
-// project import
 import { Component, OnInit } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -216,7 +78,7 @@ onSubmit() {
       // 4️⃣ Set profileName from roleID
       // user.profileName = this.getProfileName(user.roleID);
       user.Name = user.name;
-      console.log('UserName NAME:', user.Name);
+      // console.log('UserName NAME:', user.Name);
 
     
       this.setLocalstorage(user);
@@ -228,11 +90,22 @@ onSubmit() {
           // console.table(authModules);
 
           // 7️⃣ Map to authority service format
-          const mappedAuthorities = authModules.map(m => ({
-            moduleKey: m.moduleKey,          // Use exact API property
-            authorityLevel: m.authorityLevel     // match exact case
-          }));
+          // const mappedAuthorities = authModules.map(m => ({
+          //   moduleKey: m.moduleKey,          // Use exact API property
+          //   authorityLevel: m.authorityLevel     // match exact case
+          // }));
 
+// DEBUG — see exact field names from API
+// console.log('RAW FIRST MODULE:', JSON.stringify(authModules[0]));
+const mappedAuthorities = authModules.map(m => ({
+  moduleKey:  m.moduleKey,
+  canInsert:  m.canInsert,
+  canUpdate:  m.canUpdate,
+  canDelete:  m.canDelete,
+  canView:    m.canView
+}));
+
+// console.log('MAPPED FIRST:', JSON.stringify(mappedAuthorities[0]));
           // console.log('🟢 MAPPED AUTHORITIES (FOR UI):');
           // console.table(mappedAuthorities);
 
@@ -250,7 +123,14 @@ onSubmit() {
             showConfirmButton: false
           });
 
-          this.router.navigate(['/dashboard']);
+          // this.router.navigate(['/dashboard']);
+
+          const hasAnyAccess = authModules.some(m => m.canView === true);
+if (!hasAnyAccess) {
+  Swal.fire({ icon: 'warning', title: 'No Access', text: 'You have no module permissions. Contact Admin.' });
+  return;
+}
+this.router.navigate(['/dashboard']);
         },
         error: (err) => {
           console.error('❌ AUTH LOAD ERROR:', err);

@@ -20,14 +20,89 @@
 
   <div class="ced-body">
 
+    <!-- ── Card Preview ──────────────────────────────────── -->
+    <div class="ced-card-preview-wrap">
+      <div class="ced-real-card">
+
+        <!-- CONTRACTOR with NRD template -->
+        <ng-container *ngIf="data.holderType === 'Contractor' && contractorTemplate">
+          <img class="ced-card-bg" [src]="contractorTemplate" alt="template" />
+          <div class="ced-photo-overlay"
+               [style.top]="currentCardPhotoStyle['top']"
+               [style.left]="currentCardPhotoStyle['left']"
+               [style.width]="currentCardPhotoStyle['width']"
+               [style.height]="currentCardPhotoStyle['height']">
+            <img *ngIf="data.photoUrl" [src]="data.photoUrl" alt="photo" />
+            <div *ngIf="!data.photoUrl" class="ced-photo-empty">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="1">
+                <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+              </svg>
+            </div>
+          </div>
+          <ng-container *ngFor="let key of activeTextFields">
+            <div [style.position]="'absolute'"
+                 [style.left.%]="textFields[key]?.x"
+                 [style.top.%]="textFields[key]?.y"
+                 [style.transform]="'translate(-50%,-50%)'"
+                 [style.color]="textFields[key]?.color"
+                 [style.font-weight]="textFields[key]?.bold ? 'bold' : 'normal'"
+                 [style.font-size.px]="textFields[key]?.size * 160"
+                 [style.white-space]="'nowrap'"
+                 [style.pointer-events]="'none'">
+              <span *ngIf="key === 'name'">{{ data.cardHolder }}</span>
+              <span *ngIf="key === 'validity'">Validity - {{ data.validTill ? (data.validTill | date:'d/M/yyyy') : '—' }}</span>
+              <span *ngIf="key === 'company'">Company - {{ data.company || '—' }}</span>
+              <span *ngIf="key === 'cardNo'">Card No - {{ data.idNumber || '—' }}</span>
+              <span *ngIf="key === 'agency'">Agency - {{ data.agency || '—' }}</span>
+            </div>
+          </ng-container>
+        </ng-container>
+
+        <!-- NON-CONTRACTOR with template -->
+        <ng-container *ngIf="data.holderType !== 'Contractor' && currentCardTemplate">
+          <img class="ced-card-bg" [src]="currentCardTemplate" alt="template" />
+          <div class="ced-photo-overlay"
+               [style.top]="currentCardPhotoStyle['top']"
+               [style.left]="currentCardPhotoStyle['left']"
+               [style.width]="currentCardPhotoStyle['width']"
+               [style.height]="currentCardPhotoStyle['height']">
+            <img *ngIf="data.photoUrl" [src]="data.photoUrl" alt="photo" />
+            <div *ngIf="!data.photoUrl" class="ced-photo-empty">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="1">
+                <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+              </svg>
+            </div>
+          </div>
+          <ng-container *ngFor="let key of activeTextFields">
+            <div [style.position]="'absolute'"
+                 [style.left.%]="textFields[key]?.x"
+                 [style.top.%]="textFields[key]?.y"
+                 [style.transform]="'translate(-50%,-50%)'"
+                 [style.color]="textFields[key]?.color"
+                 [style.font-weight]="textFields[key]?.bold ? 'bold' : 'normal'"
+                 [style.font-size.px]="textFields[key]?.size * 160"
+                 [style.white-space]="'nowrap'"
+                 [style.pointer-events]="'none'">
+              <span *ngIf="key === 'name'">{{ data.cardHolder }}</span>
+              <span *ngIf="key === 'building'">{{ data.building }} - {{ data.flatNumber }}</span>
+              <span *ngIf="key === 'idNumber'">ID: {{ data.idNumber }}</span>
+            </div>
+          </ng-container>
+        </ng-container>
+
+      </div>
+    </div>
+    <!-- ── End Card Preview ──────────────────────────────── -->
+
+    <!--
     <div class="ced-field">
       <label class="ced-label">Cardholder</label>
       <div class="ced-readonly">{{ data.cardHolder }}</div>
     </div>
 
     <div class="ced-field">
-      <label class="ced-label">Card Details</label>
-      <input class="ced-input" [(ngModel)]="data.cardDetails" placeholder="Enter card details" />
+      <label class="ced-label">Card Details (ID Number)</label>
+      <div class="ced-readonly">{{ data.idNumber }}</div>
     </div>
 
     <div class="ced-field">
@@ -42,7 +117,6 @@
       </div>
     </div>
 
-    <!-- Access Points -->
     <div class="ced-section">
       <div class="ced-section__header">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -91,18 +165,19 @@
         </ng-template>
       </div>
     </div>
+    -->
 
   </div>
 
   <div class="ced-footer">
     <button class="btn-cancel" (click)="close()">Cancel</button>
-    <button class="btn-save" (click)="saveAndPrint()">
+    <button class="btn-save" (click)="printCard()">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
-        <polyline points="17 21 17 13 7 13 7 21"/>
-        <polyline points="7 3 7 8 15 8"/>
+        <path d="M6 9V2h12v7"/>
+        <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+        <rect x="6" y="14" width="12" height="8"/>
       </svg>
-      Save and Print
+      Print
     </button>
   </div>
 

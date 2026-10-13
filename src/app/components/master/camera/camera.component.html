@@ -1,0 +1,45 @@
+<mat-toolbar class="form-toolbar">
+  <span>{{ viewMode ? 'View Camera' : (editMode ? 'Edit Camera' : 'Add Camera') }}</span>
+</mat-toolbar>
+
+<form [formGroup]="cameraForm" (ngSubmit)="editMode ? onUpdate() : onSave()" class="form-container">
+
+  <mat-form-field appearance="outline">
+    <mat-label>Terminal ID</mat-label>
+    <input matInput formControlName="anprTerminalID" [readonly]="viewMode" />
+  </mat-form-field>
+
+  <mat-form-field appearance="outline">
+    <mat-label>Camera IP</mat-label>
+    <input matInput formControlName="anprip" [readonly]="viewMode" placeholder="192.168.31.7" />
+  </mat-form-field>
+
+  <mat-form-field appearance="outline">
+    <mat-label>Port</mat-label>
+    <input matInput formControlName="anprport" [readonly]="viewMode" />
+  </mat-form-field>
+
+  <mat-form-field appearance="outline">
+    <mat-label>Location</mat-label>
+    <input matInput formControlName="anprlocation" [readonly]="viewMode" placeholder="Falcon / Skylark" />
+  </mat-form-field>
+
+  <mat-form-field appearance="outline">
+    <mat-label>Mode</mat-label>
+    <mat-select formControlName="anprmode" [disabled]="viewMode">
+      <mat-option *ngFor="let m of modeOptions" [value]="m">{{ m }}</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <div class="form-actions" *ngIf="!viewMode">
+    <button mat-raised-button color="primary" type="submit" [disabled]="!cameraForm.valid">
+      {{ editMode ? 'Update' : 'Save' }}
+    </button>
+    <button mat-stroked-button type="button" (click)="onCancel()">Cancel</button>
+  </div>
+
+  <div class="form-actions" *ngIf="viewMode">
+    <button mat-stroked-button type="button" (click)="onCancel()">Back</button>
+  </div>
+
+</form>

@@ -49,6 +49,7 @@ export class GuestInOutLogComponent implements OnInit, AfterViewInit {
     { value: 'shortName', label: 'Short Name' },
     { value: 'mobileNo', label: 'Mobile' },
     { value: 'flatNumber', label: 'Flat Number' },
+    { value: 'referenceName', label: 'Reference' },
     { value: 'buildingName', label: 'Building Name' },
     { value: 'nrdName', label: 'NRD Name' }
   ];
@@ -330,6 +331,7 @@ getSortDirection(): 'asc' | 'desc' {
         'Short Name',
         'Mobile',
         'Flat Number',
+        'Reference',
         'Valid From',
         'Valid Till',
         'Building Name',
@@ -339,7 +341,8 @@ getSortDirection(): 'asc' | 'desc' {
         i + 1,
         r.shortName,
         r.mobileNo,
-        r.flatNumber,
+          r.flatNumber,
+        r.referenceName || '',
         r.validFrom ? new Date(r.validFrom).toLocaleDateString() : '',
         r.validTill ? new Date(r.validTill).toLocaleDateString() : '',
         r.buildingName,
@@ -401,7 +404,8 @@ exportExcel() {
     'Sr No': i + 1,
     'Short Name': r.shortName || '',
     'Mobile': r.mobileNo || '',
-    'Flat Number': r.flatNumber || '',
+        'Flat Number': r.flatNumber || '',
+    'Reference': r.referenceName || '',
     'Valid From': r.validFrom ? DateTimeUtil.formatDateTime(r.validFrom) : '',
 'Valid Till': r.validTill ? DateTimeUtil.formatDateTime(r.validTill) : '',
 
@@ -413,7 +417,7 @@ exportExcel() {
 
   /* ---------- Worksheet Layout ---------- */
   const wsData: any[][] = [
-    ['GUEST IN-OUT LOG REPORT', '', '', '', '', '', '', `Printed On: ${printedDate}`],
+       ['GUEST IN-OUT LOG REPORT', '', '', '', '', '', '', '', `Printed On: ${printedDate}`],
     [],
     Object.keys(excelData[0])
   ];

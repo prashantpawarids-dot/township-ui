@@ -39,6 +39,40 @@
       </mat-form-field>
     </div>
 
+        <!-- VEHICLE TYPE -->
+    <div class="col-10 col-md-2">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>Vehicle Type</mat-label>
+        <mat-select formControlName="vehicleType" multiple (selectionChange)="onVehicleTypeChange()">
+          <mat-select-trigger>{{ getVehicleTypeTriggerLabel() }}</mat-select-trigger>
+          <mat-option *ngFor="let v of vehicleTypes" [value]="v.value">{{ v.label }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <!-- IN / OUT -->
+    <div class="col-10 col-md-2">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>IN / OUT</mat-label>
+        <mat-select formControlName="inOut" multiple (selectionChange)="onInOutChange()">
+          <mat-select-trigger>{{ getInOutTriggerLabel() }}</mat-select-trigger>
+          <mat-option *ngFor="let io of inOutOptions" [value]="io.value">{{ io.label }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <!-- NEIGHBOURHOOD -->
+    <div class="col-10 col-md-2">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>Neighbourhood</mat-label>
+        <mat-select formControlName="project" multiple (selectionChange)="onProjectChange()">
+          <mat-select-trigger>{{ getProjectTriggerLabel() }}</mat-select-trigger>
+          <mat-option value="ALL">All</mat-option>
+          <mat-option *ngFor="let p of projectList" [value]="p">{{ p }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
     <!-- Search By -->
     <div class="col-10 col-md-2">
       <mat-form-field appearance="outline" class="w-100">
@@ -61,8 +95,14 @@
     <div class="col-auto d-flex gap-2 align-items-center mb-3">
       <button type="button" class="btn btn-sm px-3" style="height:40px;font-size:14px;" (click)="showReports()">Search</button>
       <button type="button" class="btn btn-sm px-3" style="height:40px;font-size:14px;" (click)="clear()">Clear</button>
-      <button type="button" class="btn btn-sm px-3" style="height:40px;font-size:14px;" *ngIf="displayedData.data.length > 0" (click)="exportReports()">PDF</button>
-      <button type="button" class="btn btn-sm px-3" style="height:40px;font-size:14px;" *ngIf="displayedData.data.length > 0" (click)="exportExcel()">Excel</button>
+      <!-- <button type="button" class="btn btn-sm px-3" style="height:40px;font-size:14px;" *ngIf="displayedData.data.length > 0" (click)="exportReports()">PDF</button>
+      <button type="button" class="btn btn-sm px-3" style="height:40px;font-size:14px;" *ngIf="displayedData.data.length > 0" (click)="exportExcel()">Excel</button> -->
+                  <button type="button" class="btn btn-sm px-3" style="height:40px;font-size:14px;" *ngIf="displayedData.data.length > 0" [disabled]="isExporting" (click)="exportReports()">
+        {{ exportingType === 'pdf' ? 'Exporting...' : 'PDF' }}
+      </button>
+      <button type="button" class="btn btn-sm px-3" style="height:40px;font-size:14px;" *ngIf="displayedData.data.length > 0" [disabled]="isExporting" (click)="exportExcel()">
+        {{ exportingType === 'excel' ? 'Exporting...' : 'Excel' }}
+      </button>
     </div>
 
   </div>
@@ -103,28 +143,22 @@
       </thead>
 
       <tbody *ngIf="displayedData.data.length > 0">
-        <tr *ngFor="let e of paginatedData; let i = index">
-          <td>{{ paginator.pageIndex * paginator.pageSize + i + 1 }}</td>
+               <tr *ngFor="let e of displayedData.data; let i = index">
+          <td>{{ (pageNumber - 1) * currentPageSize + i + 1 }}</td>
           <td>{{ e.vehicleNumber }}</td>
           <td>{{ e.ownerName }}</td>
           <td>{{ e.building }}</td>
           <td>{{ e.flatNumber }}</td>
           <td>{{ e.inTime | date:'dd-MM-yyyy HH:mm' }}</td>
 
-          <!-- IN Image cell -->
+                    <!-- IN Image cell -->
           <td style="white-space:nowrap;">
             <div style="display:flex; align-items:center; gap:8px;">
-              <img
-                *ngIf="e.inCameraImage"
-                [src]="e.inCameraImage"
-                style="height:32px; width:auto; border:1px solid #ccc; border-radius:3px;"
-                [title]="e.vehicleNumber"
-              />
               <mat-icon
                 title="Click to view IN frame"
-                (click)="e.inCameraImage && openVehiclePopup(e, 'in')"
-                [style.color]="e.inCameraImage ? '#16a34a' : '#9ca3af'"
-                [style.cursor]="e.inCameraImage ? 'pointer' : 'default'"
+                (click)="e.inUniqueId && openVehiclePopup(e, 'in')"
+                [style.color]="e.inUniqueId ? '#16a34a' : '#9ca3af'"
+                [style.cursor]="e.inUniqueId ? 'pointer' : 'default'"
                 style="font-size:28px; width:28px; height:28px; vertical-align:middle;">
                 {{ e.vehicleCategory === 'Two Wheeler' ? 'two_wheeler' : e.vehicleCategory === 'Three Wheeler' ? 'electric_rickshaw' : 'directions_car' }}
               </mat-icon>
@@ -133,20 +167,14 @@
 
           <td>{{ e.outTime | date:'dd-MM-yyyy HH:mm' }}</td>
 
-          <!-- OUT Image cell -->
+                  <!-- OUT Image cell -->
           <td style="white-space:nowrap;">
             <div style="display:flex; align-items:center; gap:8px;">
-              <img
-                *ngIf="e.outCameraImage"
-                [src]="e.outCameraImage"
-                style="height:32px; width:auto; border:1px solid #ccc; border-radius:3px;"
-                [title]="e.vehicleNumber"
-              />
               <mat-icon
                 title="Click to view OUT frame"
-                (click)="e.outCameraImage && openVehiclePopup(e, 'out')"
-                [style.color]="e.outCameraImage ? '#dc2626' : '#9ca3af'"
-                [style.cursor]="e.outCameraImage ? 'pointer' : 'default'"
+                (click)="e.outUniqueId && openVehiclePopup(e, 'out')"
+                [style.color]="e.outUniqueId ? '#dc2626' : '#9ca3af'"
+                [style.cursor]="e.outUniqueId ? 'pointer' : 'default'"
                 style="font-size:28px; width:28px; height:28px; vertical-align:middle;">
                 {{ e.vehicleCategory === 'Two Wheeler' ? 'two_wheeler' : e.vehicleCategory === 'Three Wheeler' ? 'electric_rickshaw' : 'directions_car' }}
               </mat-icon>
@@ -164,7 +192,13 @@
   </div>
 
   <!-- Paginator -->
-  <mat-paginator [pageSizeOptions]="pageSizes" [pageSize]="10" showFirstLastButtons></mat-paginator>
+    <mat-paginator 
+    [length]="totalCount"
+    [pageSizeOptions]="pageSizes"
+    [pageSize]="currentPageSize"
+    (page)="onPageChange($event)"
+    showFirstLastButtons>
+  </mat-paginator>
 
 </form>
 
@@ -192,14 +226,38 @@
            alt="Frame Image" />
     </div> -->
 
-    <div class="vp-img-wrap">
-  <img *ngIf="selectedVehicle.frameImage"
-       [src]="selectedVehicle.frameImage"
-       class="vp-img"
-       alt="Frame Image" />
+           <div class="vp-img-wrap">
+  <div *ngIf="selectedVehicle.imageLoading" class="text-center p-4">Loading image...</div>
+
+  <ng-container *ngIf="!selectedVehicle.imageLoading">
+    <img *ngIf="selectedVehicle.frameImage"
+         [src]="selectedVehicle.frameImage"
+         class="vp-img"
+         alt="Frame Image" />
+    <div class="vp-cam-label" *ngIf="selectedVehicle.frameImage">
+      {{ selectedVehicle.building }} {{ selectedVehicle.activeLabel === 'IN' ? 'in Gate' : 'out Gate' }}
+    </div>
+
+    <!-- <img *ngIf="selectedVehicle.plateImage"
+         [src]="selectedVehicle.plateImage"
+         class="vp-img mt-2"
+         style="border:2px dashed #999;"
+         alt="Number Plate Image" />
+    <div class="vp-cam-label" *ngIf="selectedVehicle.plateImage">Number Plate</div> -->
+
+        <img *ngIf="selectedVehicle.plateImage"
+         [src]="selectedVehicle.plateImage"
+         class="vp-plate-img mt-2"
+         alt="Number Plate Image" />
+    <div class="vp-cam-label" *ngIf="selectedVehicle.plateImage">Number Plate</div>
+
+    <div *ngIf="!selectedVehicle.frameImage && !selectedVehicle.plateImage" class="text-center p-4 text-muted">
+      No image available
+    </div>
+  </ng-container>
 </div>
 
-    <div class="vp-info">
+    <div class="vp-info vp-info-bar">
       <div class="vp-info-item">
         <span class="vp-label">&#128100; Owner</span>
         <span class="vp-value">{{ selectedVehicle.ownerName || '—' }}</span>

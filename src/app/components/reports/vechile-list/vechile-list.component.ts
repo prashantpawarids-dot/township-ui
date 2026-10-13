@@ -63,20 +63,37 @@ export class VechileListComponent implements OnInit, AfterViewInit {
 
   reportForm: FormGroup;
 
-  allData: any[] = [];
+    allData: any[] = [];
   displayedData = new MatTableDataSource<any>([]);
   uniqueNRD: string[] = [];
   nrdList: string[] = [];
 filteredData: any[] = [];
+  private prevNRD: string[] = [];
+  private prevStatus: string[] = [];
+  private prevVehicleType: string[] = [];
+
+  statusList: string[] = ['ALL', 'Active', 'Inactive', 'Deleted', 'InvalidFormat'];
+  vehicleTypeList: string[] = ['ALL', 'Two Wheeler', 'Four Wheeler', 'Other'];
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   constructor(private fb: FormBuilder, private http: HttpClient,private sortService: TableSortService) {
 let today=new Date();
-    this.reportForm = this.fb.group({
+    // this.reportForm = this.fb.group({
+    //   searchBy: [''],
+    //   searchText: [''],
+    //   nrd: [[]],
+    //   fromDate: [today],
+    //   toDate: [today]
+    // });
+
+
+                           this.reportForm = this.fb.group({
       searchBy: [''],
       searchText: [''],
       nrd: [[]],
+      status: [['Active']],
+      vehicleTypeFilter: [['ALL']],
       fromDate: [today],
       toDate: [today]
     });
@@ -104,7 +121,9 @@ let today=new Date();
 
   /** LOAD DATA FROM NEW API */
   loadAllData() {
-    this.http.get<any[]>(`${environment.apiurl}Vehicle`).subscribe(res => {
+    // this.http.get<any[]>(`${environment.apiurl}Vehicle`).subscribe(res => {
+
+        this.http.get<any[]>(`${environment.apiurl}ANPR/vehicle`).subscribe(res => {
 
       // directly assign new API result
       this.allData = res;
@@ -160,15 +179,91 @@ loadNRDList() {
 // }
 
 onNRDChange() {
-  const selected = this.reportForm.value.nrd;
-  if (selected.includes('ALL')) {
-    this.reportForm.patchValue({ 
-      nrd: ['ALL', ...this.nrdList.filter(n => n !== 'ALL')]
-    }, { emitEvent: false });
+  const selected: string[] = this.reportForm.value.nrd || [];
+  const allValues = this.nrdList.filter(n => n !== 'ALL');
+
+  const hadAll = this.prevNRD.includes('ALL');
+  const hasAll = selected.includes('ALL');
+
+  let newValue: string[];
+
+  if (!hadAll && hasAll) {
+    // User ne ALL abhi click kiya → sab select ho jaye
+    newValue = ['ALL', ...allValues];
+  } else if (hadAll && !hasAll) {
+    // User ne ALL ko khud uncheck kiya → sab kuch uncheck ho jaye
+    newValue = [];
+  } else if (hadAll && hasAll) {
+    // ALL pehle se checked tha, ab kisi ek item ko uncheck kiya gaya
+    // → ALL bhi remove ho, sirf actually selected items rahen
+    newValue = selected.filter(v => v !== 'ALL');
+  } else {
+    // Normal individual selection
+    newValue = selected.filter(v => v !== 'ALL');
+
+    // Agar user ne manually sab items select kar liye, to ALL bhi auto-check ho
+    if (allValues.length > 0 && allValues.every(v => newValue.includes(v))) {
+      newValue = ['ALL', ...allValues];
+    }
   }
+
+   this.prevNRD = [...newValue];
+  this.reportForm.patchValue({ nrd: newValue }, { emitEvent: false });
 }
 
+onStatusChange() {
+  const selected: string[] = this.reportForm.value.status || [];
+  const allValues = this.statusList.filter(n => n !== 'ALL');
 
+  const hadAll = this.prevStatus.includes('ALL');
+  const hasAll = selected.includes('ALL');
+
+  let newValue: string[];
+
+  if (!hadAll && hasAll) {
+    newValue = ['ALL', ...allValues];
+  } else if (hadAll && !hasAll) {
+    newValue = [];
+  } else if (hadAll && hasAll) {
+    newValue = selected.filter(v => v !== 'ALL');
+  } else {
+    newValue = selected.filter(v => v !== 'ALL');
+    if (allValues.length > 0 && allValues.every(v => newValue.includes(v))) {
+      newValue = ['ALL', ...allValues];
+    }
+  }
+
+  this.prevStatus = [...newValue];
+  this.reportForm.patchValue({ status: newValue }, { emitEvent: false });
+  this.filterData();
+}
+
+onVehicleTypeChange() {
+  const selected: string[] = this.reportForm.value.vehicleTypeFilter || [];
+  const allValues = this.vehicleTypeList.filter(n => n !== 'ALL');
+
+  const hadAll = this.prevVehicleType.includes('ALL');
+  const hasAll = selected.includes('ALL');
+
+  let newValue: string[];
+
+  if (!hadAll && hasAll) {
+    newValue = ['ALL', ...allValues];
+  } else if (hadAll && !hasAll) {
+    newValue = [];
+  } else if (hadAll && hasAll) {
+    newValue = selected.filter(v => v !== 'ALL');
+  } else {
+    newValue = selected.filter(v => v !== 'ALL');
+    if (allValues.length > 0 && allValues.every(v => newValue.includes(v))) {
+      newValue = ['ALL', ...allValues];
+    }
+  }
+
+  this.prevVehicleType = [...newValue];
+  this.reportForm.patchValue({ vehicleTypeFilter: newValue }, { emitEvent: false });
+  this.filterData();
+}
 
   /** SHOW BUTTON CLICK */
   filterData() {
@@ -176,8 +271,34 @@ onNRDChange() {
     const f = this.reportForm.value;
 
     // NRD filter
+    // if (f.nrd.length > 0) {
+    //   filtered = filtered.filter(x => f.nrd.includes(x.nrd));
+    // }
+
+
+        // NRD filter
     if (f.nrd.length > 0) {
       filtered = filtered.filter(x => f.nrd.includes(x.nrd));
+    }
+
+        // Status filter
+    const statusSelected: string[] = (f.status || []).filter((v: string) => v !== 'ALL');
+    if (statusSelected.length > 0) {
+      filtered = filtered.filter(x => statusSelected.includes(x.status));
+    }
+
+    // Vehicle Type filter
+    const vTypeSelected: string[] = (f.vehicleTypeFilter || []).filter((v: string) => v !== 'ALL');
+    if (vTypeSelected.length > 0) {
+      filtered = filtered.filter(x => {
+        const vt = (x.vType || '').toLowerCase();
+        return vTypeSelected.some((sel: string) => {
+          if (sel === 'Two Wheeler')  return vt.includes('two');
+          if (sel === 'Four Wheeler') return vt.includes('four');
+          if (sel === 'Other')        return vt && !vt.includes('two') && !vt.includes('four');
+          return false;
+        });
+      });
     }
 
 //     // Date filter (createdon field)
@@ -289,15 +410,29 @@ if (f.searchText && f.searchText.toString().trim() !== '') {
   }
 
   /** RESET + SHOW ALL */
-  showAll() {
+  // showAll() {
+  //   this.reportForm.reset({
+  //     nrd: [],
+  //     searchBy: '',
+  //     searchText: '',
+  //     fromDate: '',
+  //     toDate: ''
+  //   });
+
+
+               showAll() {
     this.reportForm.reset({
       nrd: [],
+      status: ['Active'],
+      vehicleTypeFilter: ['ALL'],
       searchBy: '',
       searchText: '',
       fromDate: '',
       toDate: ''
     });
 
+    this.prevStatus = [];
+    this.prevVehicleType = [];
    
   }
   public sortColumn(column: string) {

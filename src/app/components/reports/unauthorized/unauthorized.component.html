@@ -38,6 +38,39 @@
     </div>
 
     <!-- SEARCH Vehicle No -->
+    <!-- <div class="col-12 col-md-2">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>Search Vehicle No</mat-label>
+        <input matInput formControlName="searchValue" placeholder="Enter vehicle no..." />
+      </mat-form-field>
+    </div> -->
+
+
+            <!-- EXIT STATUS -->
+    <div class="col-12 col-md-2">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>Exit Status</mat-label>
+        <mat-select formControlName="exitStatus">
+          <mat-option *ngFor="let e of exitStatusOptions" [value]="e.value">
+            {{ e.label }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+        <!-- NEIGHBOURHOOD -->
+    <div class="col-12 col-md-2">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>Neighbourhood</mat-label>
+        <mat-select formControlName="neighbourhood">
+          <mat-option *ngFor="let n of neighbourhoodOptions" [value]="n.value">
+            {{ n.label }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <!-- SEARCH Vehicle No -->
     <div class="col-12 col-md-2">
       <mat-form-field appearance="outline" class="w-100">
         <mat-label>Search Vehicle No</mat-label>
@@ -75,7 +108,7 @@
             <span *ngIf="getSortColumn() === 'ownerName'">{{ getSortDirection() === 'asc' ? '▲' : '▼' }}</span>
           </th>
          
-         
+         <th>Camera Location</th>
          
           <th (click)="sortColumn('inTime')">
             IN Time
@@ -100,8 +133,8 @@
     <td>{{ d.vehicleNumber }}</td>
     <td>{{ d.tagUID }}</td>
     <td>{{ d.ownerName }}</td>
-
-    <td>{{ d.inTime | date:'dd-MM-yyyy HH:mm' }}</td>
+<td>{{ d.inCameraLocation || '—' }}</td>
+        <td>{{ d.inTime ? (d.inTime | date:'dd-MM-yyyy HH:mm') : '—' }}</td>
     <td>{{ d.outTime ? (d.outTime | date:'dd-MM-yyyy HH:mm') : '—' }}</td>
 
     <!-- IN Image -->
@@ -114,30 +147,30 @@
           [title]="d.vehicleNumber"
         />
 
-        <!-- 🔥 FIXED HERE -->
+                <!-- 🔥 FIXED HERE -->
         <mat-icon
-          *ngIf="d.inCameraImageRaw"
+          *ngIf="d.inUniqueId"
           title="Click to view IN frame"
           (click)="openVehiclePopup(d, 'in')"
           style="cursor:pointer; font-size:28px; width:28px; height:28px; color:#1e40af;">
-          directions_car
+       {{ getVehicleIcon(d.vehicleTypeLabel) }}
         </mat-icon>
       </div>
     </td>
 
     <!-- OUT Image -->
     <td style="white-space:nowrap;">
-      <!-- 🔥 FIXED HERE -->
+            <!-- 🔥 FIXED HERE -->
       <mat-icon
-        *ngIf="d.outCameraImageRaw"
+        *ngIf="d.outUniqueId"
         title="Click to view OUT frame"
         (click)="openVehiclePopup(d, 'out')"
         style="cursor:pointer; font-size:28px; width:28px; height:28px; color:#dc2626;">
-        directions_car
+    {{ getVehicleIcon(d.vehicleTypeLabel) }}
       </mat-icon>
 
       <!-- 🔥 FIXED HERE -->
-      <span *ngIf="!d.outCameraImageRaw">—</span>
+      <span *ngIf="!d.outUniqueId">—</span>
     </td>
 
   </tr>
@@ -149,7 +182,7 @@
     [pageSizeOptions]="[10, 25, 50, 100, 150, 200, 250, 300]"
     [pageSize]="10"
     showFirstLastButtons
-    (page)="updatePagination()">
+  (page)="onPageChange($event)">
   </mat-paginator>
 
 </form>
@@ -165,24 +198,44 @@
     <button class="vp-close" (click)="closeVehiclePopup()">&#10005;</button>
 
     <div class="vp-img-container">
-      <img [src]="selectedVehicleImage" class="vp-img" alt="Vehicle Image" />
 
+      <!-- 1) FRAME IMAGE (full image, no crop) -->
+      <div class="vp-frame-box">
+        <img *ngIf="selectedVehicleImage && !imageLoading"
+             [src]="selectedVehicleImage"
+             class="vp-img"
+             alt="Vehicle Image" />
+
+        <div *ngIf="imageLoading" class="vp-img-placeholder">
+          <mat-icon class="vp-placeholder-icon">hourglass_empty</mat-icon>
+          <span>Loading image…</span>
+        </div>
+
+        <div *ngIf="!imageLoading && imageSyncing" class="vp-img-placeholder">
+          <mat-icon class="vp-placeholder-icon">sync</mat-icon>
+          <span>Image is syncing from camera. Please check again shortly.</span>
+        </div>
+      </div>
+
+      <!-- 2) NUMBER PLATE (separate div, frame ke upar nahi) -->
+      <div class="vp-plate-box" *ngIf="selectedPlateImage && !imageLoading">
+        <span class="vp-plate-label">Number Plate</span>
+        <img [src]="selectedPlateImage" class="vp-plate-img" alt="Number Plate" />
+      </div>
+
+      <!-- 3) INFO BAR -->
       <div class="vp-bottom-bar">
-
-       
-
         <div class="vp-row">
-         
           <span class="vp-vnum"><b>Vehicle No:</b> {{ selectedVehicle.vehicleNumber || '—' }}</span>
         </div>
 
         <div class="vp-row">
-          <span><b>IN Time:</b> {{ selectedVehicle.inTime | date:'dd-MM-yyyy HH:mm' }}</span>
+                    <span><b>IN Time:</b> {{ selectedVehicle.inTime ? (selectedVehicle.inTime | date:'dd-MM-yyyy HH:mm') : '—' }}</span>
           <span><b>OUT Time:</b> {{ selectedVehicle.outTime ? (selectedVehicle.outTime | date:'dd-MM-yyyy HH:mm') : '—' }}</span>
           <span><b>IN Location:</b> {{ selectedVehicle.inCameraLocation || '—' }}</span>
         </div>
-
       </div>
+
     </div>
 
   </div>

@@ -39,12 +39,35 @@
                 </mat-form-field>
             </div>
 
+            <!-- <div class="col-md-4">
+    <mat-form-field class="full-width">
+        <mat-label>Status</mat-label>
+        <mat-select [(ngModel)]="vehicle.isactive" name="vehicleStatus" #vehicleStatus="ngModel">
+            <mat-option [value]="1">Active</mat-option>
+            <mat-option [value]="0">Inactive</mat-option>
+        </mat-select>
+    </mat-form-field>
+</div> -->
+
+
+
             <div class="col-md-4">
     <mat-form-field class="full-width">
         <mat-label>Status</mat-label>
         <mat-select [(ngModel)]="vehicle.isactive" name="vehicleStatus" #vehicleStatus="ngModel">
             <mat-option [value]="1">Active</mat-option>
             <mat-option [value]="0">Inactive</mat-option>
+        </mat-select>
+    </mat-form-field>
+</div>
+
+<div class="col-md-4" *ngIf="isEmployee">
+    <mat-form-field class="full-width">
+        <mat-label>Neighbourhood (Project)</mat-label>
+        <mat-select [(ngModel)]="vehicle.nrdIDs" name="vehicleNRDs" #vehicleNRDs="ngModel" multiple>
+            @for (n of nrdOptions; track n.id) {
+            <mat-option [value]="n.id">{{n.name}}</mat-option>
+            }
         </mat-select>
     </mat-form-field>
 </div>

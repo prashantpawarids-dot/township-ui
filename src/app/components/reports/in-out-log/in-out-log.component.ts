@@ -66,6 +66,7 @@ export class InOutLogComponent implements OnInit, AfterViewInit {
   ];
 
   searchTypes = [
+    { value: 'idNumber', label: 'ID Number' },
     { value: 'ownerName', label: 'Owner Name' },
     { value: 'csnNumber', label: 'CSN Number' },
     { value: 'ownerFlatNumber', label: 'Flat Number' }
@@ -106,7 +107,12 @@ export class InOutLogComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit() {
-    this.loadData();
+    const today = new Date();
+    const y = today.getFullYear();
+    const m = String(today.getMonth() + 1).padStart(2, '0');
+    const d = String(today.getDate()).padStart(2, '0');
+    console.log('[InOutLog] >>> ngOnInit loading with today date:', `${y}-${m}-${d}`);
+    this.loadData(`${y}-${m}-${d}`, `${y}-${m}-${d}`);
     this.loadNRDList();
     this.loadBuildingList();
 
@@ -164,10 +170,24 @@ export class InOutLogComponent implements OnInit, AfterViewInit {
     return this.sortService.getSortDirection();
   }
 
-  loadData() {
-    this.http.get<any[]>(`${environment.apiurl}Report/InoutRegister`).subscribe(res => {
-      this.inOutData = Array.isArray(res) ? res : [];
-      this.filteredData = [...this.inOutData];
+loadData(fromDateTime?: string, toDateTime?: string) {
+    let url = `${environment.apiurl}Report/InoutRegister`;
+    if (fromDateTime && toDateTime) {
+      url += `?fromDateTime=${encodeURIComponent(fromDateTime)}&toDateTime=${encodeURIComponent(toDateTime)}`;
+    }
+    console.log('[InOutLog] >>> CALLING API URL:', url);
+    this.http.get<any[]>(url).subscribe({
+      next: (res) => {
+        console.log('[InOutLog] >>> API SUCCESS, records:', Array.isArray(res) ? res.length : 'not array', res);
+        this.inOutData = Array.isArray(res) ? res : [];
+        this.applyFilters();
+      },
+      error: (err) => {
+        console.error('[InOutLog] >>> API ERROR:', err.status, err.error, err);
+        this.inOutData = [];
+        this.filteredData = [];
+        this.updatePagedData();
+      }
     });
   }
 
@@ -346,9 +366,10 @@ export class InOutLogComponent implements OnInit, AfterViewInit {
       data = data.filter(x => buildingFilter.includes(x.buildingName));
     }
 
-    // Date & Time Filter
+   // Date & Time Filter
     if (f.fromDate) {
-      const from = new Date(f.fromDate);
+      const fd = new Date(f.fromDate);
+      const from = new Date(fd.getFullYear(), fd.getMonth(), fd.getDate());
       if (f.fromTime) {
         const [h, m] = f.fromTime.split(':').map(Number);
         from.setHours(h, m, 0, 0);
@@ -359,7 +380,8 @@ export class InOutLogComponent implements OnInit, AfterViewInit {
     }
 
     if (f.toDate) {
-      const to = new Date(f.toDate);
+      const td = new Date(f.toDate);
+      const to = new Date(td.getFullYear(), td.getMonth(), td.getDate());
       if (f.toTime) {
         const [h, m] = f.toTime.split(':').map(Number);
         to.setHours(h, m, 59, 999);
@@ -391,8 +413,21 @@ export class InOutLogComponent implements OnInit, AfterViewInit {
   });
 }
 
-    // Sort by time
-    data = sortByTimeOnly(data, 'inoutTime', 'asc');
+  //   // Sort by time
+  //   data = sortByTimeOnly(data, 'inoutTime', 'asc');
+  //   this.filteredData = data;
+
+  //   if (this.paginator) {
+  //     this.paginator.length = this.filteredData.length;
+  //     this.paginator.pageIndex = 0;
+  //   }
+  //   this.updatePagedData();
+  // }
+
+
+       // Sort using the same working sortService logic as column-click sort
+    this.sortService.setSortColumn('inoutTime', 'asc');
+    data = this.sortService.sortData([...data], 'inoutTime');
     this.filteredData = data;
 
     if (this.paginator) {
@@ -403,7 +438,23 @@ export class InOutLogComponent implements OnInit, AfterViewInit {
   }
 
   showReports() {
-    this.applyFilters();
+    const f = this.reportForm.value;
+    console.log('[InOutLog] >>> SEARCH clicked, raw form fromDate/toDate:', f.fromDate, f.toDate);
+
+    const toApiDate = (d: any): string => {
+      const dt = new Date(d);
+      const y = dt.getFullYear();
+      const m = String(dt.getMonth() + 1).padStart(2, '0');
+      const day = String(dt.getDate()).padStart(2, '0');
+      return `${y}-${m}-${day}`;
+    };
+
+    const fromStr = f.fromDate ? toApiDate(f.fromDate) : null;
+    const toStr = f.toDate ? toApiDate(f.toDate) : null;
+
+    console.log('[InOutLog] >>> SEARCH computed date strings:', fromStr, toStr);
+
+    this.loadData(fromStr, toStr);
   }
 
   Clear() {
@@ -456,20 +507,21 @@ export class InOutLogComponent implements OnInit, AfterViewInit {
       doc.setFontSize(10);
       doc.text(`Printed On: ${generated}`, pageWidth - 10, 20, { align: 'right' });
 
-      const body = this.filteredData.map((r, i) => [
-        i + 1,
-        r.ownerName || 'N/A',
-        r.nrdName || 'N/A',
-        r.buildingName || 'N/A',
-        r.csnNumber || 'N/A',
-        r.accessmode || 'N/A',
-        r.inoutTime ? new Date(r.inoutTime).toLocaleString() : 'N/A',
-        r.cardType || 'N/A'
-      ]);
+     const body = this.filteredData.map((r, i) => [
+  i + 1,
+  r.ownerName || 'N/A',
+  r.nrdName || 'N/A',
+  r.buildingName || 'N/A',
+  r.ownerFlatNumber || 'N/A',
+  r.csnNumber || 'N/A',
+  r.accessmode || 'N/A',
+  r.inoutTime ? new Date(r.inoutTime).toLocaleString() : 'N/A',
+  r.cardType || 'N/A'
+]);
 
       autoTable(doc, {
         startY: 35,
-        head: [['Sr No', 'Name', 'Neighbourhood', 'Building', 'CSN', 'Access Mode', 'AccessTime', 'Card Type']],
+     head: [['Sr No', 'Name', 'Neighbourhood', 'Building', 'Flat Number', 'CSN', 'Access Mode', 'AccessTime', 'Card Type']],
         body,
         theme: 'grid',
         headStyles: { fillColor: [220, 220, 220], textColor: 20, fontStyle: 'bold' },
@@ -495,16 +547,17 @@ export class InOutLogComponent implements OnInit, AfterViewInit {
 
     const printedDate = new Date().toLocaleString();
 
-    const excelData = this.filteredData.map((r, i) => ({
-      'Sr No': i + 1,
-      'Name': r.ownerName || '',
-      'Neighbourhood': r.nrdName || '',
-      'Building': r.buildingName || '',
-      'CSN': r.csnNumber || '',
-      'Access Mode': r.accessmode || '',
-      'AccessTime': r.inoutTime ? DateTimeUtil.formatDateTime(r.inoutTime) : '',
-      'Card Type': r.cardType || ''
-    }));
+ const excelData = this.filteredData.map((r, i) => ({
+  'Sr No': i + 1,
+  'Name': r.ownerName || '',
+  'Neighbourhood': r.nrdName || '',
+  'Building': r.buildingName || '',
+  'Flat Number': r.ownerFlatNumber || '',
+  'CSN': r.csnNumber || '',
+  'Access Mode': r.accessmode || '',
+  'AccessTime': r.inoutTime ? DateTimeUtil.formatDateTime(r.inoutTime) : '',
+  'Card Type': r.cardType || ''
+}));
 
     const wb = XLSX.utils.book_new();
     const wsData: any[][] = [

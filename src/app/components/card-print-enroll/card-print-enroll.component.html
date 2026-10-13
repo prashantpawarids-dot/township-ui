@@ -10,109 +10,81 @@
       </span>
       <h2>ID Card Print &amp; Enroll</h2>
     </div>
-    <!-- <div class="cpe-header__filters">
-      <mat-form-field appearance="outline" class="filter-field">
-        <mat-label>Neighbourhood</mat-label>
-        <mat-select [(ngModel)]="filter.neighbourhood" (ngModelChange)="onNeighbourhoodChange()">
-          <mat-option *ngFor="let n of neighbourhoods" [value]="n.name">{{ n.name }}</mat-option>
-        </mat-select>
-      </mat-form-field>
-      <mat-form-field appearance="outline" class="filter-field">
-        <mat-label>Building</mat-label>
-        <mat-select [(ngModel)]="filter.building">
-          <mat-option *ngFor="let b of buildings" [value]="b.name">{{ b.name }}</mat-option>
-        </mat-select>
-      </mat-form-field>
-      <mat-form-field appearance="outline" class="filter-field filter-field--search-by">
-        <mat-label>Search By</mat-label>
-        <mat-select [(ngModel)]="filter.searchBy">
-          <mat-option value="">-- Select --</mat-option>
-          <mat-option *ngFor="let opt of searchOptions" [value]="opt.value">{{ opt.label }}</mat-option>
-        </mat-select>
-      </mat-form-field>
-      <mat-form-field appearance="outline" class="filter-field filter-field--search">
-        <mat-label>Search</mat-label>
-        <input matInput [(ngModel)]="filter.searchValue" (keyup.enter)="search()" />
-        <mat-icon matSuffix>search</mat-icon>
-      </mat-form-field>
-      <button class="btn-search" (click)="search()">Search</button>
-    </div> -->
-
 
     <div class="cpe-header__filters">
 
-  <!-- CATEGORY -->
-  <div class="pro-filter-group">
-    <label class="pro-filter-label">Category</label>
-    <div class="pro-dropdown">
-      <div class="pro-dropdown__trigger">{{ getCategoryLabel() }}</div>
-      <div class="pro-dropdown__menu">
-        <label class="pro-option">
-          <input type="checkbox" [checked]="selectedCategories.includes('ALL')" (change)="onCategoryToggle('ALL')" />
-          <span class="pro-check"></span> All
-        </label>
-        <label class="pro-option" *ngFor="let cat of categoryOptions">
-          <input type="checkbox" [checked]="selectedCategories.includes(cat.value)" (change)="onCategoryToggle(cat.value)" />
-          <span class="pro-check"></span> {{ cat.label }}
-        </label>
+      <!-- CATEGORY -->
+      <div class="pro-filter-group">
+        <label class="pro-filter-label">Category</label>
+        <div class="pro-dropdown">
+          <div class="pro-dropdown__trigger">{{ getCategoryLabel() }}</div>
+          <div class="pro-dropdown__menu">
+            <label class="pro-option">
+              <input type="checkbox" [checked]="selectedCategories.includes('ALL')" (change)="onCategoryToggle('ALL')" />
+              <span class="pro-check"></span> All
+            </label>
+            <label class="pro-option" *ngFor="let cat of categoryOptions">
+              <input type="checkbox" [checked]="selectedCategories.includes(cat.value)" (change)="onCategoryToggle(cat.value)" />
+              <span class="pro-check"></span> {{ cat.label }}
+            </label>
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
 
-  <!-- NEIGHBOURHOOD -->
-  <div class="pro-filter-group">
-    <label class="pro-filter-label">Neighbourhood</label>
-    <div class="pro-dropdown">
-      <div class="pro-dropdown__trigger">{{ getNRDLabel() }}</div>
-      <div class="pro-dropdown__menu">
-        <label class="pro-option">
-          <input type="checkbox" [checked]="selectedNeighbourhoods.includes('ALL')" (change)="onNeighbourhoodToggle('ALL')" />
-          <span class="pro-check"></span> All
-        </label>
-        <label class="pro-option" *ngFor="let n of neighbourhoods | slice:1">
-          <input type="checkbox" [checked]="selectedNeighbourhoods.includes(n.name)" (change)="onNeighbourhoodToggle(n.name)" />
-          <span class="pro-check"></span> {{ n.name }}
-        </label>
+      <!-- NEIGHBOURHOOD -->
+      <div class="pro-filter-group">
+        <label class="pro-filter-label">Neighbourhood</label>
+        <div class="pro-dropdown">
+          <div class="pro-dropdown__trigger">{{ getNRDLabel() }}</div>
+          <div class="pro-dropdown__menu">
+            <label class="pro-option">
+              <input type="checkbox" [checked]="selectedNeighbourhoods.includes('ALL')" (change)="onNeighbourhoodToggle('ALL')" />
+              <span class="pro-check"></span> All
+            </label>
+            <label class="pro-option" *ngFor="let n of neighbourhoods | slice:1">
+              <input type="checkbox" [checked]="selectedNeighbourhoods.includes(n.name)" (change)="onNeighbourhoodToggle(n.name)" />
+              <span class="pro-check"></span> {{ n.name }}
+            </label>
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
 
-  <!-- BUILDING -->
-  <div class="pro-filter-group">
-    <label class="pro-filter-label">Building</label>
-    <div class="pro-dropdown">
-      <div class="pro-dropdown__trigger">{{ getBuildingLabel() }}</div>
-      <div class="pro-dropdown__menu">
-        <label class="pro-option">
-          <input type="checkbox" [checked]="selectedBuildings.includes('ALL')" (change)="onBuildingToggle('ALL')" />
-          <span class="pro-check"></span> All
-        </label>
-        <label class="pro-option" *ngFor="let b of buildings | slice:1">
-          <input type="checkbox" [checked]="selectedBuildings.includes(b.name)" (change)="onBuildingToggle(b.name)" />
-          <span class="pro-check"></span> {{ b.name }}
-        </label>
+      <!-- BUILDING -->
+      <div class="pro-filter-group">
+        <label class="pro-filter-label">Building</label>
+        <div class="pro-dropdown">
+          <div class="pro-dropdown__trigger">{{ getBuildingLabel() }}</div>
+          <div class="pro-dropdown__menu">
+            <label class="pro-option">
+              <input type="checkbox" [checked]="selectedBuildings.includes('ALL')" (change)="onBuildingToggle('ALL')" />
+              <span class="pro-check"></span> All
+            </label>
+            <label class="pro-option" *ngFor="let b of buildings | slice:1">
+              <input type="checkbox" [checked]="selectedBuildings.includes(b.name)" (change)="onBuildingToggle(b.name)" />
+              <span class="pro-check"></span> {{ b.name }}
+            </label>
+          </div>
+        </div>
       </div>
+
+      <!-- SEARCH BY + SEARCH -->
+      <div class="pro-filter-group">
+        <label class="pro-filter-label">Search By</label>
+        <select class="pro-select" [(ngModel)]="filter.searchBy">
+          <option value="">-- Select --</option>
+          <option *ngFor="let opt of searchOptions" [value]="opt.value">{{ opt.label }}</option>
+        </select>
+      </div>
+
+      <div class="pro-filter-group pro-filter-group--search">
+        <label class="pro-filter-label">Search</label>
+        <div class="pro-search-wrap">
+          <input class="pro-search-input" [(ngModel)]="filter.searchValue" (keyup.enter)="search()" placeholder="Search..." />
+          <button class="pro-search-btn" (click)="search()">🔍</button>
+        </div>
+      </div>
+
     </div>
-  </div>
-
-  <!-- SEARCH BY + SEARCH -->
-  <div class="pro-filter-group">
-    <label class="pro-filter-label">Search By</label>
-    <select class="pro-select" [(ngModel)]="filter.searchBy">
-      <option value="">-- Select --</option>
-      <option *ngFor="let opt of searchOptions" [value]="opt.value">{{ opt.label }}</option>
-    </select>
-  </div>
-
-  <div class="pro-filter-group pro-filter-group--search">
-    <label class="pro-filter-label">Search</label>
-    <div class="pro-search-wrap">
-      <input class="pro-search-input" [(ngModel)]="filter.searchValue" (keyup.enter)="search()" placeholder="Search..." />
-      <button class="pro-search-btn" (click)="search()">🔍</button>
-    </div>
-  </div>
-
-</div>
   </div>
 
   <!-- FILTER BAR -->
@@ -153,93 +125,125 @@
           <p>Select a member<br/>to preview card</p>
         </div>
 
-       <div class="real-card" *ngIf="selectedCard">
+        <!-- <div class="real-card" *ngIf="selectedCard"> -->
+          <div class="real-card" *ngIf="selectedCard" #realCardRef>
 
-  <!-- CONTRACTOR DYNAMIC CARD -->
-  <ng-container *ngIf="selectedCard?.holderType === 'Contractor'">
-  <div class="contractor-card">
-    <div class="contractor-card__bg"></div>
+          <!-- ── CONTRACTOR ─────────────────────────────────── -->
+          <ng-container *ngIf="selectedCard?.holderType === 'Contractor'">
 
-    <div class="contractor-card__header">
-      <div class="company-title">{{ selectedCard?.company || 'Company Name' }}</div>
-      <div class="company-subtitle">&#64; Riverview City, Pune</div>
-    </div>
-
-    <div class="contractor-card__photo-wrap">
-      <img *ngIf="selectedCard?.photoUrl" [src]="selectedCard?.photoUrl" alt="photo" />
-      <div *ngIf="!selectedCard?.photoUrl" class="photo-placeholder">
-        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="1">
-          <circle cx="12" cy="8" r="4"/>
-          <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
-        </svg>
-      </div>
-    </div>
-
-    <div class="contractor-card__details">
-      <div class="detail-name">{{ selectedCard?.name }}</div>
-      <div class="detail-row">Validity - {{ selectedCard?.validTill ? (selectedCard?.validTill | date:'d/M/yyyy') : '—' }}</div>
-      <div class="detail-row">Company - {{ selectedCard?.company || '—' }}</div>
-      <div class="detail-row">Card No - {{ selectedCard?.idNumber  || '—' }}</div>
-      <div class="detail-row">Agency - {{ selectedCard?.agency || '—' }}</div>
-    </div>
-
-    <div class="contractor-card__footer">
-      <div class="footer-brand">
-        <span class="footer-bird">🕊️</span>
-        <span class="footer-logo">Nanded City</span>
-      </div>
-      <div class="footer-tagline">My City. My World.</div>
-      <div class="footer-url">www.nandedcitypune.com</div>
-    </div>
+            <!-- Has NRD template from API -->
+          <ng-container *ngIf="contractorTemplate">
+              <img class="real-card__bg" [src]="contractorTemplate" alt="contractor template" />
+              <!-- Photo overlay -->
+              <div class="real-card__photo-overlay"
+                   [style.top]="currentCardPhotoStyle['top']"
+                   [style.left]="currentCardPhotoStyle['left']"
+                   [style.width]="currentCardPhotoStyle['width']"
+                   [style.height]="currentCardPhotoStyle['height']"
+                   [style.position]="'absolute'">
+                <img *ngIf="selectedCard?.photoUrl" [src]="selectedCard?.photoUrl" class="real-card__photo-img" alt="photo" />
+                <div *ngIf="!selectedCard?.photoUrl" class="real-card__photo-placeholder">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="1">
+                    <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+                  </svg>
+                </div>
+              </div>
+              <img *ngIf="hasCurrentLogo" [src]="currentCardLogo" [ngStyle]="currentCardLogoStyle" alt="logo" style="object-fit:contain;" />
+              <!-- Data overlay -->
+              <!-- Data overlay — uses textFields positions -->
+<ng-container *ngFor="let key of activeTextFields">
+  <div [style.position]="'absolute'"
+       [style.left.%]="textFields[key].x"
+       [style.top.%]="textFields[key].y"
+       [style.transform]="'translate(-50%,-50%)'"
+       [style.color]="textFields[key].color"
+       [style.font-weight]="textFields[key].bold ? 'bold' : 'normal'"
+       [style.font-size.px]="textFields[key].size * 160"
+       [style.white-space]="'nowrap'"
+       [style.pointer-events]="'none'">
+    {{ getFieldValue(key) }}
   </div>
 </ng-container>
+            </ng-container>
 
-  <!-- PRE-PRINTED for non-contractor -->
-  <ng-container *ngIf="cardType === 'pre-printed' && selectedCard?.holderType !== 'Contractor'">
-    <!-- <ng-container *ngIf="cardType === 'pre-printed'"> -->
-    <img class="real-card__bg" [src]="currentCardTemplate" alt="card template" />
-    <div class="real-card__photo-overlay"
-         [style.top]="currentCardPhotoStyle['top']"
-         [style.left]="currentCardPhotoStyle['left']"
-         [style.width]="currentCardPhotoStyle['width']"
-         [style.height]="currentCardPhotoStyle['height']"
-         [style.position]="'absolute'">
-      <img *ngIf="selectedCard?.photoUrl" [src]="selectedCard?.photoUrl" class="real-card__photo-img" alt="member photo" />
-      <div *ngIf="!selectedCard?.photoUrl" class="real-card__photo-placeholder">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="1">
-          <circle cx="12" cy="8" r="4"/>
-          <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
-        </svg>
-      </div>
-    </div>
-    <div class="real-card__text-overlay">
-      <div class="real-card__name">{{ selectedCard?.name }}</div>
-      <div class="real-card__flat">{{ selectedCard?.building }} - {{ selectedCard?.flatNumber }}</div>
-      <div class="real-card__id">ID: {{ selectedCard?.idNumber }}</div>
-    </div>
-  </ng-container>
+            <!-- No NRD template — fallback HTML card -->
+           
 
-  <!-- BLANK CARD -->
-  <ng-container *ngIf="cardType === 'blank'">
-    <div class="blank-card">
-      <div class="blank-card__photo-wrap">
-        <img *ngIf="selectedCard?.photoUrl" [src]="selectedCard?.photoUrl" class="blank-card__photo" alt="member photo" />
-        <div *ngIf="!selectedCard?.photoUrl" class="blank-card__photo-placeholder">
-          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1">
-            <circle cx="12" cy="8" r="4"/>
-            <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
-          </svg>
+          </ng-container>
+          <!-- ── END CONTRACTOR ─────────────────────────────── -->
+
+          <!-- PRE-PRINTED for non-contractor -->
+          <ng-container *ngIf="cardType === 'pre-printed' && selectedCard?.holderType !== 'Contractor'">
+            <!-- <img class="real-card__bg" [src]="currentCardTemplate" alt="card template" /> -->
+             <ng-container *ngIf="currentCardTemplate; else noTemplateNonContractor">
+  <img class="real-card__bg" [src]="currentCardTemplate" alt="card template" />
+</ng-container>
+<ng-template #noTemplateNonContractor>
+  <div class="real-card-empty">
+    <p>No template uploaded for "{{ selectedCard?.holderType }}"</p>
+  </div>
+</ng-template>
+            <div class="real-card__photo-overlay"
+                 [style.top]="currentCardPhotoStyle['top']"
+                 [style.left]="currentCardPhotoStyle['left']"
+                 [style.width]="currentCardPhotoStyle['width']"
+                 [style.height]="currentCardPhotoStyle['height']"
+                 [style.position]="'absolute'">
+              <img *ngIf="selectedCard?.photoUrl" [src]="selectedCard?.photoUrl" class="real-card__photo-img" alt="member photo" />
+              <div *ngIf="!selectedCard?.photoUrl" class="real-card__photo-placeholder">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="1">
+                  <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+                </svg>
+              </div>
+            </div>
+            <img *ngIf="hasCurrentLogo" [src]="currentCardLogo" [ngStyle]="currentCardLogoStyle" alt="logo" style="object-fit:contain;" />
+            <ng-container *ngFor="let key of activeTextFields">
+  <div [style.position]="'absolute'"
+       [style.left.%]="textFields[key].x"
+       [style.top.%]="textFields[key].y"
+       [style.transform]="'translate(-50%,-50%)'"
+       [style.color]="textFields[key].color"
+       [style.font-weight]="textFields[key].bold ? 'bold' : 'normal'"
+       [style.font-size.px]="textFields[key].size * 160"
+       [style.white-space]="'nowrap'"
+       [style.pointer-events]="'none'">
+    {{ getFieldValue(key) }}
+  </div>
+</ng-container>
+          </ng-container>
+
+          <!-- BLANK CARD — same design/fields/logo as pre-printed, just no template image -->
+          <ng-container *ngIf="cardType === 'blank'">
+            <div class="real-card__bg real-card__bg--blank"></div>
+            <div class="real-card__photo-overlay"
+                 [style.top]="currentCardPhotoStyle['top']"
+                 [style.left]="currentCardPhotoStyle['left']"
+                 [style.width]="currentCardPhotoStyle['width']"
+                 [style.height]="currentCardPhotoStyle['height']"
+                 [style.position]="'absolute'">
+              <img *ngIf="selectedCard?.photoUrl" [src]="selectedCard?.photoUrl" class="real-card__photo-img" alt="member photo" />
+              <div *ngIf="!selectedCard?.photoUrl" class="real-card__photo-placeholder">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="1">
+                  <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+                </svg>
+              </div>
+            </div>
+            <img *ngIf="hasCurrentLogo" [src]="currentCardLogo" [ngStyle]="currentCardLogoStyle" alt="logo" style="object-fit:contain;" />
+            <ng-container *ngFor="let key of activeTextFields">
+              <div [style.position]="'absolute'"
+                   [style.left.%]="textFields[key].x"
+                   [style.top.%]="textFields[key].y"
+                   [style.transform]="'translate(-50%,-50%)'"
+                   [style.color]="textFields[key].color"
+                   [style.font-weight]="textFields[key].bold ? 'bold' : 'normal'"
+                   [style.font-size.px]="textFields[key].size * 160"
+                   [style.white-space]="'nowrap'"
+                   [style.pointer-events]="'none'">
+                {{ getFieldValue(key) }}
+              </div>
+            </ng-container>
+          </ng-container>
         </div>
-      </div>
-      <div class="blank-card__info">
-        <div class="blank-card__name">{{ selectedCard?.name }}</div>
-        <div class="blank-card__flat">{{ selectedCard?.building }} - {{ selectedCard?.flatNumber }}</div>
-        <div class="blank-card__id">ID: {{ selectedCard?.idNumber }}</div>
-      </div>
-    </div>
-  </ng-container>
-
-</div>
       </div>
 
       <!-- Card Type -->
@@ -259,8 +263,8 @@
 
       <div class="print-actions">
         <button class="btn-print"  (click)="print()">🖨️ Print</button>
-        <button class="btn-export" (click)="printExport()">⬇️ Print Export</button>
-         <button class="btn-preview" (click)="openPreviewCard()" [disabled]="!selectedCard">👁️ Preview Card</button>
+        <!-- <button class="btn-export" (click)="printExport()">⬇️ Print Export</button> -->
+        <!-- <button class="btn-preview" (click)="openPreviewCard()" [disabled]="!selectedCard">👁️ Preview Card</button> -->
       </div>
     </div>
     <!-- END LEFT PANEL -->
@@ -279,7 +283,11 @@
             <th mat-header-cell *matHeaderCellDef>Name</th>
             <td mat-cell *matCellDef="let row">
               <div class="name-cell">
-                <div class="name-avatar">{{ row.name?.charAt(0) }}</div>
+                <!-- <div class="name-avatar">{{ row.name?.charAt(0) }}</div> -->
+                 <div class="name-avatar">
+                  <img *ngIf="row.photoUrl" [src]="row.photoUrl" class="name-avatar__img" alt="" />
+                  <ng-container *ngIf="!row.photoUrl">{{ row.name?.charAt(0) }}</ng-container>
+                </div>
                 <span>{{ row.name }}</span>
               </div>
             </td>
@@ -306,7 +314,8 @@
           <ng-container matColumnDef="action">
             <th mat-header-cell *matHeaderCellDef>Action</th>
             <td mat-cell *matCellDef="let row">
-              <button class="btn-view" (click)="openViewDialog(row); $event.stopPropagation()">View</button>
+              <!-- <button class="btn-view" (click)="openViewDialog(row); $event.stopPropagation()">View</button> -->
+              <button class="btn-print-row" (click)="onRowClick(row); print(); $event.stopPropagation()">Print</button>
             </td>
           </ng-container>
           <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
@@ -319,7 +328,6 @@
           <p>No records found</p>
         </div>
       </div>
-      <!-- END TABLE -->
 
       <!-- PAGINATION -->
       <div class="cpe-pagination" *ngIf="totalPages > 1">
@@ -339,7 +347,7 @@
         </button>
       </div>
 
-      <!-- BOTTOM FORM (toggled) -->
+      <!-- BOTTOM FORM -->
       <div class="bottom-form" *ngIf="showIssueForm">
         <div class="bottom-form__row">
           <div class="form-field-group">
@@ -380,7 +388,6 @@
   <!-- CAMERA MODAL -->
   <div class="cam-overlay" *ngIf="showCameraModal" (click)="closeCameraModal()">
     <div class="cam-modal" (click)="$event.stopPropagation()">
-
       <div class="cam-modal__titlebar">
         <div class="cam-modal__titlebar-left">
           <span class="cam-icon">📷</span>
@@ -390,25 +397,29 @@
           <button class="cam-titlebar-btn" (click)="closeCameraModal()">✕</button>
         </div>
       </div>
-
       <div class="cam-modal__body">
-
         <div class="cam-left">
+          <!-- <div class="cam-controls">
+            <button class="cam-btn cam-btn--start" (click)="startCamera()" [disabled]="cameraActive">▶ Start Camera</button>
+            <button class="cam-btn cam-btn--stop"  (click)="stopCamera()"  [disabled]="!cameraActive">■ Stop Camera</button>
+            <button class="cam-btn cam-btn--capture" (click)="capturePhoto()" [disabled]="!cameraActive">📸 Capture</button>
+          </div> -->
+
+          <div class="cam-device-select" *ngIf="availableCameras.length > 1">
+            <label class="pro-filter-label">Select Camera</label>
+            <select class="pro-select" [(ngModel)]="selectedCameraId" (ngModelChange)="onCameraDeviceChange()">
+              <option *ngFor="let cam of availableCameras; let i = index" [value]="cam.deviceId">
+                {{ cam.label || ('Camera ' + (i + 1)) }}
+              </option>
+            </select>
+          </div>
           <div class="cam-controls">
-            <button class="cam-btn cam-btn--start" (click)="startCamera()" [disabled]="cameraActive">
-              ▶ Start Camera
-            </button>
-            <button class="cam-btn cam-btn--stop" (click)="stopCamera()" [disabled]="!cameraActive">
-              ■ Stop Camera
-            </button>
-            <button class="cam-btn cam-btn--capture" (click)="capturePhoto()" [disabled]="!cameraActive">
-              📸 Capture
-            </button>
+            <button class="cam-btn cam-btn--start" (click)="startCamera()" [disabled]="cameraActive">▶ Start Camera</button>
+            <button class="cam-btn cam-btn--stop"  (click)="stopCamera()"  [disabled]="!cameraActive">■ Stop Camera</button>
+            <button class="cam-btn cam-btn--capture" (click)="capturePhoto()" [disabled]="!cameraActive">📸 Capture</button>
           </div>
           <div class="cam-feed-box">
-            <video id="camVideo" autoplay playsinline class="cam-video"
-                   [style.display]="cameraActive ? 'block' : 'none'">
-            </video>
+            <video id="camVideo" autoplay playsinline class="cam-video" [style.display]="cameraActive ? 'block' : 'none'"></video>
             <div class="cam-feed-placeholder" *ngIf="!cameraActive && !capturedImage">
               <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
                 <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
@@ -416,29 +427,26 @@
               </svg>
               <p>Click "Start Camera" to begin</p>
             </div>
-            <img *ngIf="!cameraActive && capturedImage" [src]="capturedImage"
-                 class="cam-captured-preview" alt="captured" />
+            <img *ngIf="!cameraActive && capturedImage" [src]="capturedImage" class="cam-captured-preview" alt="captured" />
           </div>
         </div>
-
         <div class="cam-right">
           <div class="cam-right__label">Croppable Image</div>
-
           <div class="cam-crop-box" *ngIf="showCropper && imageToCrop">
             <image-cropper
               [imageBase64]="imageToCrop"
-              [maintainAspectRatio]="false"
+              [maintainAspectRatio]="true"
+              [aspectRatio]="cropperAspectRatio"
               [resizeToWidth]="400"
               [onlyScaleDown]="true"
               format="jpeg"
               [cropperMinWidth]="30"
               [cropperMinHeight]="30"
-              (imageCropped)="imageCropped($event)"
+                            (imageCropped)="imageCropped($event)"
               backgroundColor="#f4f6f9"
               style="max-height: 320px; background: #f4f6f9;">
             </image-cropper>
           </div>
-
           <div class="cam-crop-box" *ngIf="!showCropper">
             <div class="cam-crop-placeholder">
               <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" opacity="0.3">
@@ -448,10 +456,26 @@
               <p>Photo will appear here</p>
             </div>
           </div>
-
-          <div class="cam-preview-thumb" *ngIf="croppedResult">
+          <!-- <div class="cam-preview-thumb" *ngIf="croppedResult">
             <span class="cam-preview-label">Preview</span>
             <img [src]="croppedResult" class="cam-thumb-img" alt="cropped preview" />
+          </div>
+          <div class="cam-upload-left"> -->
+
+                      <div class="cam-preview-thumb" *ngIf="croppedResult">
+            <span class="cam-preview-label">Preview</span>
+            <img [src]="croppedResult" class="cam-thumb-img" [style.filter]="'brightness(' + brightnessValue + '%)'" alt="cropped preview" />
+          </div>
+
+          <div class="cam-adjust-row" *ngIf="croppedResult">
+            <label class="cam-cardno-label">Brightness</label>
+            <input type="range" min="50" max="150" [(ngModel)]="brightnessValue" class="cam-adjust-slider" />
+            <span class="cam-adjust-val">{{ brightnessValue }}%</span>
+          </div>
+          <div class="cam-adjust-row" *ngIf="croppedResult">
+            <label class="cam-cardno-label">Sharpness</label>
+            <input type="range" min="0" max="100" [(ngModel)]="sharpnessValue" class="cam-adjust-slider" />
+            <span class="cam-adjust-val">{{ sharpnessValue }}%</span>
           </div>
 
           <div class="cam-upload-left">
@@ -461,139 +485,162 @@
             </label>
             <button class="cam-clear-btn" (click)="clearCaptured()">✕ Clear</button>
           </div>
-
           <div class="cam-cardno-row">
             <label class="cam-cardno-label">CardNo</label>
             <input class="cam-cardno-input" [(ngModel)]="cardNoForPhoto" readonly />
           </div>
-
-          <button class="cam-save-btn" (click)="saveAndExit()"
-                  [disabled]="!croppedResult && !capturedImage">
+          <button class="cam-save-btn" (click)="saveAndExit()" [disabled]="!croppedResult && !capturedImage">
             💾 Save and Exit
           </button>
         </div>
-
       </div>
     </div>
   </div>
   <!-- END CAMERA MODAL -->
 
-
-
   <!-- PREVIEW CARD MODAL -->
-<div class="preview-overlay" *ngIf="showPreviewModal" (click)="closePreviewModal()">
-  <div class="preview-modal" (click)="$event.stopPropagation()">
+  <div class="preview-overlay" *ngIf="showPreviewModal" (click)="closePreviewModal()">
+    <div class="preview-modal" (click)="$event.stopPropagation()">
 
-    <div class="preview-modal__header">
-      <span>👁️ Preview Card — {{ selectedCard?.name }}</span>
-      <button class="preview-close-btn" (click)="closePreviewModal()">✕</button>
-    </div>
-
-    <div class="preview-modal__body">
-      <div class="preview-card-wrap">
-       <div class="preview-card-container" #previewContainer>
-
-  <!-- Card Template -->
-  <!-- <img class="preview-card-bg"
-       [src]="currentCardTemplate"
-       alt="card template"
-       (load)="onPreviewTemplateLoad()" /> -->
-
-
-       <!-- Card Template -->
-<ng-container *ngIf="selectedCard?.holderType === 'Contractor'; else normalTemplate">
-  <div class="contractor-card">
-    <div class="contractor-card__bg"></div>
-    <div class="contractor-card__header">
-      <div class="company-title">{{ selectedCard?.company || 'Company Name' }}</div>
-      <div class="company-subtitle">&#64; Riverview City, Pune</div>
-    </div>
-    <div class="contractor-card__photo-wrap">
-      <img *ngIf="selectedCard?.photoUrl" [src]="selectedCard?.photoUrl" alt="photo" />
-      <div *ngIf="!selectedCard?.photoUrl" class="photo-placeholder">
-        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="1">
-          <circle cx="12" cy="8" r="4"/>
-          <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
-        </svg>
+      <div class="preview-modal__header">
+        <span>👁️ Preview Card — {{ selectedCard?.name }}</span>
+        <button class="preview-close-btn" (click)="closePreviewModal()">✕</button>
       </div>
-    </div>
-    <div class="contractor-card__details">
-      <div class="detail-name">{{ selectedCard?.name }}</div>
-      <div class="detail-row">Validity - {{ selectedCard?.validTill ? (selectedCard?.validTill | date:'d/M/yyyy') : '—' }}</div>
-      <div class="detail-row">Company - {{ selectedCard?.company || '—' }}</div>
-      <div class="detail-row">Card No - {{ selectedCard?.idNumber || '—' }}</div>
-      <div class="detail-row">Agency - {{ selectedCard?.agency || '—' }}</div>
-    </div>
-    <div class="contractor-card__footer">
-      <div class="footer-brand">
-        <span class="footer-bird">🕊️</span>
-        <span class="footer-logo">Nanded City</span>
-      </div>
-      <div class="footer-tagline">My City. My World.</div>
-      <div class="footer-url">www.nandedcitypune.com</div>
-    </div>
+
+      <div class="preview-modal__body">
+        <div class="preview-card-wrap">
+          <div class="preview-card-container" #previewContainer>
+
+            <!-- ── CONTRACTOR in preview ─────────────────────── -->
+            <ng-container *ngIf="selectedCard?.holderType === 'Contractor'; else normalTemplate">
+
+              <!-- Has NRD template -->
+              <ng-container *ngIf="contractorTemplate; else contractorPreviewFallback">
+                <img class="preview-card-bg" [src]="contractorTemplate" alt="contractor template" (load)="onPreviewTemplateLoad()" />
+              </ng-container>
+
+              <!-- No NRD template — fallback asset -->
+              <ng-template #contractorPreviewFallback>
+  <div class="preview-no-template">
+    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="1">
+      <rect x="2" y="5" width="20" height="14" rx="2"/>
+      <line x1="2" y1="10" x2="22" y2="10"/>
+    </svg>
+    <p>No template uploaded for this NRD</p>
   </div>
-</ng-container>
-<ng-template #normalTemplate>
-  <img class="preview-card-bg"
-       [src]="currentCardTemplate"
-       alt="card template"
-       (load)="onPreviewTemplateLoad()" />
 </ng-template>
 
-  <!-- Draggable Resizable Photo -->
-  <div class="preview-photo-drag"
-       *ngIf="selectedCard?.photoUrl"
-       [style.top.px]="previewPhoto.top"
-       [style.left.px]="previewPhoto.left"
-       [style.width.px]="previewPhoto.width"
-       [style.height.px]="previewPhoto.height"
-       (mousedown)="onPhotoDragStart($event)">
-    <img [src]="selectedCard?.photoUrl" alt="photo" 
-         (error)="onPreviewImgError($event)" />
-    <div class="resize-handle resize-handle--se"
-         (mousedown)="onPhotoResizeStart($event, 'se')"></div>
-    <div class="resize-handle resize-handle--sw"
-         (mousedown)="onPhotoResizeStart($event, 'sw')"></div>
-    <div class="resize-handle resize-handle--ne"
-         (mousedown)="onPhotoResizeStart($event, 'ne')"></div>
-    <div class="resize-handle resize-handle--nw"
-         (mousedown)="onPhotoResizeStart($event, 'nw')"></div>
-  </div>
+              <!-- Contractor data overlay on preview -->
+          
 
-  <!-- No Photo Placeholder -->
-  <div class="preview-no-photo" *ngIf="!selectedCard?.photoUrl">
-    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="1">
-      <circle cx="12" cy="8" r="4"/>
-      <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
-    </svg>
-    <p>No photo</p>
-  </div>
+            </ng-container>
+            <!-- ── END CONTRACTOR in preview ──────────────────── -->
 
-  <!-- ✅ ADD HERE -->
-  <div class="preview-text-overlay">
-    <div class="preview-name">{{ selectedCard?.name }}</div>
-    <div class="preview-flat">{{ selectedCard?.building }} - {{ selectedCard?.flatNumber }}</div>
-    <div class="preview-id">ID: {{ selectedCard?.idNumber }}</div>
-  </div>
+            <!-- Normal (non-contractor) template -->
+            <ng-template #normalTemplate>
+              <img class="preview-card-bg"
+                   [src]="currentCardTemplate"
+                   alt="card template"
+                   (load)="onPreviewTemplateLoad()" />
+            </ng-template>
 
-</div>
+            <!-- Draggable Resizable Photo -->
+            <div class="preview-photo-drag"
+                 *ngIf="selectedCard?.photoUrl"
+                 [style.top.px]="previewPhoto.top"
+                 [style.left.px]="previewPhoto.left"
+                 [style.width.px]="previewPhoto.width"
+                 [style.height.px]="previewPhoto.height"
+                 (mousedown)="onPhotoDragStart($event)">
+              <img [src]="selectedCard?.photoUrl" alt="photo" (error)="onPreviewImgError($event)" />
+              <div class="resize-handle resize-handle--se" (mousedown)="onPhotoResizeStart($event, 'se')"></div>
+              <div class="resize-handle resize-handle--sw" (mousedown)="onPhotoResizeStart($event, 'sw')"></div>
+              <div class="resize-handle resize-handle--ne" (mousedown)="onPhotoResizeStart($event, 'ne')"></div>
+              <div class="resize-handle resize-handle--nw" (mousedown)="onPhotoResizeStart($event, 'nw')"></div>
+            </div>
+
+            <!-- No Photo Placeholder -->
+            <div class="preview-no-photo" *ngIf="!selectedCard?.photoUrl">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="1">
+                <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+              </svg>
+              <p>No photo</p>
+            </div>
+
+            <!-- Text overlay for non-contractor only -->
+           <ng-container *ngFor="let key of activeTextFields">
+  <div class="preview-text-field"
+       [class.preview-text-field--selected]="selectedTextField === key"
+       [style.left.%]="textFields[key].x"
+       [style.top.%]="textFields[key].y"
+       [style.color]="textFields[key].color"
+       [style.font-weight]="textFields[key].bold ? 'bold' : 'normal'"
+       [style.font-size.px]="textFields[key].size * 200"
+       (mousedown)="onTextDragStart($event, key)">
+    <span *ngIf="key === 'name'">{{ selectedCard?.name }}</span>
+    <span *ngIf="key === 'building'">{{ selectedCard?.building }} - {{ selectedCard?.flatNumber }}</span>
+    <span *ngIf="key === 'idNumber'">ID: {{ selectedCard?.idNumber }}</span>
+    <span *ngIf="key === 'validity'">Validity - {{ selectedCard?.validTill ? (selectedCard?.validTill | date:'d/M/yyyy') : '—' }}</span>
+    <span *ngIf="key === 'company'">Company - {{ selectedCard?.company || '—' }}</span>
+    <span *ngIf="key === 'cardNo'">Card No - {{ selectedCard?.idNumber || '—' }}</span>
+    <span *ngIf="key === 'agency'">Agency - {{ selectedCard?.agency || '—' }}</span>
+  </div>
+</ng-container>
+
+          </div>
+        </div>
+
+        <div class="preview-controls">
+
+          <!-- TEXT STYLE CONTROLS — non-contractor only -->
+       <div class="text-style-panel">
+            <div class="text-style-row">
+              <label class="pro-filter-label">Select Text</label>
+              <select class="pro-select" [(ngModel)]="selectedTextField">
+  <option value="">-- Select --</option>
+  <option *ngFor="let key of activeTextFields" [value]="key">
+    {{ textFields[key].label }}
+  </option>
+</select>
+            </div>
+            <ng-container *ngIf="selectedTextField">
+              <div class="text-style-row">
+                <label class="pro-filter-label">Color</label>
+                <input type="color" [(ngModel)]="currentTextStyle.color" class="color-picker" />
+                <span class="color-val">{{ currentTextStyle.color }}</span>
+              </div>
+              <div class="text-style-row">
+                <label class="pro-filter-label">Size</label>
+                <input type="range" min="0.020" max="0.120" step="0.005"
+                       [ngModel]="currentTextStyle.size"
+                       (ngModelChange)="currentTextStyle.size = +$event"
+                       class="size-slider" />
+                <span class="size-val">{{ (currentTextStyle.size * 100).toFixed(1) }}</span>
+              </div>
+              <div class="text-style-row">
+                <label class="pro-filter-label">Bold</label>
+                <label class="toggle-switch">
+                  <input type="checkbox" [(ngModel)]="currentTextStyle.bold" />
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+            </ng-container>
+          </div>
+
+          <div class="preview-info">
+            <span>📐 Position: {{ previewPhoto.left }}px, {{ previewPhoto.top }}px</span>
+            <span>📏 Size: {{ previewPhoto.width }}px × {{ previewPhoto.height }}px</span>
+          </div>
+          <div class="preview-actions">
+            <button class="btn-reset-preview" (click)="resetPreviewPhoto()">↺ Reset</button>
+            <button class="btn-save-preview"  (click)="savePreviewAndClose()">✅ Apply & Close</button>
+          </div>
+
+        </div>
       </div>
 
-      <div class="preview-controls">
-        <div class="preview-info">
-          <span>📐 Position: {{ previewPhoto.left }}px, {{ previewPhoto.top }}px</span>
-          <span>📏 Size: {{ previewPhoto.width }}px × {{ previewPhoto.height }}px</span>
-        </div>
-        <div class="preview-actions">
-          <button class="btn-reset-preview" (click)="resetPreviewPhoto()">↺ Reset</button>
-          <button class="btn-save-preview"  (click)="savePreviewAndClose()">✅ Apply & Close</button>
-        </div>
-      </div>
     </div>
-
   </div>
-</div>
-<!-- END PREVIEW CARD MODAL -->
+  <!-- END PREVIEW CARD MODAL -->
 
 </div>

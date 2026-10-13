@@ -84,7 +84,11 @@ export class ReaderLocationComponent {
     const payload = this.locationForm.value;
     console.log("Payload before sending:", payload);
 
-    this.authService.postReaderLocation(payload).subscribe({
+    const saveCall = this.editMode
+      ? this.authService.updateReaderLocation(payload)
+      : this.authService.postReaderLocation(payload);
+
+    saveCall.subscribe({
       next: res => {
         this.alertService.openSuccess('Successfully Saved');
         this.onCancel();

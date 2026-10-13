@@ -65,6 +65,43 @@ body {
     width: 100%;
 }
 
+// ── Global white boxed input style (was per-component, now applied once) ──
+.full-width .mat-mdc-text-field-wrapper,
+.w-100 .mat-mdc-text-field-wrapper {
+    background-color: #ffffff !important;
+    border: 1px solid #d9dce3 !important;
+    border-radius: 10px !important;
+    overflow: hidden;
+    padding-top: 4px;
+}
+
+.full-width .mat-mdc-form-field-flex,
+.w-100 .mat-mdc-form-field-flex {
+    background-color: transparent !important;
+}
+
+.full-width .mdc-line-ripple::before,
+.full-width .mdc-line-ripple::after,
+.w-100 .mdc-line-ripple::before,
+.w-100 .mdc-line-ripple::after {
+    display: none !important;
+    border: none !important;
+}
+
+.full-width.mat-focused .mat-mdc-text-field-wrapper,
+.w-100.mat-focused .mat-mdc-text-field-wrapper {
+    border-color: #a9aebb !important;
+}
+
+.full-width input.mat-mdc-input-element,
+.full-width .mat-mdc-select-value,
+.full-width textarea.mat-mdc-input-element,
+.w-100 input.mat-mdc-input-element,
+.w-100 .mat-mdc-select-value,
+.w-100 textarea.mat-mdc-input-element {
+    color: #1f2438;
+}
+
 .input_fileupload--hidden {
     display: none;
 }
@@ -86,6 +123,64 @@ body {
 
 table {
     width: 100%;
+}
+
+// ── Premium clean table style (row + column lines, no color fills) ──────
+.mat-mdc-table {
+    border: 1px solid #e3e5ea;
+    border-radius: 10px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    margin-top: 20px;
+    min-width: max-content;
+}
+
+// Wrap wide tables in horizontal scroll instead of squeezing columns
+.container:has(> table.mat-elevation-z8) {
+    overflow-x: auto;
+}
+
+.mat-mdc-header-cell,
+.mat-mdc-cell {
+    white-space: nowrap;
+}
+.mat-mdc-header-row {
+    background-color: #fafbfc;
+    position: relative;
+    z-index: 1;
+}
+
+.mat-mdc-header-cell {
+    color: #4a4f5c !important;
+    font-weight: 600 !important;
+    font-size: 13px !important;
+    letter-spacing: 0.2px;
+    box-shadow: inset -1px 0 0 #b6bcc8, inset 0 -1px 0 #b6bcc8, inset 0 1px 0 #b6bcc8;
+
+    &:first-child {
+        box-shadow: inset -1px 0 0 #b6bcc8, inset 0 -1px 0 #b6bcc8, inset 0 1px 0 #b6bcc8, inset 1px 0 0 #b6bcc8;
+    }
+
+    &:last-child {
+        box-shadow: inset 0 -1px 0 #b6bcc8, inset 0 1px 0 #b6bcc8, inset -1px 0 0 #b6bcc8;
+    }
+}
+
+.mat-mdc-cell {
+    color: #2b2f3a !important;
+    font-size: 13.5px !important;
+    box-shadow: inset -1px 0 0 #d5d9e2, inset 0 -1px 0 #d5d9e2;
+
+    &:first-child {
+        box-shadow: inset -1px 0 0 #d5d9e2, inset 0 -1px 0 #d5d9e2, inset 1px 0 0 #d5d9e2;
+    }
+
+    &:last-child {
+        box-shadow: inset 0 -1px 0 #d5d9e2, inset -1px 0 0 #d5d9e2;
+    }
+}
+
+.mat-mdc-row:hover {
+    background-color: #f7f8fa;
 }
 
 .full-screen-modal .mat-dialog-container {
@@ -117,4 +212,8 @@ input::-webkit-inner-spin-button {
 /* Firefox */
 input[type=number] {
   -moz-appearance: textfield;
+}
+
+.mat-mdc-option.mdc-list-item {
+    background-color: #ffffff !important;
 }

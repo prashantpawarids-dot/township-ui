@@ -1,0 +1,82 @@
+.real-card {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+.real-card__bg {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  object-fit: fill;
+}
+
+.real-card__photo-overlay {
+  overflow: hidden;
+  background: #dce8f0;
+  img { width: 100%; height: 100%; object-fit: cover; }
+}
+
+.real-card__photo-img {
+  width: 100%; height: 100%; object-fit: cover;
+}
+
+.real-card__photo-placeholder {
+  width: 100%; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+  background: #e8eef5;
+}
+
+.real-card-empty {
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  height: 100%; color: #aaa; gap: 8px;
+  p { font-size: 12px; text-align: center; }
+}
+
+// Contractor fallback
+.contractor-card {
+  width: 100%; height: 100%;
+  background: linear-gradient(160deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  display: flex; flex-direction: column;
+  align-items: center; padding: 12px; gap: 8px;
+  &__header { text-align: center; }
+  &__photo-wrap {
+    width: 70px; height: 80px; border-radius: 6px;
+    overflow: hidden; background: #fff;
+    img { width: 100%; height: 100%; object-fit: cover; }
+  }
+  &__details { text-align: center; }
+}
+
+.photo-placeholder {
+  width: 100%; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+}
+
+.company-title  { font-size: 11px; font-weight: 700; color: #fff; }
+.company-subtitle { font-size: 9px; color: rgba(255,255,255,0.6); }
+.detail-name    { font-size: 12px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+.detail-row     { font-size: 9px; color: rgba(255,255,255,0.8); }
+
+// Blank card
+.blank-card {
+  width: 100%; height: 100%; background: #fff;
+  display: flex; flex-direction: column; align-items: center;
+  padding: 12px; gap: 8px;
+  &__photo-wrap {
+    width: 80px; height: 90px; border-radius: 6px;
+    overflow: hidden; border: 1px solid #ddd; background: #f5f5f5;
+    img { width: 100%; height: 100%; object-fit: cover; }
+  }
+  &__photo-placeholder {
+    width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+  }
+  &__info { text-align: center; }
+  &__name { font-size: 13px; font-weight: 700; color: #111; }
+  &__flat { font-size: 10px; color: #555; }
+  &__id   { font-size: 9px; color: #888; font-family: monospace; }
+}

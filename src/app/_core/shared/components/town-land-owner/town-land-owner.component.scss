@@ -1,1 +1,58 @@
+// //land owner
+
+// .required-star {
+//   color: #d33;
+//   font-weight: 700;
+//   margin-left: 2px;
+// }
+
+// ::ng-deep .mat-mdc-form-field-required-marker {
+//   color: #d33;
+// }
+
+
 //land owner
+
+.required-star {
+  color: #d33;
+  font-weight: 700;
+  margin-left: 2px;
+}
+
+::ng-deep .mat-mdc-form-field-required-marker {
+  color: #d33;
+}
+
+// ── White boxed inputs with thin light-grey border + rounded corners ──────
+// Form uses Material "fill" appearance (underline style) — hide the underline,
+// draw a full rounded border on the wrapper instead.
+::ng-deep {
+  .full-width .mat-mdc-text-field-wrapper {
+    background-color: #ffffff !important;
+    border: 1px solid #d9dce3 !important;
+    border-radius: 10px !important;
+    overflow: hidden;
+    padding-top: 4px;
+  }
+
+  .full-width .mat-mdc-form-field-flex {
+    background-color: transparent !important;
+  }
+
+  // Kill the fill-appearance underline / ripple line completely
+  .full-width .mdc-line-ripple::before,
+  .full-width .mdc-line-ripple::after {
+    display: none !important;
+    border: none !important;
+  }
+
+  // Darker border on focus instead of Material's blue underline
+  .full-width.mat-focused .mat-mdc-text-field-wrapper {
+    border-color: #a9aebb !important;
+  }
+
+  .full-width input.mat-mdc-input-element,
+  .full-width .mat-mdc-select-value {
+    color: #1f2438;
+  }
+}

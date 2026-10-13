@@ -171,7 +171,7 @@ export class ReaderLocationComponent implements AfterViewInit {
         doc.text(`Printed on: ${today.toLocaleDateString()} ${today.toLocaleTimeString()}`, pageWidth - 10, 20, { align: 'right' });
 
         // Footer
-        doc.text('©IDS ID SMART TECH', 10, pageHeight - 10);
+        doc.text('© IDS ID PVT LTD', 10, pageHeight - 10);
         doc.text(`Page ${data.pageNumber}`, pageWidth - 10, pageHeight - 10, { align: 'right' });
       }
     });

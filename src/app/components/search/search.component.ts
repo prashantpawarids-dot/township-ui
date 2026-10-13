@@ -7,10 +7,10 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { MaterialModule } from 'src/app/_core/shared/material/material.module';
 import { AuthService } from 'src/app/services/auth.service';
 import { AuthorityService } from 'src/app/services/authority.service';
-
+import { ModuleKeys } from 'src/app/_core/enums/module-keys.enum';
 import Swal from 'sweetalert2';
 import { Observable } from 'rxjs';
-import { Console } from 'console';
+// import { Console } from 'console';
 
 @Component({
   selector: 'app-search',
@@ -31,10 +31,19 @@ export class SearchComponent {
   displayedColumns: string[] = [];
   @ViewChild('paginator') paginator: MatPaginator;
 
-  pageSizes = [3, 5, 7];
+pageSizes = [3, 5, 7];
   pageSize = 10;
    showDownloadBtn: boolean = false;
 MODULE_KEY: number = -1;
+
+  // ── Neighbourhood / Building filters ────────────────────────
+  showLocationFilters: boolean = false;
+  showBuildingFilter: boolean = false;
+  neighbourhoodOptions: any[] = [];
+  buildingOptions: any[] = [];
+  allBuildingOptions: any[] = [];
+  selectedNeighbourhoods: string[] = ['ALL'];
+  selectedBuildings: string[] = ['ALL'];
 
 get auth() {
   return this.authorityService;
@@ -50,58 +59,53 @@ getModuleKeyForPath(path: string): number {
   const cleanPath = path.split('?')[0];
 
   const map: { [key: string]: number } = {
-    // '/master/company': 1,
-    // '/master/profile': 2,
-    // '/master/project': 3,
-    // '/master/user': 4,
-    // '/master/river-view-city': 5,
-    // '/master/neighbourhood': 6,
-    // '/master/building': 7,
-    // '/master/reader-location': 8,
-    // '/master/service-provider': 9,
-    // '/master/amenities': 10,
-    // '/master/reader-relay': 11,
-    //  '/land-owner': 12,
-    // '/resident': 13,
-    // '/employee': 14, 
-    // '/card-lost-damage': 15,
-    // '/tag-block-revoke': 16,
-    // '/guest': 17,
-    // '/visitor': 18
+    
 
-    // ===== MASTER =====
-    '/master/company': 1,
-    '/master/profile': 2,
-    '/master/project': 3,
-    '/master/user': 4,
-     '/master/contrator-type': 5,
-    '/master/neighbourhood': 6,
-    '/master/building': 7,
-    '/master/reader-location': 8,
-    '/master/service-type': 9,
-    '/master/amenities': 10,
-    '/master/reader-relay': 11,
-    '/land-owner': 12,
-    '/resident': 13,
-    '/employee': 14,
-     '/card-lost-damage': 15,
-    '/tag-block-revoke': 16,
-     '/guest': 17,
-    '/visitor': 18,
-     '/service-provider': 19,
-    '/contractor': 20,
-    '/tenant': 21,
+    
+    '/master/company':        ModuleKeys.Company,
+'/master/profile':        ModuleKeys.Profile,
+'/master/project':        ModuleKeys.Project,
+'/master/user':           ModuleKeys.User,
+'/master/contrator-type': ModuleKeys.ContractorType,
+'/master/neighbourhood':  ModuleKeys.Neighbourhood,
+'/master/nrdcardtemplate': ModuleKeys.Nrdcardtemplate,
+'/master/building':       ModuleKeys.Building,
+'/master/reader-location':ModuleKeys.ReaderLocation,
+'/master/service-type':   ModuleKeys.ServiceType,
+'/master/amenities':      ModuleKeys.Amenities,
+'/master/reader-relay':   ModuleKeys.ReaderRelay,
+'/land-owner':            ModuleKeys.LandOwner,
+'/resident':              ModuleKeys.Resident,
+'/employee':              ModuleKeys.Employee,
+'/card-lost-damage':      ModuleKeys.CardLostDamage,
+'/tag-block-revoke':      ModuleKeys.TagBlockRevoke,
+'/guest':                 ModuleKeys.Guest,
+'/visitor':               ModuleKeys.Visitor,
+'/service-provider':      ModuleKeys.ServiceProvider,
+'/contractor':            ModuleKeys.Contractor,
+'/tenant':                ModuleKeys.Tenant,
+'/master/camera':         ModuleKeys.Camera,
   };
 
   return map[cleanPath] ?? 0; // 0 = no authority
 }
 
-  constructor(private route: ActivatedRoute, private router: Router,private authorityService: AuthorityService ,
+ constructor(private route: ActivatedRoute, private router: Router,private authorityService: AuthorityService ,
     private authService: AuthService) {
+    this.loadNeighbourhoods();
+    this.loadBuildings();
     this.route.queryParamMap.subscribe(params => {
       this.returnPath = params.get('returnPath');
       this.showDownloadBtn = this.returnPath?.startsWith('/master/') || false; // ✅ Show PDF only for master
       this.MODULE_KEY = this.getModuleKeyForPath(this.returnPath || '');
+
+     const locationFilterPaths = ['/land-owner', '/resident', '/tenant', '/guest', '/visitor', '/contractor','/service-provider'];
+      this.showLocationFilters = locationFilterPaths.includes(this.returnPath || '');
+      this.showBuildingFilter = this.returnPath !== '/contractor' && this.showLocationFilters;
+      this.selectedNeighbourhoods = ['ALL'];
+      this.selectedBuildings = ['ALL'];
+      this.prevSelectedNeighbourhoods = ['ALL'];
+      this.prevSelectedBuildings = ['ALL'];
 // console.log('MODULE_KEY in Search Component:', this.MODULE_KEY);
 
 // this.route.queryParamMap.subscribe(params => {
@@ -200,6 +204,14 @@ getModuleKeyForPath(path: string): number {
           this.resetFields();
           this.setProject();
           break;
+                case '/master/nrdcardtemplate':
+          this.resetFields();
+          this.setNrdcardtemplate();
+          break;
+        case '/master/camera':
+          this.resetFields();
+          this.setCamera();
+          break;
         default:
           break;
       }
@@ -208,25 +220,133 @@ getModuleKeyForPath(path: string): number {
 
   title: string;
 
+  loadNeighbourhoods(): void {
+    this.authService.getNeighbourhood().subscribe({
+      next: (res) => {
+        this.neighbourhoodOptions = [{ id: 'ALL', name: 'ALL' }, ...res];
+      },
+      error: () => { this.neighbourhoodOptions = [{ id: 'ALL', name: 'ALL' }]; }
+    });
+  }
 
+  loadBuildings(): void {
+    this.authService.getBuildings().subscribe({
+      next: (res) => {
+        this.allBuildingOptions = res;
+        this.buildingOptions = [{ id: 'ALL', name: 'ALL' }, ...res];
+      },
+      error: () => { this.allBuildingOptions = []; this.buildingOptions = [{ id: 'ALL', name: 'ALL' }]; }
+    });
+  }
+
+ private prevSelectedNeighbourhoods: string[] = ['ALL'];
+  private prevSelectedBuildings: string[] = ['ALL'];
+
+  onNeighbourhoodFilterChange(): void {
+    const allNames = this.neighbourhoodOptions.filter(n => n.name !== 'ALL' && (n.name ?? n.nrdname ?? n.Name) !== 'ALL')
+      .map((n: any) => n.name ?? n.nrdname ?? n.Name);
+
+    const wasAllSelected = this.prevSelectedNeighbourhoods.includes('ALL');
+    const isAllSelectedNow = this.selectedNeighbourhoods.includes('ALL');
+
+    if (isAllSelectedNow && !wasAllSelected) {
+      // user just clicked ALL -> select everything
+      this.selectedNeighbourhoods = ['ALL', ...allNames];
+    } else if (!isAllSelectedNow && wasAllSelected) {
+      // user just deselected ALL -> clear everything
+      this.selectedNeighbourhoods = [];
+    } else if (isAllSelectedNow && wasAllSelected && this.selectedNeighbourhoods.length < allNames.length + 1) {
+      // user deselected one specific item while ALL was checked -> drop ALL too
+      this.selectedNeighbourhoods = this.selectedNeighbourhoods.filter(n => n !== 'ALL');
+    } else if (!isAllSelectedNow && this.selectedNeighbourhoods.length === allNames.length) {
+      // user manually selected every individual item -> auto-check ALL
+      this.selectedNeighbourhoods = ['ALL', ...this.selectedNeighbourhoods];
+    }
+
+    this.prevSelectedNeighbourhoods = [...this.selectedNeighbourhoods];
+
+    if (this.selectedNeighbourhoods.includes('ALL') || this.selectedNeighbourhoods.length === 0) {
+      this.buildingOptions = [{ id: 'ALL', name: 'ALL' }, ...this.allBuildingOptions];
+    } else {
+      this.buildingOptions = [
+        { id: 'ALL', name: 'ALL' },
+        ...this.allBuildingOptions.filter((b: any) => this.selectedNeighbourhoods.includes(b.nrdName))
+      ];
+    }
+    this.selectedBuildings = ['ALL'];
+    this.prevSelectedBuildings = ['ALL'];
+    this.searchData();
+  }
+
+  onBuildingFilterChange(): void {
+    const allNames = this.buildingOptions.filter(b => b.name !== 'ALL' && (b.name ?? b.buildingname ?? b.Name) !== 'ALL')
+      .map((b: any) => b.name ?? b.buildingname ?? b.Name);
+
+    const wasAllSelected = this.prevSelectedBuildings.includes('ALL');
+    const isAllSelectedNow = this.selectedBuildings.includes('ALL');
+
+    if (isAllSelectedNow && !wasAllSelected) {
+      this.selectedBuildings = ['ALL', ...allNames];
+    } else if (!isAllSelectedNow && wasAllSelected) {
+      this.selectedBuildings = [];
+    } else if (isAllSelectedNow && wasAllSelected && this.selectedBuildings.length < allNames.length + 1) {
+      this.selectedBuildings = this.selectedBuildings.filter(b => b !== 'ALL');
+    } else if (!isAllSelectedNow && this.selectedBuildings.length === allNames.length) {
+      this.selectedBuildings = ['ALL', ...this.selectedBuildings];
+    }
+
+   this.prevSelectedBuildings = [...this.selectedBuildings];
+    this.searchData();
+  }
 
   searchData() {
-    if (!this.searchBy.query) {
-      this.dataSource.data = this.dataToDisplay;
-    } else if(this.searchBy.keyName) {
-      this.dataSource.data = this.dataToDisplay.filter((element: any) => {
+    let result = [...this.dataToDisplay];
+
+    // if (this.showLocationFilters) {
+    //   if (!this.selectedNeighbourhoods.includes('ALL') && this.selectedNeighbourhoods.length > 0) {
+    //     result = result.filter((e: any) => this.selectedNeighbourhoods.includes(e.nrdName));
+    //   }
+    //   if (!this.selectedBuildings.includes('ALL') && this.selectedBuildings.length > 0) {
+    //     result = result.filter((e: any) => this.selectedBuildings.includes(e.buildingName));
+    //   }
+    // }
+
+    if (this.showLocationFilters) {
+      if (!this.selectedNeighbourhoods.includes('ALL') && this.selectedNeighbourhoods.length > 0) {
+        result = result.filter((e: any) =>
+          Array.isArray(e.nrdNamesArr)
+            ? e.nrdNamesArr.some((n: string) => this.selectedNeighbourhoods.includes(n))
+            : this.selectedNeighbourhoods.includes(e.nrdName)
+        );
+      }
+      if (!this.selectedBuildings.includes('ALL') && this.selectedBuildings.length > 0) {
+        result = result.filter((e: any) =>
+          Array.isArray(e.buildingNamesArr)
+            ? e.buildingNamesArr.some((b: string) => this.selectedBuildings.includes(b))
+            : this.selectedBuildings.includes(e.buildingName)
+        );
+      }
+    }
+
+
+    
+
+    if (this.searchBy.query && this.searchBy.keyName) {
+      result = result.filter((element: any) => {
         if (this.searchBy.keyName === "fullname") {
           let name = [element["firstName"], element["middleName"], element["lastName"]].join(" ");
           return name.toLowerCase().includes(this.searchBy.query.toLowerCase())
         } else if (this.searchBy.keyName === "isResident") {
           return this.searchBy.query.toLowerCase() == 'yes' ? element.isResident : !element.isResident
-            
+
         } else if (element[this.searchBy.keyName]) {
           return element[this.searchBy.keyName].toLowerCase().includes(this.searchBy.query.toLowerCase());
         }
         return false
       })
     }
+
+    this.dataSource.data = result;
   }
 
   displaSearchBy = (option: any): string => {
@@ -242,29 +362,115 @@ getModuleKeyForPath(path: string): number {
     this.displayedColumns = [];
   }
 
-  setLandOwner() {
+  // setLandOwner() {
+  //   this.title = 'Land Owner';
+  //   this.searchByOptions = [{ name: "Id Number", key: "idNumber" }, { name: "Name", key: "fullname" }, { name: "Neighbourhood", key: "nrdName" }, { name: "Building", key: "buildingName" }, { name: "Flat no.", key: "flatNumber" }];
+  //   this.authService.getLandOwner().subscribe(res => {
+  //     this.dataToDisplay = [...res];
+  //     this.dataSource.data = this.dataToDisplay; // Update dataSource data
+  //     this.displayedColumns = ['srno', 'idNumber', 'fullname', 'nrdName' , 'buildingName', 'flatNumber', 'actions']
+  //   });
+  // }
+setLandOwner() {
     this.title = 'Land Owner';
-    this.searchByOptions = [{ name: "Id Number", key: "idNumber" }, { name: "Name", key: "fullname" }, { name: "Neighbourhood", key: "nrdName" }, { name: "Building", key: "buildingName" }, { name: "Flat no.", key: "flatNumber" }];
+    this.searchByOptions = [
+      { name: "Id Number",   key: "idNumber" },
+      { name: "First Name",  key: "firstName" },
+      { name: "Middle Name", key: "middleName" },
+      { name: "Last Name",   key: "lastName" },
+      { name: "Neighbourhood", key: "nrdName" },
+      { name: "Building",    key: "buildingName" },
+      { name: "Flat no.",    key: "flatNumber" }
+    ];
     this.authService.getLandOwner().subscribe(res => {
       this.dataToDisplay = [...res];
       this.dataSource.data = this.dataToDisplay; // Update dataSource data
       this.displayedColumns = ['srno', 'idNumber', 'fullname', 'nrdName' , 'buildingName', 'flatNumber', 'actions']
     });
   }
+  // setResident() {
+  //   this.title = 'Resident';
+  //   this.searchByOptions = [{ name: "Id Number", key: "idNumber" }, { name: "Name", key: "fullname" }, { name: "Neighbourhood", key: "nrdName" }, { name: "Building", key: "buildingName" }, { name: "Flat no.", key: "flatNumber" }];
+  //   this.authService.getResident().subscribe(res => {
+  //     this.dataToDisplay = [...res];
+  //     this.dataSource.data = this.dataToDisplay; // Update dataSource data
+  //     this.displayedColumns = ['srno', 'idNumber', 'fullname', 'nrdName' , 'buildingName', 'flatNumber', 'actions']
+  //   });
+  // }
+
 
   setResident() {
     this.title = 'Resident';
-    this.searchByOptions = [{ name: "Id Number", key: "idNumber" }, { name: "Name", key: "fullname" }, { name: "Neighbourhood", key: "nrdName" }, { name: "Building", key: "buildingName" }, { name: "Flat no.", key: "flatNumber" }];
+    this.searchByOptions = [
+      { name: "Id Number",   key: "idNumber" },
+      { name: "First Name",  key: "firstName" },
+      { name: "Middle Name", key: "middleName" },
+      { name: "Last Name",   key: "lastName" },
+      { name: "Neighbourhood", key: "nrdName" },
+      { name: "Building",    key: "buildingName" },
+      { name: "Flat no.",    key: "flatNumber" }
+    ];
     this.authService.getResident().subscribe(res => {
       this.dataToDisplay = [...res];
       this.dataSource.data = this.dataToDisplay; // Update dataSource data
       this.displayedColumns = ['srno', 'idNumber', 'fullname', 'nrdName' , 'buildingName', 'flatNumber', 'actions']
     });
   }
+
+setCamera() {
+  this.title = 'Camera';
+  this.searchByOptions = [
+    { name: "IP", key: "anprip" },
+    { name: "Location", key: "anprLocation" }
+  ];
+
+  this.authService.getCameras().subscribe(res => {
+    this.dataToDisplay = [...res];
+    this.dataSource.data = this.dataToDisplay;
+
+    this.displayedColumns = [
+      'srno',
+      'anprip',
+      'anprLocation',
+      'anprMode',
+      'status',
+      'actions'
+    ];
+  });
+}
+
+ setNrdcardtemplate(): void {
+  this.title = 'NRD Card Template';
+  this.searchByOptions = [{ name: 'Neighbourhood', key: 'nrdName' }];
+  this.authService.getAllNRDTemplates().subscribe(res => {
+    this.dataToDisplay = [...res];
+    this.dataSource.data = this.dataToDisplay;
+  this.displayedColumns = ['srno', 'nrdName', 'actions'];
+  });
+}
   
+  // setTenant() {
+  //   this.title = 'Tenant';
+  //   this.searchByOptions = [{ name: "Id Number", key: "idNumber" }, { name: "Name", key: "fullname" }, { name: "Neighbourhood", key: "nrdName" }, { name: "Building", key: "buildingName" }, { name: "Flat no.", key: "flatNumber" }];
+  //   this.authService.getTenant().subscribe(res => {
+  //     this.dataToDisplay = [...res];
+  //     this.dataSource.data = this.dataToDisplay; // Update dataSource data
+  //     this.displayedColumns = ['srno', 'idNumber', 'fullname', 'nrdName' , 'buildingName', 'flatNumber', 'actions']
+  //   });
+  // }
+
+
   setTenant() {
     this.title = 'Tenant';
-    this.searchByOptions = [{ name: "Id Number", key: "idNumber" }, { name: "Name", key: "fullname" }, { name: "Neighbourhood", key: "nrdName" }, { name: "Building", key: "buildingName" }, { name: "Flat no.", key: "flatNumber" }];
+    this.searchByOptions = [
+      { name: "Id Number",   key: "idNumber" },
+      { name: "First Name",  key: "firstName" },
+      { name: "Middle Name", key: "middleName" },
+      { name: "Last Name",   key: "lastName" },
+      { name: "Neighbourhood", key: "nrdName" },
+      { name: "Building",    key: "buildingName" },
+      { name: "Flat no.",    key: "flatNumber" }
+    ];
     this.authService.getTenant().subscribe(res => {
       this.dataToDisplay = [...res];
       this.dataSource.data = this.dataToDisplay; // Update dataSource data
@@ -272,19 +478,75 @@ getModuleKeyForPath(path: string): number {
     });
   }
 
-  setServiceProvider() {
+  // setServiceProvider() {
+  //   this.title = 'Service Provider';
+  //   this.searchByOptions = [{ name: "Id Number", key: "idNumber" },{ name: "Name", key: "fullname" }, { name: "Service Type", key: "serviceType" }];
+  //   this.authService.getServiceProvider().subscribe(res => {
+  //     this.dataToDisplay = [...res];
+  //     this.dataSource.data = this.dataToDisplay; // Update dataSource data
+  //     this.displayedColumns = ['srno', 'idNumber', 'fullname', 'serviceType', 'mobileNo', 'actions']
+  //   });
+  // }
+
+
+
+  // setServiceProvider() {
+  //   this.title = 'Service Provider';
+  //   this.searchByOptions = [
+  //     { name: "Id Number",   key: "idNumber" },
+  //     { name: "First Name",  key: "firstName" },
+  //     { name: "Middle Name", key: "middleName" },
+  //     { name: "Last Name",   key: "lastName" },
+  //     { name: "Service Type", key: "serviceType" }
+  //   ];
+  //   this.authService.getServiceProvider().subscribe(res => {
+  //     this.dataToDisplay = [...res];
+  //     this.dataSource.data = this.dataToDisplay; // Update dataSource data
+  //     this.displayedColumns = ['srno', 'idNumber', 'fullname', 'serviceType', 'mobileNo', 'actions']
+  //   });
+  // }
+
+setServiceProvider() {
     this.title = 'Service Provider';
-    this.searchByOptions = [{ name: "Id Number", key: "idNumber" },{ name: "Name", key: "fullname" }, { name: "Service Type", key: "serviceType" }];
+    this.searchByOptions = [
+      { name: "Id Number",   key: "idNumber" },
+      { name: "First Name",  key: "firstName" },
+      { name: "Middle Name", key: "middleName" },
+      { name: "Last Name",   key: "lastName" },
+      { name: "Service Type", key: "serviceType" }
+    ];
     this.authService.getServiceProvider().subscribe(res => {
-      this.dataToDisplay = [...res];
+      this.dataToDisplay = [...res].map((r: any) => ({
+        ...r,
+        nrdNamesArr: r.nrdNames ?? [],
+        buildingNamesArr: r.buildingNames ?? []
+      }));
       this.dataSource.data = this.dataToDisplay; // Update dataSource data
       this.displayedColumns = ['srno', 'idNumber', 'fullname', 'serviceType', 'mobileNo', 'actions']
     });
   }
+  
+  // setEmployee(){
+  //   this.title = 'Employee';
+  //   this.searchByOptions = [{ name: "Id Number", key: "idNumber" }, { name: "Name", key: "fullname" }, { name: "Is Resident", key: "isResident" }];
+  //   this.authService.getEmployee().subscribe(res => {
+  //     this.dataToDisplay = [...res];
+  //     this.dataSource.data = this.dataToDisplay;
+  //     this.displayedColumns = ['srno', 'idNumber', 'fullname', 'role', 'mobileNo', 'Is Resident','actions']
+  //   });
+  // }
+
+
 
   setEmployee(){
     this.title = 'Employee';
-    this.searchByOptions = [{ name: "Id Number", key: "idNumber" }, { name: "Name", key: "fullname" }, { name: "Is Resident", key: "isResident" }];
+    this.searchByOptions = [
+      { name: "Id Number",   key: "idNumber" },
+      { name: "First Name",  key: "firstName" },
+      { name: "Middle Name", key: "middleName" },
+      { name: "Last Name",   key: "lastName" },
+      { name: "Is Resident", key: "isResident" }
+    ];
     this.authService.getEmployee().subscribe(res => {
       this.dataToDisplay = [...res];
       this.dataSource.data = this.dataToDisplay;
@@ -312,19 +574,58 @@ getModuleKeyForPath(path: string): number {
     });
   }
 
+  // setGuest(){
+  //   this.title = 'Guest';
+  //   this.searchByOptions = [{ name: "Id Number", key: "idNumber" }, { name: "Name", key: "fullname" }, { name: "Neighbourhood", key: "nrdName" }, { name: "Building", key: "buildingName" }, { name: "Flat no.", key: "flatNumber" }];
+  //   this.authService.getGuest().subscribe(res =>{
+  //     this.dataToDisplay = [...res];
+  //     this.dataSource.data = this.dataToDisplay;
+  //     this.displayedColumns = ['srno', 'idNumber', 'fullname', 'nrdName', 'buildingName', 'flatNumber','actions']
+  //   });
+  // }
+
+
   setGuest(){
     this.title = 'Guest';
-    this.searchByOptions = [{ name: "Id Number", key: "idNumber" }, { name: "Name", key: "fullname" }, { name: "Neighbourhood", key: "nrdName" }, { name: "Building", key: "buildingName" }, { name: "Flat no.", key: "flatNumber" }];
-    this.authService.getGuest().subscribe(res =>{
+    this.searchByOptions = [
+      { name: "Id Number",   key: "idNumber" },
+      { name: "First Name",  key: "firstName" },
+      { name: "Middle Name", key: "middleName" },
+      { name: "Last Name",   key: "lastName" },
+      { name: "PAN Number",  key: "paNnumber" },
+      { name: "Flat no.",    key: "flatNumber" }
+    ];
+    // this.authService.getGuest().subscribe(res =>{
+    //   this.dataToDisplay = [...res];
+    //   this.dataSource.data = this.dataToDisplay;
+    //   this.displayedColumns = ['srno', 'idNumber', 'fullname', 'nrdName', 'buildingName', 'flatNumber','actions']
+        this.authService.getGuest().subscribe(res =>{
       this.dataToDisplay = [...res];
       this.dataSource.data = this.dataToDisplay;
-      this.displayedColumns = ['srno', 'idNumber', 'fullname', 'nrdName', 'buildingName', 'flatNumber','actions']
+      this.displayedColumns = ['srno', 'idNumber', 'fullname', 'nrdName', 'buildingName', 'flatNumber', 'referenceName', 'actions']
     });
   }
 
+  // setVisitor(){
+  //   this.title = 'Visitor';
+  //   this.searchByOptions = [{ name: "Id Number", key: "idNumber" }, { name: "Name", key: "fullname" }, { name: "Neighbourhood", key: "nrdName" }, { name: "Building", key: "buildingName" }, { name: "Flat no.", key: "flatNumber" }];
+  //   this.authService.getVisitor().subscribe(res =>{
+  //     this.dataToDisplay = [...res];
+  //     this.dataSource.data = this.dataToDisplay;
+  //     this.displayedColumns = ['srno', 'idNumber', 'fullname', 'nrdName', 'buildingName', 'flatNumber','actions']
+  //   });
+  // }
+
   setVisitor(){
     this.title = 'Visitor';
-    this.searchByOptions = [{ name: "Id Number", key: "idNumber" }, { name: "Name", key: "fullname" }, { name: "Neighbourhood", key: "nrdName" }, { name: "Building", key: "buildingName" }, { name: "Flat no.", key: "flatNumber" }];
+    this.searchByOptions = [
+      { name: "Id Number",   key: "idNumber" },
+      { name: "First Name",  key: "firstName" },
+      { name: "Middle Name", key: "middleName" },
+      { name: "Last Name",   key: "lastName" },
+      { name: "PAN Number",  key: "paNnumber" },
+      { name: "Flat no.",    key: "flatNumber" }
+    ];
     this.authService.getVisitor().subscribe(res =>{
       this.dataToDisplay = [...res];
       this.dataSource.data = this.dataToDisplay;
@@ -381,16 +682,7 @@ getModuleKeyForPath(path: string): number {
     });
   }
 
-  // setNeighbourhood() {
-  //   this.title = 'Neighbourhood';
-  //  this.searchByOptions = [{ name: "Id", key: "id" }, { name: "Company Name", key: "name" }, { name: "Neighbourhood", key: "code" }];
-
-  //   this.authService.getNeighbourhood().subscribe(res => {
-  //     this.dataToDisplay = [...res];
-  //     this.dataSource.data = (this.dataToDisplay);
-  //     this.displayedColumns = ['srno', 'Id',  'Name','short name', 'actions']
-  //   });
-  // }
+  
 
 setNeighbourhood() {
     this.title = 'Neighbourhood';
@@ -403,37 +695,7 @@ setNeighbourhood() {
     });
   }
 
-  // setBuilding() {
-  //   this.title = 'Building';
-  //   this.searchByOptions = [{ name: "Id", key: "id" }, { name: "Name", key: "name" }, { name: "Short Name", key: "code" }];
-  //   this.authService.getBuildings().subscribe(res => {
-  //     this.dataToDisplay = [...res];
-  //     this.dataSource.data = (this.dataToDisplay);
-  //     this.displayedColumns = ['srno', 'Id', 'short name', 'Name', 'actions']
-  //   });
-  // }
-
-
-
-//   setBuilding() {
-//   this.title = 'Building';
-//   this.searchByOptions = [
-//     { name: "Id", key: "id" },
-//     { name: "Name", key: "name" },
-//     { name: "Short Name", key: "code" }
-//   ];
-
-//   this.authService.getBuildings().subscribe(res => {
-
-//     // 🔥 Sort by ID ascending
-//     const sorted = res.sort((a, b) => a.id - b.id);
-
-//     this.dataToDisplay = [...sorted];
-//     this.dataSource.data = this.dataToDisplay;
-
-//     this.displayedColumns = ['srno', 'Id', 'short name', 'Name', 'actions'];
-//   });
-// }
+  
 
 
 setBuilding() {
@@ -474,24 +736,45 @@ setBuilding() {
     });
   }
 
+
+
+
 setContractorType() {
   this.title = 'Contractor Type';
 
   this.authService.getContractorType().subscribe(res => {
-    this.dataToDisplay = [...res];
+    // Show all except header row (isactive=0 with name=ContractorType)
+    // Admin can see active and inactive to manage them
+    this.dataToDisplay = res.filter((item: any) => item.isactive === 1 || item.isactive === true);
     this.dataSource.data = this.dataToDisplay;
-
-    
     this.displayedColumns = ['srno', 'Id', 'contractor type', 'actions'];
   });
 }
 
 
-  setContractor() {
+  // setContractor() {
+  //   this.title = 'Contractor';
+  //   this.searchByOptions = [{ name: "Id", key: "id" }, { name: "Name", key: "fullname" }, { name: "Contactor Type", key: "contractorTypeName" }];
+  //   this.authService.getContractor().subscribe(res => {
+  //     this.dataToDisplay = [...res];
+  //     this.dataSource.data = (this.dataToDisplay);
+  //     this.displayedColumns = ['srno', "Id", 'fullname', 'contactorType', 'actions']
+  //   });
+  // }
+
+
+ setContractor() {
     this.title = 'Contractor';
-    this.searchByOptions = [{ name: "Id", key: "id" }, { name: "Name", key: "fullname" }, { name: "Contactor Type", key: "contractorTypeName" }];
+    this.searchByOptions = [
+      { name: "Id Number",   key: "idNumber" },
+      { name: "First Name",  key: "firstName" },
+      { name: "Middle Name", key: "middleName" },
+      { name: "Last Name",   key: "lastName" },
+      { name: "PAN Number",  key: "paNnumber" },
+      { name: "Contactor Type", key: "contractorTypeName" }
+    ];
     this.authService.getContractor().subscribe(res => {
-      this.dataToDisplay = [...res];
+      this.dataToDisplay = [...res].map((r: any) => ({ ...r, nrdName: r.nbrName }));
       this.dataSource.data = (this.dataToDisplay);
       this.displayedColumns = ['srno', "Id", 'fullname', 'contactorType', 'actions']
     });
@@ -529,7 +812,6 @@ setContractorType() {
 // }
 
 
-
 setReaderRelay() {
   this.title = 'Reader Relay';
 
@@ -543,12 +825,13 @@ setReaderRelay() {
       'readerport',
       'readermode',
       'readerLocation',
+      'nrdName',
       'readertype',
+      'status',
       'actions'
     ];
   });
 }
-
 
   // viewData(data: any) {
   //   if (this.returnPath) {
@@ -558,7 +841,12 @@ setReaderRelay() {
 
 viewData(data: any) {
   if (this.returnPath) {
-    const idToPass = (this.returnPath || '').includes('/master/profile') ? data.profileID : data.id;
+    // const idToPass = (this.returnPath || '').includes('/master/profile') ? data.profileID : data.id;
+    const idToPass = (this.returnPath || '').includes('/master/profile') 
+  ? data.profileID 
+  : (this.returnPath || '').includes('/master/nrdcardtemplate')
+  ? data.nrdId
+  : data.id;
     this.navigateBack(idToPass, true);
   }
 }
@@ -591,12 +879,18 @@ viewData(data: any) {
       case '/master/neighbourhood':
         this.viewTenant(data.id);
         break;
-      case '/master/building':
+            case '/master/building':
+        this.viewTenant(data.id);
+        break;
+      case '/master/camera':
         this.viewTenant(data.id);
         break;
       case '/master/user':
         this.viewTenant(data.id);
         break;
+        case '/master/nrdcardtemplate':
+  this.viewTenant(data.nrdId);
+  break;
       default:
         this.viewTenant(data.id);
         break;
@@ -618,7 +912,7 @@ viewData(data: any) {
 deleteData(element: any) {
   // Check if already deleted
   console.log('Checking delete status for element:', element);
-  if (element.logicalDeleted === 1 || element.isactive === false || element.isDeleted === true) {
+ if (element.logicalDeleted === 1 || element.isactive === false || element.isactive === 0 || element.isDeleted === true) {
     this.showSwal('error', `This ${this.title} is already deleted`);
     return;
   }
@@ -642,6 +936,7 @@ deleteData(element: any) {
         '/master/company': this.authService.deleteCompany.bind(this.authService),
         '/master/project': this.authService.deleteProject.bind(this.authService),
         '/master/neighbourhood': this.authService.deleteNeighbourhood.bind(this.authService),
+        '/master/nrdcardtemplate': this.authService.deleteNRDTemplate.bind(this.authService),
         '/master/service-type': this.authService.deleteServiceType.bind(this.authService),
         '/master/contrator-type': this.authService.deleteContractorType.bind(this.authService),
         '/master/reader-location': this.authService.deleteReaderLocation.bind(this.authService),
@@ -664,8 +959,12 @@ deleteData(element: any) {
       }
 
       // ✅ Use profileID for profile route, otherwise use id
-     const idToDelete = (this.returnPath || '').includes('/master/profile') ? element.profileID : element.id;
-
+    //  const idToDelete = (this.returnPath || '').includes('/master/profile') ? element.profileID : element.id;
+const idToDelete = (this.returnPath || '').includes('/master/profile') 
+  ? element.profileID 
+  : (this.returnPath || '').includes('/master/nrdcardtemplate')
+  ? element.nrdId
+  : element.id;
       // Call the delete function
       deleteFn(idToDelete).subscribe({
         next: () => {

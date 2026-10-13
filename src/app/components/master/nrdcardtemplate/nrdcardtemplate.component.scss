@@ -1,0 +1,53 @@
+.nrd-form-panel {
+  background: #fff;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 20px 24px;
+  margin-bottom: 16px;
+}
+
+.nrd-form-title {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  color: #1a2b3c;
+}
+
+.nrd-img-wrap {
+  position: relative;
+  width: 160px;
+
+  .nrd-img {
+    width: 100%;
+    border-radius: 6px;
+    border: 1px solid #dee2e6;
+  }
+
+  .nrd-badge {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    font-size: 10px;
+  }
+}
+
+.nrd-thead th {
+  background: #f4f6f9;
+  padding: 10px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #5a7184;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.nrd-trow td {
+  padding: 10px 14px;
+  border-bottom: 1px solid #eef1f5;
+  font-size: 14px;
+  color: #1a2b3c;
+}
+
+.nrd-trow:hover td {
+  background: #f0f7ff;
+}

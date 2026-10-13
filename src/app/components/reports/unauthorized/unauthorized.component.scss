@@ -1,5 +1,25 @@
 // ─── Vehicle Detail Popup ─────────────────────────────────────────────────────
+.vp-img-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  min-height: 220px;
+  color: #6b7280;
+  background: #f3f4f6;
+  gap: 8px;
+  font-size: 14px;
+  text-align: center;
+  padding: 16px;
+}
 
+.vp-placeholder-icon {
+  font-size: 40px;
+  width: 40px;
+  height: 40px;
+  color: #9ca3af;
+}
 .vp-overlay {
   position: fixed;
   inset: 0;
@@ -148,7 +168,8 @@
 .vp-vnum {
   font-family: monospace;
   font-size: 15px;
-  color: #1e40af;
+  color: #60a5fa;
+  font-weight: 700;
   letter-spacing: 1px;
 }
 
@@ -216,61 +237,94 @@
   z-index: 9999;
 }
 
-/* Popup card */
+/* ═══════ POPUP LAYOUT FIX: frame / plate / info alag alag ═══════ */
+
 .vp-card {
+  height: 85vh;
+  max-height: 90vh;
+}
+
+/* Column layout: frame (flex) → plate → info */
+.vp-img-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+}
+
+/* 1) Frame box: bachi hui saari height le, image poori dikhe */
+.vp-frame-box {
+  flex: 1 1 auto;
+  min-height: 0;
   position: relative;
-  width: 60vw;
-  height: 80vh;
-  max-width: 1100px;
   background: #000;
-  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   overflow: hidden;
 }
 
-/* Close button */
-.vp-close {
-  position: absolute;
-  top: 10px;
-  right: 12px;
-  z-index: 10;
-  background: rgba(0,0,0,0.6);
-  color: #fff;
-  border: none;
-  border-radius: 50%;
-  width: 32px;
-  height: 32px;
-  cursor: pointer;
-}
-
-/* Image container */
-.vp-img-container {
-  position: relative;
+.vp-frame-box .vp-img {
   width: 100%;
   height: 100%;
-}
-
-/* FULL IMAGE */
-.vp-img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;   /* ✅ FULL IMAGE (no crop) */
+  object-fit: contain;   /* poori image, kuch cut nahi */
   background: #000;
 }
 
-/* 🔥 Bottom bar (one line info) */
-/* 🔥 Bottom bar container */
-.vp-bottom-bar {
-  position: absolute;
-  bottom: 0;
+.vp-frame-box .vp-img-placeholder {
   width: 100%;
-  padding: 10px 15px;
-  background: rgba(0, 0, 0, 0.75);
-  color: #fff;
-  font-size: 13px;
-  backdrop-filter: blur(6px);
+  height: 100%;
+  background: #111;
+  color: #9ca3af;
 }
 
-/* Each row */
+/* 2) Number plate: alag strip, frame ke upar nahi */
+.vp-plate-box {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 8px 12px;
+  background: #111;
+  border-top: 1px solid #333;
+}
+
+.vp-plate-label {
+  color: #9ca3af;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.vp-plate-box .vp-plate-img {
+  position: static;       /* absolute hata diya */
+  transform: none;
+  bottom: auto;
+  left: auto;
+  height: 80px;
+  max-width: 60%;
+  min-height: 0;
+  width: auto;
+  object-fit: contain;    /* plate poori dikhe */
+  background: #000;
+  border: 2px solid #60a5fa;
+  border-radius: 4px;
+}
+
+/* 3) Info bar: ab overlay nahi, sabse neeche */
+.vp-bottom-bar {
+  position: static;
+  flex: 0 0 auto;
+  width: 100%;
+  backdrop-filter: none;
+  background: #0b0b0b;
+  padding: 10px 15px;
+  color: #fff;
+  font-size: 13px;
+}
+
 .vp-row {
   display: flex;
   justify-content: space-between;
@@ -278,7 +332,6 @@
   margin: 3px 0;
 }
 
-/* Text styling */
 .vp-row span {
   flex: 1;
   text-align: center;
@@ -286,11 +339,4 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-/* Vehicle number highlight */
-.vp-vnum {
-  font-family: monospace;
-  color: #60a5fa;
-  font-weight: 700;
 }

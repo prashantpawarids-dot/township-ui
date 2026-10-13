@@ -1,0 +1,189 @@
+<div class="backup-container">
+  <h2>Database Backup & Maintenance</h2>
+
+  <div class="alert" [ngClass]="messageType" *ngIf="message">{{ message }}</div>
+
+    <div class="card summary-card" *ngIf="viewMode">
+    <div class="summary-header">
+      <div>
+        <h3>Current Backup Configuration</h3>
+        <span class="badge" [ngClass]="settings.enabled ? 'success' : 'failed'">
+          {{ settings.enabled ? 'Automatic Backup Enabled' : 'Automatic Backup Disabled' }}
+        </span>
+      </div>
+      <div class="summary-actions">
+        <button class="btn-outline" (click)="editSettings()">✏️ Edit</button>
+        <button class="btn-outline danger" (click)="deleteSettings()">🗑️ Delete</button>
+      </div>
+    </div>
+    <div class="summary-grid">
+      <div><label>Frequency</label><span>{{ settings.frequency }}</span></div>
+      <div><label>Time</label><span>{{ settings.time }}</span></div>
+      <div><label>Folder</label><span>{{ settings.folderPath }}</span></div>
+      <div><label>Retention</label><span>{{ settings.retentionDays }} day(s)</span></div>
+      <div><label>Last Run</label><span>{{ formatRunTime(settings.lastRunTime) }}</span></div>
+      <div><label>Last Status</label><span>{{ settings.lastRunStatus || '-' }}</span></div>
+    </div>
+    <div class="actions">
+      <button class="btn-secondary" (click)="runNow()" [disabled]="running">
+        {{ running ? 'Running Backup...' : 'Run Now' }}
+      </button>
+    </div>
+  </div>
+
+  <div class="card" *ngIf="!viewMode">
+    <div class="card-header">
+      <label class="switch">
+        <input type="checkbox" [(ngModel)]="settings.enabled">
+        <span class="slider"></span>
+      </label>
+      <span class="header-title">Automatic Backup {{ settings.enabled ? 'Enabled' : 'Disabled' }}</span>
+    </div>
+
+    <div class="status-row" *ngIf="settings.lastRunTime">
+                                Last run: {{ formatRunTime(settings.lastRunTime) }}
+      <span class="badge" [ngClass]="settings.lastRunStatus === 'Success' ? 'success' : 'failed'">
+        {{ settings.lastRunStatus }}
+      </span>
+    </div>
+
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Frequency</label>
+        <select [(ngModel)]="settings.frequency">
+          <option value="Daily">Daily</option>
+          <option value="Weekly">Weekly</option>
+          <option value="Monthly">Monthly</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Time</label>
+        <input type="time" [(ngModel)]="settings.time">
+      </div>
+
+      <div class="form-group" *ngIf="settings.frequency === 'Weekly'">
+        <label>Day of Week</label>
+        <select [(ngModel)]="settings.dayOfWeek">
+          <option *ngFor="let d of weekDays" [value]="d.value">{{ d.label }}</option>
+        </select>
+      </div>
+
+      <div class="form-group" *ngIf="settings.frequency === 'Monthly'">
+        <label>Day of Month</label>
+        <input type="number" min="1" max="31" [(ngModel)]="settings.dayOfMonth">
+      </div>
+
+      <div class="form-group">
+        <label>Retention (days)</label>
+        <input type="number" min="1" [(ngModel)]="settings.retentionDays">
+      </div>
+
+      <div class="form-group full-width">
+        <label>Backup Folder</label>
+        <div class="folder-row">
+          <input type="text" [(ngModel)]="settings.folderPath" placeholder="D:\Backups" readonly>
+          <button type="button" class="btn-outline" (click)="openFolderBrowser()">Browse</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- <div class="section-toggle" (click)="showAdvancedDb = !showAdvancedDb">
+      <span>{{ showAdvancedDb ? '▾' : '▸' }} Database Connection (optional — leave blank to use default)</span>
+    </div>
+    <div class="form-grid" *ngIf="showAdvancedDb">
+      <div class="form-group">
+        <label>Server</label>
+        <input type="text" [(ngModel)]="settings.server" placeholder="e.g. AccserverRC">
+      </div>
+      <div class="form-group">
+        <label>Database</label>
+        <input type="text" [(ngModel)]="settings.database" placeholder="e.g. IDS_AccessDB">
+      </div>
+      <div class="form-group">
+        <label>SQL User</label>
+        <input type="text" [(ngModel)]="settings.sqlUser" placeholder="optional">
+      </div>
+      <div class="form-group">
+        <label>SQL Password</label>
+        <input type="password" [(ngModel)]="settings.sqlPassword" placeholder="optional">
+      </div>
+    </div> -->
+
+    <div class="section-toggle" (click)="showEmailSettings = !showEmailSettings">
+      <span>{{ showEmailSettings ? '▾' : '▸' }} Email Notification (optional)</span>
+      <label class="switch small">
+        <input type="checkbox" [(ngModel)]="settings.emailEnabled" (click)="$event.stopPropagation()">
+        <span class="slider"></span>
+      </label>
+    </div>
+    <div class="form-grid" *ngIf="showEmailSettings">
+      <div class="form-group">
+        <label>From Email</label>
+        <input type="email" [(ngModel)]="settings.fromEmail" placeholder="you@gmail.com">
+      </div>
+      <div class="form-group">
+        <label>App Password</label>
+        <input type="password" [(ngModel)]="settings.appPassword" placeholder="Gmail app password">
+      </div>
+      <div class="form-group">
+        <label>To Email</label>
+        <input type="email" [(ngModel)]="settings.toEmail" placeholder="notify@gmail.com">
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn-primary" (click)="saveSettings()" [disabled]="saving">
+        {{ saving ? 'Saving...' : 'Save Settings' }}
+      </button>
+      <button class="btn-secondary" (click)="runNow()" [disabled]="running">
+        {{ running ? 'Running Backup...' : 'Run Now' }}
+      </button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Backup History</h3>
+        <div class="history-table-wrapper" *ngIf="history.length > 0; else noHistory">
+      <table class="history-table">
+        <thead>
+          <tr><th>Time</th><th>Status</th><th>Database</th><th>File</th><th>Size (MB)</th><th>Trigger</th></tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let h of history">
+            <td>{{ formatRunTime(h.runTime) }}</td>
+            <td><span class="badge" [ngClass]="h.success ? 'success' : 'failed'">{{ h.success ? 'Success' : 'Failed' }}</span></td>
+            <td>{{ h.database }}</td>
+            <td>{{ h.fileName || '-' }}</td>
+            <td>{{ h.sizeMB || '-' }}</td>
+            <td>{{ h.triggerType }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <ng-template #noHistory><p class="empty-text">No backups run yet.</p></ng-template>
+  </div>
+</div>
+
+<div class="modal-overlay" *ngIf="showFolderBrowser" (click)="cancelFolderBrowser()">
+  <div class="modal-box" (click)="$event.stopPropagation()">
+    <h3>Select Backup Folder</h3>
+
+    <div class="breadcrumb-row">
+      <button type="button" class="btn-outline small" (click)="goToThisPC()">💻 This PC</button>
+      <button type="button" class="btn-outline small" (click)="goUp()" [disabled]="!currentBrowsePath">⬆ Up</button>
+    </div>
+
+    <p class="current-path">{{ currentBrowsePath || 'This PC' }}</p>
+
+    <div class="folder-list">
+      <div class="folder-item" *ngFor="let f of folderList" (click)="browseFolder(f.path)">📁 {{ f.name }}</div>
+      <p *ngIf="folderList.length === 0" class="empty-text">No sub-folders here.</p>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-outline" (click)="cancelFolderBrowser()">Cancel</button>
+      <button class="btn-primary" (click)="selectFolder()" [disabled]="!currentBrowsePath">Select This Folder</button>
+    </div>
+  </div>
+</div>

@@ -27,8 +27,11 @@
         <mat-expansion-panel-header>
             <mat-panel-title> Vehicle </mat-panel-title>
         </mat-expansion-panel-header>
-        <app-town-vehicle [vehicle]="vehicle" [dataToDisplayVehicle]="vehicleList"
-            [dataSourceVehicle]="dataSourceVehicle" (vehicleEvent)="updateVehicleTable($event)"></app-town-vehicle>
+        <!-- <app-town-vehicle [vehicle]="vehicle" [dataToDisplayVehicle]="vehicleList"
+            [dataSourceVehicle]="dataSourceVehicle" (vehicleEvent)="updateVehicleTable($event)"></app-town-vehicle> -->
+
+                    <app-town-vehicle [vehicle]="vehicle" [dataToDisplayVehicle]="vehicleList"
+            [dataSourceVehicle]="dataSourceVehicle" [isEmployee]="true" (vehicleEvent)="updateVehicleTable($event)"></app-town-vehicle>
     </mat-expansion-panel>
     <mat-expansion-panel *ngIf="isViewOrEdit">
         <mat-expansion-panel-header>

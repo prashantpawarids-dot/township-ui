@@ -275,15 +275,23 @@ private showSwal(icon: 'success' | 'error' | 'warning', title: string) {
   });
 }
 
+  // editData(data) {
+  //   const addondialogRef = this.addonDialog.open(AddonDetailsComponent, {
+  //     maxWidth: '100%',
+  //     width: '960px',
+
+  //   });
+  //   addondialogRef.componentInstance.addonData = data;
+  //   addondialogRef.componentInstance.isView = false;
+  //   addondialogRef.componentInstance.tenantType = this.tenantType;
+  //   addondialogRef.afterClosed().subscribe((result) => {
+
   editData(data) {
     const addondialogRef = this.addonDialog.open(AddonDetailsComponent, {
       maxWidth: '100%',
       width: '960px',
-
+      data: { addonData: data, isView: false, tenantType: this.tenantType }
     });
-    addondialogRef.componentInstance.addonData = data;
-    addondialogRef.componentInstance.isView = false;
-    addondialogRef.componentInstance.tenantType = this.tenantType;
     addondialogRef.afterClosed().subscribe((result) => {
       if (result) {
         if (this.photoPreview) {
@@ -299,14 +307,23 @@ private showSwal(icon: 'success' | 'error' | 'warning', title: string) {
     });
   }
 
+  // openAddonDialog(data) {
+  //   const addondialogRef = this.addonDialog.open(AddonDetailsComponent, {
+  //     maxWidth: '100%',
+  //     width: '960px',
+
+  //   });
+  //   addondialogRef.componentInstance.addonData = data;
+
+  // }
+
+
   openAddonDialog(data) {
-    const addondialogRef = this.addonDialog.open(AddonDetailsComponent, {
+    this.addonDialog.open(AddonDetailsComponent, {
       maxWidth: '100%',
       width: '960px',
-
+      data: { addonData: data, isView: true, tenantType: this.tenantType }
     });
-    addondialogRef.componentInstance.addonData = data;
-
   }
 
 }

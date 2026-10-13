@@ -80,9 +80,38 @@
   margin-top: 20px;
 }
 
+// ================= INPUT BOX STYLE (same as Land Owner) =================
+::ng-deep {
+  .w-100 .mat-mdc-text-field-wrapper {
+    background-color: #ffffff !important;
+    border: 1px solid #d9dce3 !important;
+    border-radius: 10px !important;
+    overflow: hidden;
+    padding-top: 4px;
+  }
+
+  .w-100 .mat-mdc-form-field-flex {
+    background-color: transparent !important;
+  }
+
+  .w-100 .mdc-line-ripple::before,
+  .w-100 .mdc-line-ripple::after {
+    display: none !important;
+    border: none !important;
+  }
+
+  .w-100.mat-focused .mat-mdc-text-field-wrapper {
+    border-color: #a9aebb !important;
+  }
+
+  .w-100 input.mat-mdc-input-element,
+  .w-100 .mat-mdc-select-value {
+    color: #1f2438;
+  }
+}
+
 // ================= MATERIAL + CDK OVERRIDES =================
 ::ng-deep {
-
   // ✅ ROOT FIX: cdk-overlay-container is Angular's top-level overlay host
   // It renders datepicker, select, tooltip panels — must beat modal z-index
   .cdk-overlay-container {

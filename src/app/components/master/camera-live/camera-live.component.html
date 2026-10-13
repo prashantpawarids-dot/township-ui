@@ -1,0 +1,259 @@
+<div class="camera-live-wrapper">
+
+  <div class="toolbar">
+    <select class="camera-select" [(ngModel)]="selectedCamera">
+      <option [ngValue]="null">Select Camera</option>
+      <option *ngFor="let cam of cameras" [ngValue]="cam">
+        {{ cam.anprLocation }} ({{ cam.anprip }})
+      </option>
+    </select>
+
+    <button class="btn-connect" (click)="onConnectClick()" [disabled]="isConnecting">
+      {{ isConnecting ? 'Checking...' : (isConnected ? 'Reconnect' : 'Connect') }}
+    </button>
+
+    <button class="btn-disconnect" *ngIf="isConnected" (click)="disconnect()">
+      Disconnect
+    </button>
+
+    <!-- Top right: Live Camera -->
+    <button class="btn-live-camera" *ngIf="isConnected" (click)="openLivePopup()">
+      &#9679; Live Camera
+    </button>
+  </div>
+
+  <div class="content" *ngIf="isConnected">
+
+    <!-- Graph + right side cards -->
+    <div class="summary-row">
+
+      <div class="chart-card">
+        <div class="panel-title">Vehicle Count</div>
+
+        <div class="chart-legend">
+          <span><i class="dot dot-auth"></i> Authorized</span>
+          <span><i class="dot dot-unauth"></i> Unauthorized</span>
+        </div>
+
+        <div class="chart-scroll">
+          <svg [attr.viewBox]="'0 0 ' + chartW + ' ' + chartH" class="chart-svg">
+            <g *ngFor="let t of yTicks">
+              <line [attr.x1]="36" [attr.x2]="chartW - 12" [attr.y1]="t.y" [attr.y2]="t.y" class="grid-line" />
+              <text [attr.x]="30" [attr.y]="t.y + 4" text-anchor="end" class="axis-text">{{ t.value }}</text>
+            </g>
+
+            <text *ngFor="let t of xTicks" [attr.x]="t.x" [attr.y]="chartH - 8" text-anchor="middle" class="axis-text">
+              {{ t.label }}
+            </text>
+
+                        <path [attr.d]="unauthPath" class="line line-unauth" />
+            <path [attr.d]="authPath" class="line line-auth" />
+
+            <g (mouseleave)="clearHover()">
+              <rect *ngFor="let i of hourIdx"
+                    [attr.x]="zoneX(i)" y="0" [attr.width]="zoneW" [attr.height]="chartH"
+                    class="hover-zone" (mouseenter)="setHover(i)" />
+            </g>
+
+            <g *ngIf="hoverInfo as hi" class="hover-layer">
+              <line [attr.x1]="hi.x" [attr.x2]="hi.x" y1="12" [attr.y2]="chartH - 28" class="hover-line" />
+              <circle [attr.cx]="hi.x" [attr.cy]="hi.unauthY" r="3.5" class="pt pt-unauth" />
+              <circle [attr.cx]="hi.x" [attr.cy]="hi.authY" r="3.5" class="pt pt-auth" />
+
+              <rect [attr.x]="hi.tx" [attr.y]="hi.ty" [attr.width]="hi.w" [attr.height]="hi.h" rx="6" class="tip-box" />
+              <text [attr.x]="hi.tx + 10" [attr.y]="hi.ty + 15" class="tip-title">{{ hi.label }}</text>
+
+              <circle [attr.cx]="hi.tx + 13" [attr.cy]="hi.ty + 28" r="3" class="pt-auth-fill" />
+              <text [attr.x]="hi.tx + 22" [attr.y]="hi.ty + 31" class="tip-label">Authorized</text>
+              <text [attr.x]="hi.tx + hi.w - 10" [attr.y]="hi.ty + 31" text-anchor="end" class="tip-value">{{ hi.auth }}</text>
+
+              <circle [attr.cx]="hi.tx + 13" [attr.cy]="hi.ty + 43" r="3" class="pt-unauth-fill" />
+              <text [attr.x]="hi.tx + 22" [attr.y]="hi.ty + 46" class="tip-label">Unauthorized</text>
+              <text [attr.x]="hi.tx + hi.w - 10" [attr.y]="hi.ty + 46" text-anchor="end" class="tip-value">{{ hi.unauth }}</text>
+            </g>
+          </svg>
+        </div>
+      </div>
+
+                 <div class="stat-col">
+
+        <div class="stat-card">
+          <div class="stat-icon stat-icon-auth">
+            <mat-icon>directions_car</mat-icon>
+          </div>
+          <div class="stat-body">
+            <div class="stat-title">Authorized <span class="info-dot">i</span></div>
+            <div class="stat-values stat-values-auth">
+              <span title="Two wheeler"><mat-icon>two_wheeler</mat-icon>{{ stats.authBike }}</span>
+              <span title="Four wheeler"><mat-icon>directions_car</mat-icon>{{ stats.authCar }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon stat-icon-unauth">
+            <mat-icon>directions_car</mat-icon>
+          </div>
+          <div class="stat-body">
+            <div class="stat-title">Unauthorized <span class="info-dot">i</span></div>
+            <div class="stat-values stat-values-unauth">
+              <span title="Two wheeler"><mat-icon>two_wheeler</mat-icon>{{ stats.unauthBike }}</span>
+              <span title="Four wheeler"><mat-icon>directions_car</mat-icon>{{ stats.unauthCar }}</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Table -->
+    <div class="tracking-panel">
+      <div class="panel-header">
+        <div class="panel-title">Live Tracking</div>
+        <div class="filter-toggle">
+          <button [class.active]="filterMode === 'live'" (click)="setFilter('live')">Live</button>
+          <button [class.active]="filterMode === 'today'" (click)="setFilter('today')">Today</button>
+        </div>
+      </div>
+
+      <div class="filter-row">
+        <div class="log-dropdown">
+          <button class="log-dropdown-btn" (click)="toggleAuthMenu($event)">
+            {{ authLabel }} <span class="caret">▾</span>
+          </button>
+
+          <div class="log-dropdown-menu" *ngIf="showAuthMenu">
+            <button class="opt opt-all" (click)="setAuthFilter('all')">All Logs</button>
+            <button class="opt opt-authorized" (click)="setAuthFilter('authorized')">Authorized</button>
+            <button class="opt opt-unauthorized" (click)="setAuthFilter('unauthorized')">Unauthorized</button>
+          </div>
+        </div>
+
+        <input
+          class="search-box"
+          type="text"
+          placeholder="Search using number plate"
+          [(ngModel)]="searchPlate"
+          (keyup.enter)="onSearch()"
+        />
+        <button class="btn-search" (click)="onSearch()">Search</button>
+      </div>
+
+      <table class="tracking-table">
+        <thead>
+          <tr>
+                       <th class="col-type">Type</th>
+            <th>Date</th>
+            <th>Time</th>
+            <th>Name</th>
+            <th>Registration Number</th>
+                        <th>Plate Image</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of pagedRows">
+                      <td class="col-type">
+              <mat-icon class="type-icon"
+                        [class.type-auth]="row.auth && !row.isBlacklisted"
+                        [class.type-unauth]="!row.auth || row.isBlacklisted"
+                        [title]="typeLabel(row)">
+                {{ vehicleLabel(row) === 'Two Wheeler' ? 'two_wheeler' : 'directions_car' }}
+              </mat-icon>
+            </td>
+            <td>{{ row.date }}</td>
+            <td>{{ row.time }}</td>
+            <td>{{ row.name }}</td>
+            <td>{{ row.registrationNumber }}</td>
+            <td>
+              <img *ngIf="row.plateImage" [src]="row.plateImage" class="plate-thumb" alt="plate" />
+                            <span *ngIf="!row.plateImage">N/A</span>
+            </td>
+            <td>
+              <button class="btn-info" title="View details" (click)="openDetails(row)">i</button>
+            </td>
+          </tr>
+          <tr *ngIf="filteredRows.length === 0">
+                    <td colspan="7" class="empty-row">No events</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="pagination" *ngIf="filteredRows.length > pageSize">
+        <button (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 1">Prev</button>
+        <span>Page {{ currentPage }} of {{ totalPages }}</span>
+        <button (click)="goToPage(currentPage + 1)" [disabled]="currentPage === totalPages">Next</button>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="empty-state" *ngIf="!isConnected">
+    Select a camera and click Connect to view Live Tracking.
+  </div>
+  <!-- Log Details popup (same as GateGuard) -->
+  <div class="modal-backdrop" *ngIf="selectedRow" (click)="closeDetails()">
+    <div class="modal-card details-card" (click)="$event.stopPropagation()">
+
+      <div class="details-header">
+        <span>Log Details</span>
+        <button class="details-close" (click)="closeDetails()">✕</button>
+      </div>
+
+      <div class="details-body">
+
+        <div class="evidence-col">
+          <div class="evidence-top">
+            <span class="cam">{{ selectedRow.cameraName }}</span>
+            <span>Date: {{ selectedRow.date }} &nbsp;|&nbsp; Time: {{ selectedRow.time }}</span>
+          </div>
+
+          <img *ngIf="selectedRow.evidenceImage" [src]="selectedRow.evidenceImage" class="evidence-img" alt="evidence" />
+          <div class="no-image" *ngIf="!selectedRow.evidenceImage">No evidence image</div>
+
+          <div class="evidence-strip">
+            <span>Plate Number: {{ selectedRow.registrationNumber }}</span>
+            <span>Vehicle Type: {{ vehicleLabel(selectedRow) }}</span>
+            <span>Location: {{ selectedRow.cameraName }}</span>
+            <span>Type: {{ typeLabel(selectedRow) }}</span>
+          </div>
+        </div>
+
+        <div class="info-col">
+          <div class="info-card">
+            <div class="info-title">Plate Image</div>
+            <img *ngIf="selectedRow.plateImage" [src]="selectedRow.plateImage" class="info-plate" alt="plate" />
+          </div>
+
+          <div class="info-card">
+            <div class="info-title">Event Details</div>
+
+            <div class="kv"><label>NAME</label><div>{{ selectedRow.name }}</div></div>
+            <div class="kv"><label>LOCATION</label><div>{{ selectedRow.cameraName }}</div></div>
+            <div class="kv"><label>PLATE NUMBER</label><div>{{ selectedRow.registrationNumber }}</div></div>
+            <div class="kv"><label>FLAT NUMBER</label><div>{{ selectedRow.flatNumber || 'Unknown' }}</div></div>
+            <div class="kv"><label>TIMESTAMP</label><div>{{ selectedRow.date }}, {{ selectedRow.time }}</div></div>
+            <div class="kv"><label>TYPE</label><div>{{ typeLabel(selectedRow) }}</div></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Live Camera popup card -->
+  <div class="modal-backdrop" *ngIf="showLivePopup" (click)="closeLivePopup()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div class="panel-title">Live Camera</div>
+        <button class="modal-close" (click)="closeLivePopup()">✕</button>
+      </div>
+      <div class="video-box">
+        <img *ngIf="liveImageUrl" [src]="liveImageUrl" alt="Live feed" />
+        <div class="placeholder" *ngIf="!liveImageUrl">Connecting to stream...</div>
+      </div>
+    </div>
+  </div>
+
+</div>

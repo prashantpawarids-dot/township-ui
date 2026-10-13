@@ -1,0 +1,101 @@
+<div class="pk-wrap">
+
+  <div class="pk-top">
+    <div>
+      <h1>Parking management</h1>
+      <p class="pk-sub">Four wheelers only.
+        <span *ngIf="lastUpdated"> Updated {{ lastUpdated | date:'HH:mm:ss' }}</span>
+      </p>
+    </div>
+    <div class="pk-ctl">
+      <select aria-label="Society" [value]="selectedNrd" (change)="onNrdChange($any($event.target).value)">
+        <option value="All">All</option>
+        <option *ngFor="let s of societies" [value]="s">{{ s }}</option>
+      </select>
+      <input type="search" placeholder="Search plate, owner, flat" aria-label="Search"
+             [value]="search" (input)="onSearch($any($event.target).value)">
+      <span class="pk-live"><span class="pk-dot"></span>Auto-refresh {{ REFRESH_MS / 1000 }}s</span>
+    </div>
+  </div>
+
+  <div class="pk-error" *ngIf="error">{{ error }}</div>
+  <div class="pk-loading" *ngIf="loading">Loading parking data...</div>
+
+  <ng-container *ngIf="!loading">
+
+    <section class="pk-panel pk-mb">
+      <h2>Parking available by society</h2>
+      <div class="pk-dashgrid">
+        <div class="pk-soc" *ngFor="let x of societySummaries">
+          <b>{{ x.nrd }}</b>
+          <div class="pk-row"><span>Available {{ x.s.available }} / {{ x.s.total }}</span><span>{{ x.s.percentFull }}% full</span></div>
+          <div class="pk-bar"><i [style.width.%]="x.s.percentFull"></i></div>
+          <div class="pk-row"><span>Inside {{ x.s.inside }}</span></div>
+        </div>
+      </div>
+    </section>
+
+    <div class="pk-cards">
+      <div class="pk-card c-tot"><div class="n">{{ summary.total }}</div><div class="l">Registered (Active)</div></div>
+      <div class="pk-card c-in"><div class="n">{{ summary.inside }}</div><div class="l">Inside (parked)</div></div>
+      <div class="pk-card c-out"><div class="n">{{ summary.out }}</div><div class="l">Out (parking available)</div></div>
+      <div class="pk-card c-unk"><div class="n">{{ summary.none }}</div><div class="l">No event today</div></div>
+    </div>
+
+    <section class="pk-panel">
+      <div class="pk-tabs">
+        <button type="button" *ngFor="let t of tabs" class="pk-tab" [class.active]="tab === t.key" (click)="setTab(t.key)">{{ t.label }}</button>
+      </div>
+
+      <div class="pk-tblwrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Vehicle no.</th><th>Owner</th><th>Flat</th><th>Building</th>
+              <th>Status</th><th>Last seen</th><th>Camera</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let v of rows; trackBy: trackByPlate" (click)="openVehicle(v)">
+              <td class="pk-plate">{{ v.plate }}</td>
+              <td>{{ v.owner }}</td>
+              <td>{{ v.flat }}</td>
+              <td>{{ v.building }}</td>
+              <td>
+                <span class="pk-pill" [ngClass]="{'p-in': v.status==='IN', 'p-out': v.status==='OUT', 'p-unk': v.status==='NONE'}">
+                  {{ statusLabel(v.status) }}
+                </span>
+              </td>
+              <td>{{ v.lastSeen ? (v.lastSeen | date:'dd MMM, HH:mm') : '-' }}</td>
+              <td>{{ v.camera }}</td>
+            </tr>
+            <tr *ngIf="rows.length === 0">
+              <td colspan="7" class="pk-empty">No vehicles match. Change the society, tab or search.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="pk-note">Available = registered Active four wheelers whose latest camera event is OUT (or not seen in the period). Click a row to see the photo.</p>
+    </section>
+  </ng-container>
+
+  <p class="pk-debug" *ngIf="SHOW_DEBUG">
+    DEBUG: loading={{ loading }} | all={{ all.length }} | rows={{ rows.length }} | societies={{ societies.length }} | error={{ error || 'none' }}
+  </p>
+
+  <div class="pk-overlay" *ngIf="selected" (click)="closeVehicle()">
+    <div class="pk-dialog" (click)="$event.stopPropagation()">
+      <h2>{{ selected.plate }}</h2>
+      <div class="pk-img">
+        <span *ngIf="imageLoading">Loading photo...</span>
+        <img *ngIf="imageSrc" [src]="imageSrc" alt="Vehicle photo">
+        <span *ngIf="!imageLoading && !imageSrc">{{ imageError }}</span>
+      </div>
+      <p class="pk-sub">{{ selected.owner }} | {{ selected.flat }} | {{ selected.nrd }}</p>
+      <p class="pk-sub">{{ statusLabel(selected.status) }}
+        <span *ngIf="selected.lastSeen"> at {{ selected.lastSeen | date:'dd MMM, HH:mm' }}</span></p>
+      <div class="pk-actions"><button type="button" (click)="closeVehicle()">Close</button></div>
+    </div>
+  </div>
+
+</div>

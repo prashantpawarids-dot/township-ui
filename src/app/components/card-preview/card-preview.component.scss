@@ -1,0 +1,110 @@
+.preview-root {
+  width: 100vw;
+  height: 100vh;
+  background: #0d1117;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  overflow: hidden;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.preview-dot {
+  position: fixed;
+  top: 16px;
+  right: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #ef5350;
+  background: rgba(0,0,0,0.5);
+  padding: 4px 12px;
+  border-radius: 20px;
+  z-index: 100;
+  &--live { color: #66BB6A; }
+}
+
+// ── Idle ──────────────────────────────────────
+.preview-idle {
+  text-align: center;
+  color: rgba(255,255,255,0.25);
+  &__icon { font-size: 80px; margin-bottom: 20px; }
+  &__text { font-size: 26px; font-weight: 600; margin-bottom: 8px; }
+  &__sub  { font-size: 14px; }
+}
+
+// ── Skeleton ──────────────────────────────────
+.preview-skeleton {
+  .skeleton-card {
+    width: 280px;
+    background: #1c2128;
+    border-radius: 16px;
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+  .skeleton-photo {
+    width: 100px;
+    height: 130px;
+    border-radius: 8px;
+    background: linear-gradient(90deg, #2d3748 25%, #3d4a5c 50%, #2d3748 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+  }
+  .skeleton-line {
+    width: 100%;
+    height: 14px;
+    border-radius: 4px;
+    background: linear-gradient(90deg, #2d3748 25%, #3d4a5c 50%, #2d3748 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    &--short   { width: 70%; }
+    &--shorter { width: 50%; }
+  }
+}
+
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+// ── Stage ─────────────────────────────────────
+.preview-stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+// ── Card wrap — same ratio as ID card ─────────
+.preview-card-wrap {
+  width: auto;
+  height: auto;
+  max-width: 340px;
+  max-height: 80vh;
+  border-radius: 12px;
+  overflow: visible;
+  box-shadow: 0 25px 80px rgba(0,0,0,0.6);
+  animation: cardIn 0.4s ease;
+  position: relative;
+}
+
+@keyframes cardIn {
+  from { transform: scale(0.92); opacity: 0; }
+  to   { transform: scale(1);    opacity: 1; }
+}
+
+.preview-hint {
+  color: rgba(255,255,255,0.15);
+  font-size: 12px;
+  letter-spacing: 0.5px;
+}
+
+.preview-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}

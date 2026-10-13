@@ -33,6 +33,23 @@ export class LandownerCommon {
     files: File[] = [];
 }
 
+export class SemacTransaction {
+    id: number;
+    readerID: string;
+    readerLocation: string;
+    ipAddress: string;
+    idNumber: string;
+    accessMode: string;
+    accessTime: string;
+    csnNumber: string;
+}
+
+export class PagedResult<T> {
+    page: number;
+    pageSize: number;
+    totalCount: number;
+    data: T[];
+}
 
 
 export class LandOwner extends LandownerCommon {
@@ -73,7 +90,8 @@ export class Contractors extends LandownerCommon {
   company: string;
   project:string;
   
-  neighbourhood: string[]; //need to be add in a API and Database      
+     neighbourhood: string[]; //need to be add in a API and Database   
+     nbr?: number = null; // ← ADD THIS
     validFromDate: string;        
     validToDate: string;          
 } 
@@ -161,6 +179,7 @@ export class Vehicle {
     stickerNo: string;
      isactive?: number;
      logical_Delete?: number;
+       nrdIDs: number[] = [];
 }
 
 // Building
@@ -288,6 +307,7 @@ export class CardPrintEnroll {
     validTill?:  string;
 company?:    string;
 agency?:     string;
+
 }
 
 export class CardAccessPoint {
@@ -299,7 +319,9 @@ export class CardEditDetail {
     cardHolder: string;
     cardDetails: string;
     cardCSN: string;
+     idNumber: string;
     accessPoints: CardAccessPoint[] = [];
+   
 }
 
 // export class CardSearchFilter {

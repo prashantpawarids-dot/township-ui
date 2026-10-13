@@ -1,0 +1,29 @@
+<div class="preview-root" (click)="goFullscreen()">
+
+  <div class="preview-dot" [class.preview-dot--live]="isConnected">
+    {{ isConnected ? '● LIVE' : '● OFFLINE' }}
+  </div>
+
+  <div class="preview-idle" *ngIf="!isLoading && !cardImageBase64">
+    <div class="preview-idle__icon">🪪</div>
+    <div class="preview-idle__text">Waiting for card selection...</div>
+    <div class="preview-idle__sub">Operator will select a card</div>
+  </div>
+
+  <div class="preview-skeleton" *ngIf="isLoading">
+    <div class="skeleton-card">
+      <div class="skeleton-photo"></div>
+      <div class="skeleton-line"></div>
+      <div class="skeleton-line skeleton-line--short"></div>
+      <div class="skeleton-line skeleton-line--shorter"></div>
+    </div>
+  </div>
+
+  <div class="preview-stage" *ngIf="!isLoading && cardImageBase64">
+    <div class="preview-card-wrap">
+      <img [src]="cardImageBase64" alt="{{ cardName }}" class="preview-card-img" />
+    </div>
+    <div class="preview-hint">Click anywhere for fullscreen</div>
+  </div>
+
+</div>

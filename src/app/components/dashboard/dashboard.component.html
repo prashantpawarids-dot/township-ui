@@ -1,136 +1,533 @@
 <div class="dashboard-container">
 
- <!-- Stats Grid -->
-<div class="stats-grid">
-  <mat-card 
-    class="stat-card" 
-    *ngFor="let key of metricsOrder; let i = index"
-    [ngStyle]="{ 'background-color': metricColors[i], 'color': '#fff' }"
-  >
-    <mat-card-title class="fw-bold fs-3">{{ key }}</mat-card-title>
+  <!-- Stats Grid -->
+  <div class="stats-grid">
+           <div class="stat-card"
+      *ngFor="let key of metricsOrder; let i = index"
+      [style.background]="metricColors[i]"
+      [class.stat-card--clickable]="metricRoutes[i]"
+      (click)="goToMetricPage(i)">
 
-    <mat-card-content>
-      <ng-container *ngIf="primaryDependent[key]">
-        <!-- Main count: bigger and bold -->
-        <div class="fw-bold fs-1">{{ counts[key] || 0 }}</div>
+      <div class="stat-card__icon-circle">
+        <mat-icon>{{ metricIcons[i] }}</mat-icon>
+      </div>
 
-        
-        <div class="fs-6 mt-1">
-  <span class="d-block fs-5">Primary - {{ primaryDependent[key].primary }}</span>
-  <span class="d-block fs-5">Dependent - {{ primaryDependent[key].dependent }}</span>
-</div>
+      <div class="stat-card__content">
+        <div class="stat-card__label">{{ key }}</div>
+        <div class="stat-card__count">{{ counts[key] || 0 }}</div>
+        <div class="stat-card__sub" *ngIf="primaryDependent[key]">
+        </div>
+      </div>
 
-      </ng-container>
+      <div class="nrd-popover" *ngIf="nrdBreakdown[key]">
+        <div class="nrd-popover__header">{{ key }} — by Project</div>
+        <div class="nrd-popover__row" *ngFor="let entry of getNrdEntries(key)">
+          <span class="nrd-popover__dot"></span>
+          <span class="nrd-popover__name">{{ entry.name }}</span>
+          <span class="nrd-popover__count">{{ entry.count }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
 
-      <ng-container *ngIf="!primaryDependent[key]">
-        <div class="fw-bold fs-1">{{ counts[key] || 0 }}</div>
-      </ng-container>
-    </mat-card-content>
-  </mat-card>
-</div>
+    <!-- Card Summary -->
+  <div class="section-card section-card--accent">
+    <div class="section-title">
+      <span class="section-title__icon"><mat-icon>credit_card</mat-icon></span>
+      Card Summary
+    </div>
+        <div class="info-grid four-col">
+            <div class="info-tile info-tile--blue">
+        <div class="info-tile__icon-circle"><mat-icon>layers</mat-icon></div>
+        <div class="info-tile__count">{{ displayedCounts.Total }}</div>
+        <div class="info-tile__label">Total</div>
 
+        <div class="nrd-popover" *ngIf="cardSummaryNrdBreakdown['Total']">
+          <div class="nrd-popover__header">Total — by Project</div>
+          <div class="nrd-popover__row" *ngFor="let entry of getCardSummaryNrdEntries('Total')">
+            <span class="nrd-popover__dot"></span>
+            <span class="nrd-popover__name">{{ entry.name }}</span>
+            <span class="nrd-popover__count">{{ entry.count }}</span>
+          </div>
+        </div>
+      </div>
+            <div class="info-tile info-tile--green">
+        <div class="info-tile__icon-circle"><mat-icon>check_circle</mat-icon></div>
+        <div class="info-tile__count">{{ displayedCounts.Encoded }}</div>
+        <div class="info-tile__label">Card Issued</div>
 
-<div class="card p-3 mt-2 border border-warning border-2 rounded-3">
-   <h3 style="text-align: center;">Card</h3>
-  <div class="d-flex justify-content-between text-center small gap-2">
-    
-    <!-- Total -->
-    <div class="flex-fill card p-2 rounded">
-     
-      <div class="fw-bold fs-5">Total</div>
-      <div class="fw-bold fs-4">{{ displayedCounts.Total }}</div>
-      
+        <div class="nrd-popover" *ngIf="cardSummaryNrdBreakdown['Encoded']">
+          <div class="nrd-popover__header">Card Issued — by Project</div>
+          <div class="nrd-popover__row" *ngFor="let entry of getCardSummaryNrdEntries('Encoded')">
+            <span class="nrd-popover__dot"></span>
+            <span class="nrd-popover__name">{{ entry.name }}</span>
+            <span class="nrd-popover__count">{{ entry.count }}</span>
+          </div>
+        </div>
+      </div>
+                        <div class="info-tile info-tile--orange">
+        <div class="info-tile__icon-circle"><mat-icon>credit_card_off</mat-icon></div>
+        <div class="info-tile__count">{{ displayedCounts.NonEncoded }}</div>
+        <div class="info-tile__label">Not Issued</div>
+
+        <div class="nrd-popover" *ngIf="cardSummaryNrdBreakdown['NonEncoded']">
+          <div class="nrd-popover__header">Not Issued — by Project</div>
+          <div class="nrd-popover__row" *ngFor="let entry of getCardSummaryNrdEntries('NonEncoded')">
+            <span class="nrd-popover__dot"></span>
+            <span class="nrd-popover__name">{{ entry.name }}</span>
+            <span class="nrd-popover__count">{{ entry.count }}</span>
+          </div>
+        </div>
+      </div>
+            <div class="info-tile info-tile--red">
+        <div class="info-tile__icon-circle"><mat-icon>block</mat-icon></div>
+        <div class="info-tile__count">{{ displayedCounts.Blocked }}</div>
+        <div class="info-tile__label">Blocked</div>
+
+        <div class="nrd-popover" *ngIf="cardSummaryNrdBreakdown['Blocked']">
+          <div class="nrd-popover__header">Blocked — by Project</div>
+          <div class="nrd-popover__row" *ngFor="let entry of getCardSummaryNrdEntries('Blocked')">
+            <span class="nrd-popover__dot"></span>
+            <span class="nrd-popover__name">{{ entry.name }}</span>
+            <span class="nrd-popover__count">{{ entry.count }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Alert: Not Exited unknown vehicles (Today) -->
+  <div class="alert-card" [class.alert-card--ok]="notExitedToday.total === 0">
+    <div class="alert-card__head" (click)="goToNotExited()">
+      <span class="alert-card__icon"><mat-icon>{{ notExitedToday.total ? 'warning' : 'verified' }}</mat-icon></span>
+      <div class="alert-card__title">
+              {{ notExitedToday.total ? 'Alert: Unknown vehicles  (Today)' : 'No unknown vehicles inside (Today)' }}
+        <small>{{ notExitedToday.total ? 'Click to view in report' : 'All unknown vehicles have exited' }}</small>
+      </div>
+      <div class="alert-card__total">{{ notExitedToday.total }}</div>
     </div>
 
-    <!-- Encoded -->
-    <div class="flex-fill card p-2 rounded">
-      <div class="fw-bold fs-5">Card Issue</div>
-      <div class="fw-bold fs-4">{{ displayedCounts.Encoded }}</div>
+    <div class="alert-card__list" *ngIf="notExitedToday.byLocation.length">
+      <div class="alert-card__row" *ngFor="let loc of notExitedToday.byLocation" (click)="goToNotExited(loc.location)">
+        <mat-icon>videocam</mat-icon>
+        <span class="alert-card__loc">{{ loc.location }}</span>
+        <span class="alert-card__count">{{ loc.count }}</span>
+      </div>
+    </div>
+  </div>
+  <!-- Alert: Not Exited unknown vehicles (OVERALL, location wise) -->
+  <div class="alert-card" [class.alert-card--ok]="notExitedOverall.total === 0">
+    <div class="alert-card__head" (click)="goToNotExited()">
+      <span class="alert-card__icon"><mat-icon>{{ notExitedOverall.total ? 'warning' : 'verified' }}</mat-icon></span>
+      <div class="alert-card__title">
+        {{ notExitedOverall.total ? 'Alert: Unknown vehicles  (Overall)' : 'No unknown vehicles inside (Overall)' }}
+        <small>{{ notExitedOverall.total ? 'All dates · Click to view in report' : 'All unknown vehicles have exited' }}</small>
+      </div>
+      <div class="alert-card__total">{{ notExitedOverall.total }}</div>
     </div>
 
-    <!-- Non-Encoded -->
-    <div class="flex-fill card p-2 rounded">
-      <div class="fw-bold fs-5">Block Card</div>
-      <div class="fw-bold fs-4">{{ displayedCounts.NonEncoded }}</div>
+    <div class="alert-card__list" *ngIf="notExitedOverall.byLocation.length">
+      <div class="alert-card__row" *ngFor="let loc of notExitedOverall.byLocation" (click)="goToNotExited(loc.location)">
+        <mat-icon>videocam</mat-icon>
+        <span class="alert-card__loc">{{ loc.location }}</span>
+        <span class="alert-card__count">{{ loc.count }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Controllers & ANPR -->
+  <div class="two-col-grid">
+
+                          <div class="section-card section-card--clickable" (click)="goToPage('/master/reader-relay')">
+      <div class="section-title">
+        <span class="section-title__icon"><mat-icon>router</mat-icon></span>
+        Controllers
+      </div>
+
+           <div class="controller-type-grid">
+                <div class="controller-type-card">
+          <mat-icon>nfc</mat-icon>
+          <span class="controller-type-card__label">RFID</span>
+          <div class="controller-type-card__status-list">
+            <span class="controller-type-card__status-row controller-type-card__status-row--on">
+              <mat-icon>check_circle</mat-icon>{{ controllerStatus.in }}
+            </span>
+            <span class="controller-type-card__status-row controller-type-card__status-row--off">
+              <mat-icon>cancel</mat-icon>{{ controllerStatus.out }}
+            </span>
+          </div>
+        </div>
+        <div class="controller-type-card">
+          <mat-icon>sensors</mat-icon>
+          <span class="controller-type-card__label">FastTag-UHF</span>
+
+          <div class="controller-type-card__status-list">
+            <span class="controller-type-card__status-row controller-type-card__status-row--on">
+              <mat-icon>check_circle</mat-icon>{{ 0 }}
+            </span>
+            <span class="controller-type-card__status-row controller-type-card__status-row--off">
+              <mat-icon>cancel</mat-icon>{{ 0 }}
+            </span>
+          </div>
+        </div>
+        <div class="controller-type-card">
+          <mat-icon>qr_code_2</mat-icon>
+          <span class="controller-type-card__label">QR</span>
+         <div class="controller-type-card__status-list">
+            <span class="controller-type-card__status-row controller-type-card__status-row--on">
+              <mat-icon>check_circle</mat-icon>{{ 0 }}
+            </span>
+            <span class="controller-type-card__status-row controller-type-card__status-row--off">
+              <mat-icon>cancel</mat-icon>{{ 0 }}
+            </span>
+          </div>
+        </div>
+        <div class="controller-type-card">
+          <mat-icon>face</mat-icon>
+          <span class="controller-type-card__label">AI Face Recognition</span>
+         <div class="controller-type-card__status-list">
+            <span class="controller-type-card__status-row controller-type-card__status-row--on">
+              <mat-icon>check_circle</mat-icon>{{ 0 }}
+            </span>
+            <span class="controller-type-card__status-row controller-type-card__status-row--off">
+              <mat-icon>cancel</mat-icon>{{ 0 }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="nrd-popover" *ngIf="getControllerProjectEntries().length">
+        <div class="nrd-popover__header">Controllers — by Project</div>
+        <div class="nrd-popover__row" *ngFor="let proj of getControllerProjectEntries()">
+          <span class="nrd-popover__dot"></span>
+          <span class="nrd-popover__name">{{ proj.name }}</span>
+          <span class="nrd-popover__count">
+            <span class="nrd-popover__on">{{ proj.in }}</span>/<span class="nrd-popover__off">{{ proj.out }}</span>
+          </span>
+        </div>
+      </div>
     </div>
 
-    <!-- Pending -->
-    <!-- <div class="flex-fill card p-2 rounded">
-      <div class="fw-bold fs-5">Pending</div>
-      <div class="fw-bold fs-4">0</div>
-    </div> -->
+                        <div
+  class="section-card section-card--clickable section-card--accent"
+  (click)="goToPage('/reports/vechileList')"
+>
+  <div class="section-title">
+    <span class="section-title__icon">
+      <mat-icon>directions_car</mat-icon>
+    </span>
+    Vehicle 
+  </div>
 
+    <div class="status-row">
+    <div class="status-badge status-badge--on">
+      <mat-icon>check_circle</mat-icon>
+      Active <strong>{{ vehicleStatus.in }}</strong>
+    </div>
+
+    <div class="status-badge status-badge--off">
+      <mat-icon>cancel</mat-icon>
+      Inactive <strong>{{ vehicleStatus.out }}</strong>
+    </div>
+  </div>
+
+    <!-- Two / Four wheeler + Sticker tiles (each has its own project-wise popover) -->
+  <div class="vehicle-tiles">
+
+    <div class="vehicle-tile vehicle-tile--blue">
+      <div class="vehicle-tile__icon"><mat-icon>two_wheeler</mat-icon></div>
+      <div class="vehicle-tile__count">{{ vehicleTypeStats.twoWheeler.total }}</div>
+      <div class="vehicle-tile__label">Two Wheeler</div>
+      <div class="vehicle-tile__sub">
+        <span class="vehicle-tile__on">{{ vehicleTypeStats.twoWheeler.active }}</span> /
+        <span class="vehicle-tile__off">{{ vehicleTypeStats.twoWheeler.inactive }}</span>
+      </div>
+
+      <div class="nrd-popover" *ngIf="getVehicleTypeProjectEntries('two').length">
+        <div class="nrd-popover__header">Two Wheeler — by Project</div>
+        <div class="nrd-popover__row" *ngFor="let proj of getVehicleTypeProjectEntries('two')">
+          <span class="nrd-popover__dot"></span>
+          <span class="nrd-popover__name">{{ proj.name }}</span>
+          <span class="nrd-popover__count">
+            <span class="nrd-popover__on">{{ proj.in }}</span>/<span class="nrd-popover__off">{{ proj.out }}</span>
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <div class="vehicle-tile vehicle-tile--purple">
+      <div class="vehicle-tile__icon"><mat-icon>directions_car</mat-icon></div>
+      <div class="vehicle-tile__count">{{ vehicleTypeStats.fourWheeler.total }}</div>
+      <div class="vehicle-tile__label">Four Wheeler</div>
+      <div class="vehicle-tile__sub">
+        <span class="vehicle-tile__on">{{ vehicleTypeStats.fourWheeler.active }}</span> /
+        <span class="vehicle-tile__off">{{ vehicleTypeStats.fourWheeler.inactive }}</span>
+      </div>
+
+      <div class="nrd-popover" *ngIf="getVehicleTypeProjectEntries('four').length">
+        <div class="nrd-popover__header">Four Wheeler — by Project</div>
+        <div class="nrd-popover__row" *ngFor="let proj of getVehicleTypeProjectEntries('four')">
+          <span class="nrd-popover__dot"></span>
+          <span class="nrd-popover__name">{{ proj.name }}</span>
+          <span class="nrd-popover__count">
+            <span class="nrd-popover__on">{{ proj.in }}</span>/<span class="nrd-popover__off">{{ proj.out }}</span>
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <div class="vehicle-tile vehicle-tile--green">
+      <div class="vehicle-tile__icon"><mat-icon>local_offer</mat-icon></div>
+      <div class="vehicle-tile__count">{{ vehicleTypeStats.withSticker }}</div>
+      <div class="vehicle-tile__label">With Sticker</div>
+      <div class="vehicle-tile__sub vehicle-tile__sub--muted">of {{ vehicleStatus.in + vehicleStatus.out }}</div>
+
+      <div class="nrd-popover" *ngIf="getVehicleStickerProjectEntries('with').length">
+        <div class="nrd-popover__header">With Sticker — by Project</div>
+        <div class="nrd-popover__row" *ngFor="let proj of getVehicleStickerProjectEntries('with')">
+          <span class="nrd-popover__dot"></span>
+          <span class="nrd-popover__name">{{ proj.name }}</span>
+          <span class="nrd-popover__count">{{ proj.count }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="vehicle-tile vehicle-tile--orange">
+      <div class="vehicle-tile__icon"><mat-icon>label_off</mat-icon></div>
+      <div class="vehicle-tile__count">{{ vehicleTypeStats.noSticker }}</div>
+      <div class="vehicle-tile__label">No Sticker</div>
+      <div class="vehicle-tile__sub vehicle-tile__sub--muted">of {{ vehicleStatus.in + vehicleStatus.out }}</div>
+
+      <div class="nrd-popover" *ngIf="getVehicleStickerProjectEntries('no').length">
+        <div class="nrd-popover__header">No Sticker — by Project</div>
+        <div class="nrd-popover__row" *ngFor="let proj of getVehicleStickerProjectEntries('no')">
+          <span class="nrd-popover__dot"></span>
+          <span class="nrd-popover__name">{{ proj.name }}</span>
+          <span class="nrd-popover__count">{{ proj.count }}</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- existing Active / Inactive project-wise popover (unchanged) -->
+  <div class="nrd-popover" *ngIf="getVehicleProjectEntries().length">
+    <div class="nrd-popover__header">Vehicle — by Project</div>
+    <div class="nrd-popover__row" *ngFor="let proj of getVehicleProjectEntries()">
+      <span class="nrd-popover__dot"></span>
+      <span class="nrd-popover__name">{{ proj.name }}</span>
+      <span class="nrd-popover__count">
+        <span class="nrd-popover__on">{{ proj.in }}</span>/<span class="nrd-popover__off">{{ proj.out }}</span>
+      </span>
+    </div>
   </div>
 </div>
 
 
-
-
-
-
-  <!-- Controller & Vehicle Status -->
-  <div class="status-summary border border-warning border-2 rounded-3">
-    
-    <mat-card class="status-card">
-      <mat-card-title>Controllers</mat-card-title>
-      <mat-card-content>
-        <span class="connected-count">Connected: {{ controllerStatus.in }}</span>
-        <span class="disconnected-count">Disconnected: {{ controllerStatus.out }}</span>
-      </mat-card-content>
-    </mat-card>
-
-    <mat-card class="status-card">
-      <mat-card-title>Vehicle ANPR Cameras</mat-card-title>
-      <mat-card-content>
-        <span class="connected-count">Connected: {{ vehicleStatus.in }}</span>
-        <span class="disconnected-count">Disconnected: {{ vehicleStatus.out }}</span>
-      </mat-card-content>
-    </mat-card>
   </div>
 
-  <!-- Visitor Details -->
-<div class="visitor-details d-flex justify-content-between gap-2 border border-warning border-2 rounded-3 p-2">
+    <!-- ANPR Camera Status + Environment Monitoring row -->
+  <div class="two-col-grid">
 
-  <mat-card class="visitor-card flex-fill text-center p-2 rounded">
-    <mat-card-title>Total</mat-card-title>
-    <mat-card-content>
-      {{ visitorStatus.twoWheeler + visitorStatus.fourWheeler + 0 }}
-    </mat-card-content>
-  </mat-card>
+  <div class="section-card section-card--accent">
+  <div class="section-title">
+    <span class="section-title__icon">
+      <mat-icon>videocam</mat-icon>
+    </span>
+    ANPR Camera Status
+  </div>
 
-  <mat-card class="visitor-card flex-fill text-center p-2 rounded">
-    <mat-card-title>2-Wheeler</mat-card-title>
-    <mat-card-content>{{ visitorStatus.twoWheeler }}</mat-card-content>
-  </mat-card>
+    <div class="status-row">
+    <div class="status-badge status-badge--on">
+      <mat-icon>check_circle</mat-icon>
+      Connected <strong>{{ cameraStatus.in }}</strong>
+    </div>
 
-  <mat-card class="visitor-card flex-fill text-center p-2 rounded">
-    <mat-card-title>4-Wheeler</mat-card-title>
-    <mat-card-content>{{ visitorStatus.fourWheeler }}</mat-card-content>
-  </mat-card>
+    <div class="status-badge status-badge--off">
+      <mat-icon>cancel</mat-icon>
+      Disconnected <strong>{{ cameraStatus.out }}</strong>
+    </div>
+  </div>
 
-  <mat-card class="visitor-card flex-fill text-center p-2 rounded">
-    <mat-card-title>Other</mat-card-title>
-    <mat-card-content>0</mat-card-content>
-  </mat-card>
-
+  <div class="nrd-popover" *ngIf="getCameraProjectEntries().length">
+    <div class="nrd-popover__header">ANPR Camera Status — by Project</div>
+    <div class="nrd-popover__row" *ngFor="let proj of getCameraProjectEntries()">
+      <span class="nrd-popover__dot"></span>
+      <span class="nrd-popover__name">{{ proj.name }}</span>
+      <span class="nrd-popover__count">
+        <span class="nrd-popover__on">{{ proj.in }}</span>/<span class="nrd-popover__off">{{ proj.out }}</span>
+      </span>
+    </div>
+  </div>
 </div>
 
+    <div class="section-card section-card--accent">
+    <div class="section-title">
+      <span class="section-title__icon">
+        <mat-icon>eco</mat-icon>
+      </span>
+      Environment Monitoring
+    </div>
+        <div class="env-grid">
+
+      <!-- Air Quality — live from Open-Meteo -->
+      <div class="env-card">
+        <div class="env-card__icon-circle env-card__icon-circle--teal">
+          <mat-icon>air</mat-icon>
+        </div>
+        <div class="env-card__label">Air Quality — Loni Kalbhor</div>
+        <div class="env-card__value">{{ airQuality.aqi ?? '--' }}<span class="env-card__unit">AQI</span></div>
+        <div class="env-card__status" [ngClass]="'env-card__status--' + airQuality.level">{{ airQuality.label }}</div>
+        <div class="env-card__details">
+          <div class="env-chip">
+            <span class="env-chip__value">{{ airQuality.pm25 ?? '--' }}</span>
+            <span class="env-chip__label">PM2.5 µg/m³</span>
+          </div>
+          <div class="env-chip">
+            <span class="env-chip__value">{{ airQuality.pm10 ?? '--' }}</span>
+            <span class="env-chip__label">PM10 µg/m³</span>
+          </div>
+        </div>
+        <div class="env-card__source">{{ airQuality.source }}</div>
+      </div>
+
+      <!-- Water Quality — graded against BIS IS 10500 -->
+      <div class="env-card">
+        <div class="env-card__icon-circle env-card__icon-circle--blue">
+          <mat-icon>water_drop</mat-icon>
+        </div>
+        <div class="env-card__label">Water Quality — TDS</div>
+        <div class="env-card__value">{{ waterReadings.tds }}<span class="env-card__unit">mg/L</span></div>
+        <div class="env-card__status" [ngClass]="'env-card__status--' + waterStatus.level">{{ waterStatus.label }}</div>
+        <div class="env-card__details">
+          <div class="env-chip">
+            <span class="env-chip__value">{{ waterReadings.ph }}</span>
+            <span class="env-chip__label">pH</span>
+          </div>
+          <div class="env-chip">
+            <span class="env-chip__value">{{ waterReadings.turbidity }}</span>
+            <span class="env-chip__label">Turbidity NTU</span>
+          </div>
+        </div>
+        <div class="env-card__source">{{ waterReadings.source }}</div>
+      </div>
+
+    </div>
+
+  </div>
+
+  </div>
 
 
 
+    <!-- Amenities -->
+  <div class="section-card section-card--accent">
+    <div class="section-title">
+      <span class="section-title__icon"><mat-icon>pool</mat-icon></span>
+      Amenities
+    </div>
+
+    <div class="amenity-grid">
+      <div class="amenity-card" *ngFor="let a of amenityCards" [class.amenity-card--closed]="!a.isActive">
+
+        <div class="amenity-card__top">
+          <div class="amenity-card__icon" [style.background]="a.color">
+            <mat-icon>{{ a.icon }}</mat-icon>
+          </div>
+          <div class="amenity-card__title">
+            <div class="amenity-card__name">{{ a.name }}</div>
+            <span class="amenity-card__access" [class.amenity-card__access--book]="a.access === 'Booking Required'">
+              <mat-icon>{{ a.access === 'Booking Required' ? 'event_available' : 'badge' }}</mat-icon>
+              {{ a.access }}
+            </span>
+          </div>
+          <span class="amenity-card__state" *ngIf="!a.isActive">Closed</span>
+        </div>
+
+        <div class="amenity-card__main">
+          <div class="amenity-card__count">{{ a.total }}</div>
+                  <div class="amenity-card__label" *ngIf="a.totalLabel">{{ a.totalLabel }}</div>
+        </div>
+
+        <div class="amenity-card__splits">
+          <div class="amenity-split" *ngFor="let s of a.splits">
+            <mat-icon>{{ s.icon }}</mat-icon>
+            <span class="amenity-split__value">{{ s.value }}</span>
+            <span class="amenity-split__label">{{ s.label }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+    <!-- Today's Vehicle Traffic: Authorized vs Unauthorized -->
+
+
+    <!-- Today's Vehicle Traffic: Authorized vs Unauthorized -->
+  <!-- <div class="two-col-grid">
+
+        <div class="section-card section-card--clickable" (click)="goToPage('/reports/vechileInOutRegister')">
+      <div class="section-title">
+        <span class="section-title__icon"><mat-icon>verified</mat-icon></span>
+        Authorized Vehicles (Today)
+      </div>
+      <div class="info-grid three-col">
+        <div class="info-tile info-tile--blue">
+          <div class="info-tile__icon-circle"><mat-icon>layers</mat-icon></div>
+          <div class="info-tile__count">{{ authorizedToday.total }}</div>
+          <div class="info-tile__label">Total</div>
+        </div>
+        <div class="info-tile info-tile--green">
+          <div class="info-tile__icon-circle"><mat-icon>login</mat-icon></div>
+          <div class="info-tile__count">{{ authorizedToday.in }}</div>
+          <div class="info-tile__label">IN</div>
+        </div>
+        <div class="info-tile info-tile--orange">
+          <div class="info-tile__icon-circle"><mat-icon>logout</mat-icon></div>
+          <div class="info-tile__count">{{ authorizedToday.out }}</div>
+          <div class="info-tile__label">OUT</div>
+        </div>
+      </div>
+    </div>
+
+                <div class="section-card section-card--clickable section-card--accent" (click)="goToPage('/reports/unauthorized')">
+      <div class="section-title">
+        <span class="section-title__icon"><mat-icon>report</mat-icon></span>
+        Unauthorized Vehicles (Today)
+      </div>
+      <div class="info-grid three-col">
+        <div class="info-tile info-tile--blue">
+          <div class="info-tile__icon-circle"><mat-icon>layers</mat-icon></div>
+          <div class="info-tile__count">{{ unauthorizedToday.total }}</div>
+          <div class="info-tile__label">Total</div>
+        </div>
+        <div class="info-tile info-tile--green">
+          <div class="info-tile__icon-circle"><mat-icon>login</mat-icon></div>
+          <div class="info-tile__count">{{ unauthorizedToday.in }}</div>
+          <div class="info-tile__label">IN</div>
+        </div>
+        <div class="info-tile info-tile--red">
+          <div class="info-tile__icon-circle"><mat-icon>logout</mat-icon></div>
+          <div class="info-tile__count">{{ unauthorizedToday.out }}</div>
+          <div class="info-tile__label">OUT</div>
+        </div>
+      </div>
+    </div>
+
+  </div> -->
 
   <!-- Charts -->
   <div class="charts-container">
     <div class="chart-card">
-      <h3>Bar Chart - Metrics</h3>
+      <h3><span class="chart-card__icon"><mat-icon>bar_chart</mat-icon></span> Metrics</h3>
       <canvas baseChart [data]="barChartData" [options]="barChartOptions" type="bar"></canvas>
     </div>
     <div class="chart-card">
-      <h3>Line Chart - Visitors & Vehicles</h3>
+      <h3><span class="chart-card__icon"><mat-icon>show_chart</mat-icon></span> Visitors & Vehicles</h3>
       <canvas baseChart [data]="lineChartData" [options]="lineChartOptions" type="line"></canvas>
     </div>
     <div class="chart-card">
-      <h3>Pie Chart - Metrics</h3>
+      <h3><span class="chart-card__icon"><mat-icon>pie_chart</mat-icon></span> Distribution</h3>
       <canvas baseChart [data]="pieChartData" [options]="pieChartOptions" type="pie"></canvas>
     </div>
   </div>

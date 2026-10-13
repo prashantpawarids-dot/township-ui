@@ -21,6 +21,10 @@ import { sortByTimeOnly } from 'src/app/_core/shared/utils/sort.util';
 import { DateTimeUtil } from 'src/app/_core/shared/utils/datetime.util';
 import { DateAdapter } from '@angular/material/core';
 import { CustomDateAdapter } from 'src/app/_core/shared/utils/custom-date-adapter';
+import { timeout } from 'rxjs/operators';
+import { AuthService } from 'src/app/services/auth.service';
+import { LoaderService } from 'src/app/_core/shared/utils/loader.service';
+
 
 @Component({
   selector: 'app-vehicle-in-out-log',
@@ -49,9 +53,25 @@ export class VehicleRegisterInOutComponent implements OnInit, AfterViewInit {
   vehicleData: any[] = [];
   displayedData = new MatTableDataSource<any>([]);
   pageSizes = [10, 25, 50, 100, 150, 200];
-  buildings: string[] = [];
+    buildings: string[] = [];
   allBuildings: string[] = [];
-  filteredData: any[] = [];
+  projectList: string[] = [];
+
+  vehicleTypes = [
+    { value: 'Two Wheeler', label: 'Two Wheeler' },
+    { value: 'Four Wheeler', label: 'Four Wheeler' },
+    { value: 'Three Wheeler', label: 'Three Wheeler' }
+  ];
+
+  inOutOptions = [
+    { value: 'IN', label: 'IN (Inside)' },
+    { value: 'OUT', label: 'OUT (Exited)' }
+  ];
+  // filteredData: any[] = [];
+    filteredData: any[] = [];
+  totalCount = 0;
+  pageNumber = 1;
+  currentPageSize = 10;
 
   // ─── Popup ───────────────────────────────────────────────────
   selectedVehicle: any = null;
@@ -66,12 +86,33 @@ export class VehicleRegisterInOutComponent implements OnInit, AfterViewInit {
   // }
 
 
-  openVehiclePopup(d: any, type: 'in' | 'out') {
+     openVehiclePopup(d: any, type: 'in' | 'out') {
+  const uniqueId = type === 'in' ? d.inUniqueId : d.outUniqueId;
+
   this.selectedVehicle = {
     ...d,
-    frameImage: type === 'in' ? d.inCameraFrameImage : d.outCameraFrameImage,
-    activeLabel: type === 'in' ? 'IN' : 'OUT'
+    frameImage: null,
+    plateImage: null,
+    activeLabel: type === 'in' ? 'IN' : 'OUT',
+    imageLoading: !!uniqueId
   };
+
+  if (!uniqueId) return;
+
+    this.authService.getVehicleImage(uniqueId).subscribe({
+    next: (res) => {
+      if (this.selectedVehicle) {
+        this.selectedVehicle.frameImage = res?.frameImage || null;
+        this.selectedVehicle.plateImage = res?.plateImage || null;
+        this.selectedVehicle.imageLoading = false;
+      }
+    },
+    error: () => {
+      if (this.selectedVehicle) {
+        this.selectedVehicle.imageLoading = false;
+      }
+    }
+  });
 }
 
   closeVehiclePopup() { this.selectedVehicle = null; }
@@ -89,30 +130,48 @@ export class VehicleRegisterInOutComponent implements OnInit, AfterViewInit {
     'inCameraImage', 'outCameraImage', 'inTime', 'outTime'
   ];
 
-  constructor(
+       constructor(
     private fb: FormBuilder,
     private http: HttpClient,
-    private sortService: TableSortService
+    private authService: AuthService,
+    private sortService: TableSortService,
+    private loaderService: LoaderService
   ) {
     const today = new Date();
-    this.reportForm = this.fb.group({
+       this.reportForm = this.fb.group({
       fromDate:    [today],
       fromTime:    [''],
       toDate:      [today],
       toTime:      [''],
       buildings:   [[]],
+      vehicleType: [[]],
+      inOut:       [[]],
+      project:     [[]],
       searchType:  [''],
       searchValue: ['']
     });
   }
 
-  ngOnInit() {
-    this.loadVehicleData();
+   ngOnInit() {
+    // this.loadVehicleData();
     this.loadBuildingList();
+    this.loadProjectList();
   }
 
-  ngAfterViewInit() {
-    this.displayedData.paginator = this.paginator;
+  loadProjectList() {
+    this.http.get<any[]>(`${environment.apiurl}nrd`).subscribe(
+      res => { this.projectList = res.map(n => n.name); },
+      err => console.error('Error fetching NRD list:', err)
+    );
+  }
+
+  // ngAfterViewInit() {
+  //   this.displayedData.paginator = this.paginator;
+  // }
+
+
+    ngAfterViewInit() {
+    // paginator ab server-side hai, local link nahi chahiye
   }
 
   get paginatedData() {
@@ -128,7 +187,76 @@ export class VehicleRegisterInOutComponent implements OnInit, AfterViewInit {
     return real.join(', ');
   }
 
-  loadVehicleData(fromDate?: Date, toDate?: Date) {
+  // loadVehicleData(fromDate?: Date, toDate?: Date) {
+
+  //   const from = fromDate || this.reportForm.value.fromDate || new Date();
+  //   const to   = toDate   || this.reportForm.value.toDate   || new Date();
+
+  //   const formatDate = (d: Date) => {
+  //     const day   = String(d.getDate()).padStart(2, '0');
+  //     const month = d.toLocaleString('en-US', { month: 'short' });
+  //     const year  = d.getFullYear();
+  //     return `${day}-${month}-${year}`;
+  //   };
+
+  //   const apiUrl =
+  //     `${environment.apiurl}Report/vehicleInoutRegister` +
+  //     `?fromDateTime=${encodeURIComponent(formatDate(from))}` +
+  //     `&toDateTime=${encodeURIComponent(formatDate(to))}`;
+
+  //   this.http.get<any[]>(apiUrl).subscribe({
+  //     next: (data) => {
+
+  //       if (!Array.isArray(data)) {
+  //         this.vehicleData      = [];
+  //         this.displayedData.data = [];
+  //         return;
+  //       }
+
+  //       const formatImage = (img: any): string | null => {
+  //         if (!img || typeof img !== 'string') return null;
+  //         if (img.startsWith('data:image')) return img;
+  //         if (img.startsWith('http'))        return img;
+  //         if (img.length > 50)               return `data:image/jpeg;base64,${img}`;
+  //         return null;
+  //       };
+
+  //       this.vehicleData = data.map(v => ({
+  //         vehicleNumber:       v.vehicleNumber       || '',
+  //         ownerName:           v.ownerName           || '',
+  //         building:            v.building            || '',
+  //         flatNumber:          v.flatNumber          || '',
+  //         vehicleCategory: v.vType || '',
+  //         inCameraImage:       formatImage(v.inCameraImage),
+  //         outCameraImage:      formatImage(v.outCameraImage),
+  //         inCameraFrameImage:  formatImage(v.inCameraFrameImage),
+  //         outCameraFrameImage: formatImage(v.outCameraFrameImage),
+
+  //         //  inCameraImage: 'https://imgs.search.brave.com/hm32eGAdBnA5XQnorYeu-pM_zcH_iLkTrBocad73SuM/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly91cGxv/YWQud2lraW1lZGlh/Lm9yZy93aWtpcGVk/aWEvY29tbW9ucy8w/LzA2L0ZyZW5jaE51/bWJlclBsYXRlcy5q/cGc',
+  //         // inCameraFrameImage: 'https://imgs.search.brave.com/zXyfwrAgFvltIfbpa-zA_aNE67iPKmqha3Dkp4rBxk4/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9tZWRp/YS5zcHluZWFpLmNv/bS91bnNhZmUvZmls/dGVyczpmb3JtYXQo/d2VicCkvaHR0cHM6/Ly9zcHluZS1zdGF0/aWMuczMudXMtZWFz/dC0xLmFtYXpvbmF3/cy5jb20vcGx1Z2lu/LWxpYnJhcnkvZHVt/bXkrbnVtYmVyK3Rv/b2wvY2FyK2ltYWdl/KzFfMTF6b24uanBn',
+  //         // outCameraImage: 'https://imgs.search.brave.com/hm32eGAdBnA5XQnorYeu-pM_zcH_iLkTrBocad73SuM/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly91cGxv/YWQud2lraW1lZGlh/Lm9yZy93aWtpcGVk/aWEvY29tbW9ucy8w/LzA2L0ZyZW5jaE51/bWJlclBsYXRlcy5q/cGc',
+  //         // outCameraFrameImage: 'https://imgs.search.brave.com/zXyfwrAgFvltIfbpa-zA_aNE67iPKmqha3Dkp4rBxk4/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9tZWRp/YS5zcHluZWFpLmNv/bS91bnNhZmUvZmls/dGVyczpmb3JtYXQo/d2VicCkvaHR0cHM6/Ly9zcHluZS1zdGF0/aWMuczMudXMtZWFz/dC0xLmFtYXpvbmF3/cy5jb20vcGx1Z2lu/LWxpYnJhcnkvZHVt/bXkrbnVtYmVyK3Rv/b2wvY2FyK2ltYWdl/KzFfMTF6b24uanBn',
+
+  //         inTime:              v.inTime  || null,
+  //         outTime:             v.outTime || null
+  //       }));
+
+  //       this.filteredData       = [...this.vehicleData];
+  //       this.displayedData.data = this.vehicleData;
+  //       this.applyFilters();
+
+  //       if (this.paginator) this.paginator.firstPage();
+  //     },
+  //     error: (err) => {
+  //       console.error('❌ API Error:', err);
+  //       this.vehicleData        = [];
+  //       this.displayedData.data = [];
+  //     }
+  //   });
+  // }
+
+
+    loadVehicleData(fromDate?: Date, toDate?: Date, pageNumber = 1, pageSize = this.currentPageSize) {
 
     const from = fromDate || this.reportForm.value.fromDate || new Date();
     const to   = toDate   || this.reportForm.value.toDate   || new Date();
@@ -140,17 +268,72 @@ export class VehicleRegisterInOutComponent implements OnInit, AfterViewInit {
       return `${day}-${month}-${year}`;
     };
 
-    const apiUrl =
+    //     const vehicleTypes = (this.reportForm.value.vehicleType || []).join(',');
+    // const inOutVal      = (this.reportForm.value.inOut || []).join(',');
+    // const nrdVal         = (this.reportForm.value.project || []).filter((p: string) => p !== 'ALL').join(',');
+
+    //    let apiUrl =
+    //   `${environment.apiurl}Report/vehicleInoutRegister` +
+    //   `?fromDateTime=${encodeURIComponent(formatDate(from))}` +
+    //   `&toDateTime=${encodeURIComponent(formatDate(to))}` +
+    //   `&pageNumber=${pageNumber}&pageSize=${pageSize}`;
+
+    // if (vehicleTypes) apiUrl += `&vehicleType=${encodeURIComponent(vehicleTypes)}`;
+    // if (inOutVal)      apiUrl += `&inOut=${encodeURIComponent(inOutVal)}`;
+    // if (nrdVal)        apiUrl += `&nrd=${encodeURIComponent(nrdVal)}`;
+
+
+
+            const vehicleTypes = (this.reportForm.value.vehicleType || []).join(',');
+    const inOutVal      = (this.reportForm.value.inOut || []).join(',');
+    const nrdVal         = (this.reportForm.value.project || []).filter((p: string) => p !== 'ALL').join(',');
+    const searchTypeVal  = this.reportForm.value.searchType || '';
+    const searchValueVal = (this.reportForm.value.searchValue || '').toString().trim();
+
+       let apiUrl =
       `${environment.apiurl}Report/vehicleInoutRegister` +
       `?fromDateTime=${encodeURIComponent(formatDate(from))}` +
-      `&toDateTime=${encodeURIComponent(formatDate(to))}`;
+      `&toDateTime=${encodeURIComponent(formatDate(to))}` +
+      `&pageNumber=${pageNumber}&pageSize=${pageSize}`;
 
-    this.http.get<any[]>(apiUrl).subscribe({
-      next: (data) => {
+    if (vehicleTypes) apiUrl += `&vehicleType=${encodeURIComponent(vehicleTypes)}`;
+    if (inOutVal)      apiUrl += `&inOut=${encodeURIComponent(inOutVal)}`;
+    if (nrdVal)        apiUrl += `&nrd=${encodeURIComponent(nrdVal)}`;
+    if (searchTypeVal && searchValueVal) {
+      apiUrl += `&searchType=${encodeURIComponent(searchTypeVal)}&searchValue=${encodeURIComponent(searchValueVal)}`;
+    }
+
+    // this.http.get<any[]>(apiUrl, {
+
+    // this.http.get<any[]>(apiUrl, {
+    //   headers: { 'Cache-Control': 'no-cache' }
+    // }).pipe(
+    //   timeout(120000) // allow up to 2 min for large date ranges
+    // ).subscribe({
+    //   next: (data) => {
+
+    //     if (!Array.isArray(data)) {
+    //       this.vehicleData      = [];
+    //       this.displayedData.data = [];
+    //       return;
+    //     }
+
+                this.loaderService.show();
+
+    this.http.get<any>(apiUrl, {
+      headers: { 'Cache-Control': 'no-cache' }
+    }).pipe(
+      timeout(120000) // allow up to 2 min for large date ranges
+    ).subscribe({
+      next: (res) => {
+
+        const data = res?.data;
+        this.totalCount = res?.totalCount || 0;
 
         if (!Array.isArray(data)) {
           this.vehicleData      = [];
           this.displayedData.data = [];
+          this.loaderService.hide();
           return;
         }
 
@@ -162,38 +345,38 @@ export class VehicleRegisterInOutComponent implements OnInit, AfterViewInit {
           return null;
         };
 
-        this.vehicleData = data.map(v => ({
+                this.vehicleData = data.map(v => ({
           vehicleNumber:       v.vehicleNumber       || '',
           ownerName:           v.ownerName           || '',
           building:            v.building            || '',
           flatNumber:          v.flatNumber          || '',
-          vehicleCategory: v.vType || '',
-          inCameraImage:       formatImage(v.inCameraImage),
-          outCameraImage:      formatImage(v.outCameraImage),
-          inCameraFrameImage:  formatImage(v.inCameraFrameImage),
-          outCameraFrameImage: formatImage(v.outCameraFrameImage),
-
-          //  inCameraImage: 'https://imgs.search.brave.com/hm32eGAdBnA5XQnorYeu-pM_zcH_iLkTrBocad73SuM/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly91cGxv/YWQud2lraW1lZGlh/Lm9yZy93aWtpcGVk/aWEvY29tbW9ucy8w/LzA2L0ZyZW5jaE51/bWJlclBsYXRlcy5q/cGc',
-          // inCameraFrameImage: 'https://imgs.search.brave.com/zXyfwrAgFvltIfbpa-zA_aNE67iPKmqha3Dkp4rBxk4/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9tZWRp/YS5zcHluZWFpLmNv/bS91bnNhZmUvZmls/dGVyczpmb3JtYXQo/d2VicCkvaHR0cHM6/Ly9zcHluZS1zdGF0/aWMuczMudXMtZWFz/dC0xLmFtYXpvbmF3/cy5jb20vcGx1Z2lu/LWxpYnJhcnkvZHVt/bXkrbnVtYmVyK3Rv/b2wvY2FyK2ltYWdl/KzFfMTF6b24uanBn',
-          // outCameraImage: 'https://imgs.search.brave.com/hm32eGAdBnA5XQnorYeu-pM_zcH_iLkTrBocad73SuM/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly91cGxv/YWQud2lraW1lZGlh/Lm9yZy93aWtpcGVk/aWEvY29tbW9ucy8w/LzA2L0ZyZW5jaE51/bWJlclBsYXRlcy5q/cGc',
-          // outCameraFrameImage: 'https://imgs.search.brave.com/zXyfwrAgFvltIfbpa-zA_aNE67iPKmqha3Dkp4rBxk4/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9tZWRp/YS5zcHluZWFpLmNv/bS91bnNhZmUvZmls/dGVyczpmb3JtYXQo/d2VicCkvaHR0cHM6/Ly9zcHluZS1zdGF0/aWMuczMudXMtZWFz/dC0xLmFtYXpvbmF3/cy5jb20vcGx1Z2lu/LWxpYnJhcnkvZHVt/bXkrbnVtYmVyK3Rv/b2wvY2FyK2ltYWdl/KzFfMTF6b24uanBn',
-
+          vehicleCategory:     v.vType || '',
+          inUniqueId:          v.inUniqueId  || null,
+          outUniqueId:         v.outUniqueId || null,
           inTime:              v.inTime  || null,
           outTime:             v.outTime || null
         }));
-
-        this.filteredData       = [...this.vehicleData];
+                                this.filteredData       = this.vehicleData;
         this.displayedData.data = this.vehicleData;
-        this.applyFilters();
-
-        if (this.paginator) this.paginator.firstPage();
+        this.loaderService.hide();
       },
       error: (err) => {
-        console.error('❌ API Error:', err);
+        console.error('❌ API Error:', err.status, err.name, err.message);
         this.vehicleData        = [];
         this.displayedData.data = [];
+        this.loaderService.hide();
       }
     });
+  }
+    onPageChange(event: any) {
+    this.pageNumber = event.pageIndex + 1;
+    this.currentPageSize = event.pageSize;
+    this.loadVehicleData(
+      this.reportForm.value.fromDate,
+      this.reportForm.value.toDate,
+      this.pageNumber,
+      this.currentPageSize
+    );
   }
 
   loadBuildingList() {
@@ -207,17 +390,63 @@ export class VehicleRegisterInOutComponent implements OnInit, AfterViewInit {
   }
 
   // ── Building change: select ALL → expand; uncheck any item → remove ALL ────
+    getVehicleTypeTriggerLabel(): string {
+    return (this.reportForm.get('vehicleType')?.value || []).join(', ');
+  }
+
+  getInOutTriggerLabel(): string {
+    return (this.reportForm.get('inOut')?.value || []).join(', ');
+  }
+
+  getProjectTriggerLabel(): string {
+    const selected: string[] = this.reportForm.get('project')?.value || [];
+    return selected.filter(p => p !== 'ALL').join(', ');
+  }
+
+  onVehicleTypeChange() { /* multi-select, no ALL option needed here */ }
+
+  onInOutChange() { /* multi-select, no ALL option needed here */ }
+
+    prevProjectSelection: string[] = [];
+
+  onProjectChange() {
+    let selected: string[] = this.reportForm.get('project')?.value || [];
+    const hadAll = this.prevProjectSelection.includes('ALL');
+    const hasAll = selected.includes('ALL');
+
+    if (hasAll && !hadAll) {
+      selected = ['ALL', ...this.projectList];
+    } else if (!hasAll && hadAll) {
+      selected = [];
+    } else if (hasAll && selected.length <= this.projectList.length) {
+      selected = selected.filter(p => p !== 'ALL');
+    }
+
+    this.prevProjectSelection = selected;
+    this.reportForm.patchValue({ project: selected }, { emitEvent: false });
+  }
+
+  // ── Building change: select ALL → expand; uncheck any item → remove ALL ────
+  prevBuildingsSelection: string[] = [];
+
   onBuildingChange() {
     let selected: string[] = this.reportForm.get('buildings')?.value || [];
+    const hadAll = this.prevBuildingsSelection.includes('ALL');
+    const hasAll = selected.includes('ALL');
 
-    if (selected.includes('ALL')) {
-      // ALL just got checked → select every real building
-      this.reportForm.patchValue({ buildings: ['ALL', ...this.allBuildings] });
-    } else {
-      // A real item was unchecked → strip ALL, keep only what's checked
-      const withoutAll = selected.filter(b => b !== 'ALL');
-      this.reportForm.patchValue({ buildings: withoutAll });
+    if (hasAll && !hadAll) {
+      // ALL just checked → select everything
+      selected = ['ALL', ...this.allBuildings];
+    } else if (!hasAll && hadAll) {
+      // ALL just unchecked → clear everything
+      selected = [];
+    } else if (hasAll && selected.length <= this.allBuildings.length) {
+      // ek individual item uncheck hua jab ALL already tha → ALL token hatao
+      selected = selected.filter(b => b !== 'ALL');
     }
+
+    this.prevBuildingsSelection = selected;
+    this.reportForm.patchValue({ buildings: selected }, { emitEvent: false });
   }
 
   public sortColumn(column: string) {
@@ -229,14 +458,13 @@ export class VehicleRegisterInOutComponent implements OnInit, AfterViewInit {
       this.sortService.setSortColumn(column, 'asc');
     }
 
-    this.displayedData.data = this.sortService.sortData([...this.displayedData.data], column);
-    this.paginator.firstPage();
+       this.displayedData.data = this.sortService.sortData([...this.displayedData.data], column);
   }
 
   getSortColumn(): string            { return this.sortService.getSortColumn(); }
   getSortDirection(): 'asc' | 'desc' { return this.sortService.getSortDirection(); }
 
-  clear() {
+   clear() {
     this.reportForm.reset({
       buildings:   [],
       searchType:  '',
@@ -245,14 +473,15 @@ export class VehicleRegisterInOutComponent implements OnInit, AfterViewInit {
       toDate:      ''
     });
 
+    this.pageNumber = 1;
     this.displayedData.data = [];
-    if (this.paginator) this.paginator.firstPage();
   }
 
-  showReports() {
+    showReports() {
+    this.pageNumber = 1;
     const fromDate = this.reportForm.value.fromDate;
     const toDate   = this.reportForm.value.toDate;
-    this.loadVehicleData(fromDate, toDate);
+    this.loadVehicleData(fromDate, toDate, 1, this.currentPageSize);
   }
 
   private applyFilters() {
@@ -301,15 +530,105 @@ export class VehicleRegisterInOutComponent implements OnInit, AfterViewInit {
       );
     }
 
-    result = sortByTimeOnly(result, 'inTime', 'asc');
+        this.sortService.setSortColumn('inTime', 'asc');
+    result = this.sortService.sortData([...result], 'inTime');
     this.filteredData       = result;
     this.displayedData.data = result;
 
     if (this.paginator) this.paginator.firstPage();
   }
 
+   isExporting = false;
+  exportingType: 'pdf' | 'excel' | null = null;
+
+  private async fetchAllForExport(): Promise<any[]> {
+    const from = this.reportForm.value.fromDate || new Date();
+    const to   = this.reportForm.value.toDate   || new Date();
+
+    const formatDate = (d: Date) => {
+      const day   = String(d.getDate()).padStart(2, '0');
+      const month = d.toLocaleString('en-US', { month: 'short' });
+      const year  = d.getFullYear();
+      return `${day}-${month}-${year}`;
+    };
+
+        const vehicleTypes = (this.reportForm.value.vehicleType || []).join(',');
+    const inOutVal      = (this.reportForm.value.inOut || []).join(',');
+    const nrdVal         = (this.reportForm.value.project || []).filter((p: string) => p !== 'ALL').join(',');
+    const searchTypeVal  = this.reportForm.value.searchType || '';
+    const searchValueVal = (this.reportForm.value.searchValue || '').toString().trim();
+
+        const exportPageSize = 500; // backend cap
+
+    const buildUrl = (page: number) => {
+      let apiUrl =
+        `${environment.apiurl}Report/vehicleInoutRegister` +
+        `?fromDateTime=${encodeURIComponent(formatDate(from))}` +
+        `&toDateTime=${encodeURIComponent(formatDate(to))}` +
+        `&pageNumber=${page}&pageSize=${exportPageSize}`;
+
+      if (vehicleTypes) apiUrl += `&vehicleType=${encodeURIComponent(vehicleTypes)}`;
+      if (inOutVal)      apiUrl += `&inOut=${encodeURIComponent(inOutVal)}`;
+      if (nrdVal)        apiUrl += `&nrd=${encodeURIComponent(nrdVal)}`;
+      if (searchTypeVal && searchValueVal) {
+        apiUrl += `&searchType=${encodeURIComponent(searchTypeVal)}&searchValue=${encodeURIComponent(searchValueVal)}`;
+      }
+      return apiUrl;
+    };
+
+    const getPage = (page: number): Promise<any> =>
+      this.http.get<any>(buildUrl(page), { headers: { 'Cache-Control': 'no-cache' } })
+        .pipe(timeout(120000))
+        .toPromise();
+
+    const mapRow = (v: any) => ({
+      vehicleNumber: v.vehicleNumber || '',
+      ownerName:     v.ownerName     || '',
+      building:      v.building      || '',
+      flatNumber:    v.flatNumber    || '',
+      vehicleCategory: v.vType       || '',
+      inUniqueId:    v.inUniqueId    || null,
+      outUniqueId:   v.outUniqueId   || null,
+      inTime:        v.inTime        || null,
+      outTime:       v.outTime       || null
+    });
+
+    // page 1 se total pata chalta hai, baaki pages ek saath (parallel) mangwao
+    const first: any = await getPage(1);
+    const total = first?.totalCount || 0;
+    let all: any[] = (first?.data || []).map(mapRow);
+
+    const totalPages = Math.ceil(total / exportPageSize);
+    if (totalPages > 1) {
+      const rest = await Promise.all(
+        Array.from({ length: totalPages - 1 }, (_, i) => getPage(i + 2))
+      );
+      rest.forEach((r: any) => { all = all.concat((r?.data || []).map(mapRow)); });
+    }
+
+    return all;
+  }
+
+
+
+
+
   /* ─── PDF EXPORT ─────────────────────────────────────────────── */
-  exportReports() {
+    async exportReports() {
+    if (this.isExporting) return;
+    this.isExporting = true;
+    this.exportingType = 'pdf';
+    try {
+      this.filteredData = await this.fetchAllForExport();
+    } catch (e) {
+      console.error('Export error:', e);
+      alert('Export failed. Please try again.');
+      return;
+    } finally {
+      this.isExporting = false;
+      this.exportingType = null;
+    }
+
     if (this.filteredData.length === 0) return;
 
     const doc         = new jsPDF('l', 'mm', 'a4');
@@ -392,8 +711,24 @@ export class VehicleRegisterInOutComponent implements OnInit, AfterViewInit {
     };
   }
 
-  /* ─── EXCEL EXPORT ───────────────────────────────────────────── */
-  exportExcel() {
+
+
+   /* ─── EXCEL EXPORT ───────────────────────────────────────────── */
+    async exportExcel() {
+    if (this.isExporting) return;
+    this.isExporting = true;
+    this.exportingType = 'excel';
+    try {
+      this.filteredData = await this.fetchAllForExport();
+    } catch (e) {
+      console.error('Export error:', e);
+      alert('Export failed. Please try again.');
+      return;
+    } finally {
+      this.isExporting = false;
+      this.exportingType = null;
+    }
+
     if (this.filteredData.length === 0) return;
 
     const printedOn = new Date().toLocaleString('en-GB');

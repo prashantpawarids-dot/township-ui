@@ -21,6 +21,7 @@ export class ApiService {
   }
 
   getItemById(id: number): Observable<any> {
+    
     return this.http.get(`${this.baseUrl}/items/${id}`);
   }
 

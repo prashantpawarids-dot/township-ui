@@ -10,6 +10,10 @@
         </div>
     </div>
         </mat-expansion-panel-header>
+        <!-- <app-town-land-owner [landOwner]="resident" [isResident]="true" [isViewOrEdit]="isViewOrEdit"></app-town-land-owner>
+        <div class="container"> -->
+
+            <form #residentForm="ngForm">
         <app-town-land-owner [landOwner]="resident" [isResident]="true" [isViewOrEdit]="isViewOrEdit"></app-town-land-owner>
         <div class="container">
             <div class="row">
@@ -22,6 +26,7 @@
                 </div>
             </div>
         </div>
+            </form>
     </mat-expansion-panel>
     <mat-expansion-panel *ngIf="isViewOrEdit">
         <mat-expansion-panel-header>

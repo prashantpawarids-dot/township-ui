@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component } from '@angular/core';
+import { ChangeDetectorRef, Component,ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TownAddAccessRightsComponent } from 'src/app/_core/shared/components/town-add-access-rights/town-add-access-rights.component';
@@ -12,7 +12,9 @@ import { AlertService } from 'src/app/services/alert.service';
 import { AuthService } from 'src/app/services/auth.service';
 import { ErrorHandlerService } from 'src/app/services/error-handler.service';
 import { catchError, concatMap, EMPTY, from } from 'rxjs';
+import {formvalidation} from 'src/app/_core/shared/utils/form-validation.util';
 import { LandOwnerComponent } from '../land-owner/land-owner.component';
+import { NgForm } from '@angular/forms';
 import Swal from 'sweetalert2';
 @Component({
   selector: 'app-resident',
@@ -25,7 +27,9 @@ import Swal from 'sweetalert2';
 export class ResidentComponent {
 
   // resident
+  // resident: Resident = new Resident();
   resident: Resident = new Resident();
+  @ViewChild('residentForm') residentForm!: NgForm;
   // add on card
   isViewOrEdit: boolean = false;
  
@@ -379,6 +383,9 @@ export class ResidentComponent {
   // Save Form
 
   saveResident() {
+    if (!formvalidation(this.residentForm)) {
+      return;
+    }
     this.resident.shortName = this.resident.firstName + " " + this.resident.lastName;
     
     let photo = this.resident.photo; 

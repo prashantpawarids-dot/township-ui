@@ -60,7 +60,8 @@ export class BreadcrumbComponent {
         const breadcrumbList = this.filterNavigation(this.navigations, activeLink);
         this.navigationList = breadcrumbList;
         const title = breadcrumbList[breadcrumbList.length - 1]?.title || 'Welcome123';
-        this.titleService.setTitle(title + ' | Township UI');
+        // this.titleService.setTitle(title + ' | IDSID');
+          this.titleService.setTitle('IDSID Pvt Ltd');
       }
     });
   }

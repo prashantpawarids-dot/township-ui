@@ -10,7 +10,20 @@
         </div>
     </div>
         </mat-expansion-panel-header>
+        <!-- <app-town-land-owner [isGuest]="true" [landOwner]="guest"></app-town-land-owner> -->
+
         <app-town-land-owner [isGuest]="true" [landOwner]="guest"></app-town-land-owner>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <mat-form-field class="full-width">
+                        <mat-label>Load Reference</mat-label>
+                        <input matInput readonly [value]="referenceName"
+                            placeholder="Auto-filled after selecting Neighbourhood, Building and Flat No" />
+                    </mat-form-field>
+                </div>
+            </div>
+        </div>
         <div class="container">
             <div class="row">
                 <div class="col-md-12">

@@ -66,9 +66,13 @@ buildingLabelMap: { [key: string]: string } = {};
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   searchType = [
-    { value: 'shortName', label: 'Short Name' },
+  {idNumber: 'idNumber', label: 'ID Number' },
+    { value: 'firstName', label: 'First Name' },
+    { value: 'middleName', label: 'Middle Name' },
+    { value: 'lastName', label: 'Last Name' },
     { value: 'flatNumber', label: 'Flat No' },
-    // { value: 'buildingName', label: 'Building' }
+   
+  
   ];
 
   constructor(private fb: FormBuilder, private http: HttpClient ,private sortService: TableSortService) {}

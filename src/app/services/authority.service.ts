@@ -1,3 +1,7 @@
+
+
+
+
 import { Injectable } from '@angular/core';
 
 @Injectable({
@@ -5,85 +9,67 @@ import { Injectable } from '@angular/core';
 })
 export class AuthorityService {
 
-  private authorityMap = new Map<number, number>();
+  private permissionMap = new Map<number, {
+    canInsert: boolean;
+    canUpdate: boolean;
+    canDelete: boolean;
+    canView: boolean;
+  }>();
 
-  /** Load authorities into map */
   loadAuthorities(authorities: any[]) {
-    this.authorityMap.clear();
+    this.permissionMap.clear();
 
     authorities.forEach(a => {
-      const key = a?.moduleId ?? a?.moduleKey ?? null;
-      const level = Number(a?.Authority ?? a?.authorityLevel ?? 0);
-
+      const key = a?.moduleKey ?? a?.moduleId ?? null;
       if (key != null && key > 0) {
-        this.authorityMap.set(key, level);
+        this.permissionMap.set(key, {
+          canInsert: a.canInsert === true || a.canInsert === 1,
+          canUpdate: a.canUpdate === true || a.canUpdate === 1,
+          canDelete: a.canDelete === true || a.canDelete === 1,
+          canView:   a.canView   === true || a.canView   === 1
+        });
       }
     });
   }
-private currentModuleId: number | null = null;
 
-setCurrentModuleId(id: number) {
-  this.currentModuleId = id;
-}
-
-  /** Initialize from localStorage (for refresh) */
   initFromLocalStorage() {
     const stored = localStorage.getItem('authorities');
     if (stored) {
       const authorities = JSON.parse(stored);
       this.loadAuthorities(authorities);
-      // console.log('🟢 Authorities reloaded from localStorage');
-    } else {
-      console.warn('⚠️ No authorities found in localStorage');
     }
   }
 
-  private getLevel(moduleKey?: number | null): number {
-    if (!moduleKey) {
-      // console.log('⚠️ moduleKey is null or undefined, returning level 0');
-      return 0;
-    }
-    const level = this.authorityMap.get(moduleKey) ?? 0;
-    // console.log(`🔍 getLevel(${moduleKey}) => ${level}`);
-    return level;
+  canView(moduleKey?: number | null): boolean {
+    if (!moduleKey) return false;
+    return this.permissionMap.get(moduleKey)?.canView ?? false;
   }
 
- 
+  canInsert(moduleKey?: number | null): boolean {
+    if (!moduleKey) return false;
+    return this.permissionMap.get(moduleKey)?.canInsert ?? false;
+  }
 
-  /** VIEW = Authority >= 1 */
-canView(moduleKey?: number | null): boolean {
-  const level = this.getLevel(moduleKey);
-  return level >= 1;
+  canUpdate(moduleKey?: number | null): boolean {
+    if (!moduleKey) return false;
+    return this.permissionMap.get(moduleKey)?.canUpdate ?? false;
+  }
+
+  canDelete(moduleKey?: number | null): boolean {
+    if (!moduleKey) return false;
+    return this.permissionMap.get(moduleKey)?.canDelete ?? false;
+  }
+
+  canBlock(moduleKey?: number | null): boolean {
+  if (!moduleKey) return false;
+  const p = this.permissionMap.get(moduleKey);
+  // Block button only shows if user has all 4 permissions
+  return (p?.canInsert && p?.canUpdate && p?.canDelete && p?.canView) ?? false;
 }
 
-/** INSERT = Authority >= 2 */
-canInsert(moduleKey?: number | null): boolean {
-  const level = this.getLevel(moduleKey);
-  return level >= 2;
-}
-
-/** UPDATE = Authority >= 3 */
-canUpdate(moduleKey?: number | null): boolean {
-  const level = this.getLevel(moduleKey);
-  return level >= 3;
-}
-
-/** DELETE = Authority >= 4 */
-canDelete(moduleKey?: number | null): boolean {
-  const level = this.getLevel(moduleKey);
-  return level >= 4;
-}
-
-/** BLOCK = Authority >= 3 */
-canBlock(moduleKey?: number | null): boolean {
-  const level = this.getLevel(moduleKey);
-  return level >= 3;
-}
-
-/** FULL ACCESS = Authority === 4 */
-isFullAccess(moduleKey?: number | null): boolean {
-  const level = this.getLevel(moduleKey);
-  return level === 4;
-}
-
+  isFullAccess(moduleKey?: number | null): boolean {
+    if (!moduleKey) return false;
+    const p = this.permissionMap.get(moduleKey);
+    return (p?.canInsert && p?.canUpdate && p?.canDelete && p?.canView) ?? false;
+  }
 }

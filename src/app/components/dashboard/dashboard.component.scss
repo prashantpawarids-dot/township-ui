@@ -1,274 +1,957 @@
+// ══════════════════════════════════════════════════
+// FINAL REDESIGN — pill-shaped hero stats, elevated
+// cards, accent-colored icon chips, premium spacing
+// ══════════════════════════════════════════════════
+
 .dashboard-container {
-  padding: 16px;
+  padding: 28px 30px;
   display: flex;
   flex-direction: column;
-  gap: 24px;
-  background: #f5f6fa;
+  gap: 26px;
+  background: #eef1f8;
+  min-height: 100vh;
+  font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+}
 
-  .project-header {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    flex-wrap: wrap;
-
-    h1 {
-      font-size: 24px;
-      font-weight: 600;
-      margin: 0;
-    }
-
-    .project-selector {
-      width: 250px;
-    }
-  }
-// .stats-grid {
-//   display: grid;
-//   gap: 16px;
-//   grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); 
-
-//   @media (max-width: 768px) {
-//     grid-template-columns: repeat(2, 1fr); 
-//   }
-
-//   .stat-card {
-//     padding: 12px;
-//     border-radius: 12px;
-//     text-align: center;
-//     background: #fff;
-//   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
-//     transition: transform 0.2s, box-shadow 0.2s;
-
-//     &:hover {
-//       transform: translateY(-4px);
-//       box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
-//     }
-
-//     mat-card-title {
-//       font-weight: 600;
-//       font-size: 16px;
-//     }
-
-//     mat-card-content {
-//       font-size: 20px;
-//       margin-top: 8px;
-//       font-weight: 500;
-//     }
-//   }
-// }
-
+// ── HERO STAT CARDS — true stadium/pill shape ───────
 .stats-grid {
   display: grid;
-  gap: 16px;
-
-  
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  /* min-width 200px ensures cards are large enough on all screens */
-
-  .stat-card {
-    padding: 16px;
-    border-radius: 12px;
-    text-align: center;
-    background: #fff;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
-    transition: transform 0.2s, box-shadow 0.2s;
-
-    &:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
-    }
-
-    mat-card-title {
-      font-weight: 600;
-      font-size: 16px;
-    }
-
-    mat-card-content {
-      font-size: 20px;
-      margin-top: 8px;
-      font-weight: 500;
-    }
-  }
+  grid-template-columns: repeat(4, 1fr);
+  gap: 22px;
 }
 
-/* Smaller screens */
-@media (max-width: 1024px) {
-  .stats-grid {
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  }
-}
-
-@media (max-width: 768px) {
-  .stats-grid {
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  }
-}
-
-@media (max-width: 480px) {
-  .stats-grid {
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  }
-}
-
-
-  /* Encoded/NonEncoded Section */
-  .encoded-summary {
+.stat-card {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 16px;
+  align-items: center;
+  gap: 18px;
+  padding: 18px 26px;
+  min-height: 112px;
+  border-radius: 46px;              // full stadium/pill shape
+  color: #fff;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.14);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  position: relative;
+  overflow: visible;                // was hidden — popover needs to escape the card
 
-  .encoded-card {
-    flex: 1 1 220px;
-    max-width: 280px;
-    text-align: center;
-    color: #fff;
-    border-radius: 12px;
-    padding: 16px;
-    //box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-    transition: transform 0.25s ease, box-shadow 0.25s ease;
-
-    mat-card-title {
-      font-size: 18px;
-      font-weight: 600;
-    }
-
-    mat-card-content {
-      font-size: 28px;
-      font-weight: 700;
-      margin-top: 6px;
-    }
-
-    &:hover {
-      transform: translateY(-6px);
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-    }
-
-    &.encoded {
-      background: linear-gradient(135deg, #43a047, #66bb6a);
-    }
-
-    &.nonencoded {
-      background: linear-gradient(135deg, #e53935, #ef5350);
-    }
-
-    &.total {
-      background: linear-gradient(135deg, #1e88e5, #42a5f5);
-    }
+  &::after {                            // subtle glossy sheen like reference
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;             // keep sheen clipped to the pill shape now that overflow is visible
+    background: linear-gradient(180deg, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0) 55%);
+    pointer-events: none;
   }
-}
 
+      &:hover {
+    box-shadow: 0 16px 32px rgba(0, 0, 0, 0.20);
+    z-index: 30;   // hovered card + its popover always sit above every neighbour
+  }
 
-  .status-summary {
+  &__icon-circle {
+    flex-shrink: 0;
+    width: 62px;
+    height: 62px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.28);
     display: flex;
-    gap: 16px;
-    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    box-shadow: inset 0 0 0 2px rgba(255,255,255,0.25);
 
-    .status-card {
-      flex: 1 1 200px;
-      text-align: center;
-      padding: 12px;
-      border-radius: 12px;
-      background: #fff;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
-
-      mat-card-title {
-        font-weight: 600;
-      }
-
-      mat-card-content {
-        display: flex;
-        justify-content: space-around;
-        margin-top: 8px;
-      }
-
-      .connected-count {
-        color: #28a745;
-        font-weight: 500;
-      }
-
-      .disconnected-count {
-        color: #dc3545;
-        font-weight: 500;
-      }
+    mat-icon {
+      font-size: 30px;
+      width: 30px;
+      height: 30px;
+      color: #fff;
     }
   }
 
-  .visitor-details {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 16px;
+  &__content { flex: 1; min-width: 0; z-index: 1; }
 
-    .visitor-card {
-      padding: 12px;
-      text-align: center;
-      border-radius: 12px;
-      background: #fff;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+ &__label {
+    font-size: 13.5px;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+    opacity: 0.97;
+    line-height: 1.25;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
 
-      mat-card-title {
-        font-weight: 600;
-      }
+  &__count {
+    font-size: 32px;
+    font-weight: 800;
+    line-height: 1.1;
+    margin: 2px 0 4px;
+    text-shadow: 0 2px 6px rgba(0,0,0,0.12);
+  }
 
-      mat-card-content {
-        font-size: 18px;
-        margin-top: 4px;
-        font-weight: 500;
-      }
+  &__sub {
+    font-size: 12.5px;
+    opacity: 0.95;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+
+    strong { font-weight: 800; }
+    .sep { opacity: 0.55; }
+  }
+}
+
+// Only cards with a mapped route (7 of 8 — not Visitors) get the pointer cursor hint
+.stat-card--clickable {
+  cursor: pointer;
+}
+
+
+// ── NRD BREAKDOWN POPOVER — premium dark card, row-by-row ──
+.nrd-popover {
+  position: absolute;
+  top: calc(100% + 12px);
+  left: 50%;
+  transform: translateX(-50%) translateY(6px);
+  min-width: 220px;
+  max-width: 280px;
+
+    background: #ffffff;
+  border-radius: 16px;
+  padding: 18px 20px;
+  box-shadow: 0 6px 18px rgba(31, 45, 90, 0.08);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.12s ease, transform 0.12s ease;   // fast fade-OUT — never lingers into the next card
+  z-index: 20;
+  color: #1f2438;
+
+  &::before {                       // little arrow pointing to the card
+    content: '';
+    position: absolute;
+    top: -6px;
+    left: 50%;
+    transform: translateX(-50%) rotate(45deg);
+    width: 14px;
+    height: 14px;
+        background: #ffffff;
+    border-radius: 2px;
+  }
+
+    &__header {
+    font-size: 14px;
+    font-weight: 700;
+    color: #6b7280;
+    margin-bottom: 12px;
+  }
+
+  &__row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 0;
+    font-size: 14px;
+  }
+
+    &__dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #5b6cff;
+    flex-shrink: 0;
+  }
+
+    &__row:nth-child(5n+1) &__dot { background: #22b168; }
+  &__row:nth-child(5n+2) &__dot { background: #ff9800; }
+  &__row:nth-child(5n+3) &__dot { background: #4facfe; }
+  &__row:nth-child(5n+4) &__dot { background: #8e7bff; }
+  &__row:nth-child(5n+5) &__dot { background: #ff6b6b; }
+
+  &__name {
+    flex: 1;
+    font-weight: 500;
+    color: #4a5068;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+   &__count {
+    font-weight: 700;
+    color: #1f2438;
+    font-size: 14px;
+  }
+
+  &__on  { color: #22b168; font-weight: 800; }
+  &__off { color: #e64545; font-weight: 800; }
+}
+.stat-card:hover > .nrd-popover,
+.info-tile:hover > .nrd-popover,
+.section-card:hover > .nrd-popover {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(-50%) translateY(0);
+  transition: opacity 0.18s ease 0.05s, transform 0.18s ease 0.05s;   // smooth fade-IN, slight delay
+  z-index: 40;
+}
+
+// ── SECTION CARD (white wrapper) ─────────────────────
+.section-card {
+  background: #fff;
+  border-radius: 20px;
+  padding: 24px 28px 28px;
+  box-shadow: 0 6px 20px rgba(31, 45, 90, 0.07);
+  border-top: 4px solid transparent;
+  position: relative;
+  overflow: visible;
+  z-index: 1;
+
+  &:hover {
+    z-index: 30;
+  }
+}
+
+// Only the Controllers card gets this — visual hint that it's clickable
+.section-card--clickable {
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 28px rgba(31, 45, 90, 0.14);
+  }
+}
+
+// Give each section a themed accent stripe + icon chip color
+// Give each section a themed accent stripe + icon chip color
+.section-card:nth-of-type(1) { border-top-color: #5b6cff; }
+.section-card--accent { border-top-color: #5b6cff; }
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 19px;
+  font-weight: 800;
+  color: #1f2438;
+  margin-bottom: 22px;
+
+  &__icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #eef1ff, #dfe4ff);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    mat-icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+      color: #5b6cff;
+    }
+  }
+}
+
+// ── INFO TILES (Card Summary / Visitor Vehicles) ─────
+.info-grid {
+  display: grid;
+  gap: 20px;
+
+  &.three-col { grid-template-columns: repeat(3, 1fr); }
+  &.four-col  { grid-template-columns: repeat(4, 1fr); }
+}
+
+.info-tile {
+  border-radius: 20px;
+  padding: 26px 16px;
+  min-height: 128px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: #fff;
+  box-shadow: 0 10px 22px hsla(352, 87%, 28%, 0);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  position: relative;
+  overflow: visible;
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0) 60%);
+    pointer-events: none;
+  }
+
+    &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 16px 30px rgba(0, 0, 0, 0.20);
+    z-index: 20;
+  }
+
+  &__icon-circle {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.28);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+
+    mat-icon {
+      font-size: 22px;
+      width: 22px;
+      height: 22px;
+      color: #fff;
     }
   }
 
-  .charts-container {
+  &__count {
+    font-size: 28px;
+    font-weight: 800;
+    line-height: 1;
+    z-index: 1;
+    text-shadow: 0 2px 6px rgba(0,0,0,0.12);
+  }
+
+  &__label {
+    font-size: 13.5px;
+    font-weight: 700;
+    opacity: 0.96;
+    text-align: center;
+    z-index: 1;
+  }
+
+  &--blue   { background: linear-gradient(135deg, #4facfe, #3f8ff5); }
+  &--green  { background: linear-gradient(135deg, #43e97b, #2fb96a); }
+  &--red    { background: linear-gradient(135deg, #ff6b6b, #ee2e5c); }
+  &--indigo { background: linear-gradient(135deg, #8e7bff, #6a5cf0); }
+  &--teal   { background: linear-gradient(135deg, #34d3c4, #14a89b); }
+  &--orange { background: linear-gradient(135deg, #ffb74d, #ff9800); }
+  &--grey   { background: linear-gradient(135deg, #14213d, #2b3a67); }
+}
+
+// ── TWO-COL GRID ──────────────────────────────────
+.two-col-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 22px;
+}
+
+// ── CONTROLLERS CARD — left column + right type-cards layout ────
+.controllers-layout {
+  display: flex;
+  gap: 22px;
+  align-items: stretch;
+}
+
+.controllers-layout__main {
+  flex: 0 0 260px;
+  display: flex;
+  align-items: center;
+}
+
+.status-row--vertical {
+  flex-direction: column;
+  width: 100%;
+}
+
+.controller-type-grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+
+.controller-type-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 120px;
+  padding: 14px 8px;
+  border-radius: 16px;
+  background: #f4f6fb;
+  border: 1px solid #e4e8f4;
+  text-align: center;
+  box-sizing: border-box;
+
+  mat-icon {
+    font-size: 26px;
+    width: 26px;
+    height: 26px;
+    color: #5b6cff;
+    flex-shrink: 0;
+  }
+
+  &__label {
+    font-size: 12.5px;
+    font-weight: 700;
+    color: #1f2438;
+    line-height: 1.2;
+    min-height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__badge {
+    font-size: 10.5px;
+    font-weight: 700;
+    color: #9aa1b8;
+    background: #eceff8;
+    padding: 3px 8px;
+    border-radius: 100px;
+  }
+
+    &__counts {
+    font-size: 12.5px;
+    font-weight: 800;
+  }
+
+  &__on  { color: #22b168; }
+  &__off { color: #e64545; }
+
+  &__status-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  &__status-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    font-size: 12.5px;
+    font-weight: 800;
+
+    mat-icon {
+      font-size: 15px;
+      width: 15px;
+      height: 15px;
+    }
+
+    &--on {
+      color: #22b168;
+      mat-icon { color: #22b168; }
+    }
+    &--off {
+      color: #e64545;
+      mat-icon { color: #e64545; }
+    }
+  }
+}
+
+@media (max-width: 900px) {
+  .controllers-layout { flex-direction: column; }
+  .controllers-layout__main { flex: 1; }
+  .controller-type-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+// ── STATUS BADGES — softer pill style ────────────
+.status-row {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.status-badge {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 18px 22px;
+  border-radius: 100px;                 // pill shape to match hero cards
+  font-size: 15px;
+  font-weight: 700;
+  flex: 1;
+  justify-content: center;
+  min-width: 150px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  transition: transform 0.2s ease;
+
+  &:hover { transform: translateY(-2px); }
+
+  mat-icon { font-size: 22px; width: 22px; height: 22px; }
+  strong { margin-left: 4px; font-size: 18px; }
+
+  &--on  {
+    background: linear-gradient(135deg, #e6f9ee, #d3f3e2);
+    color: #1a7f4b;
+    mat-icon { color: #22b168; }
+  }
+  &--off {
+    background: linear-gradient(135deg, #ffeaea, #ffdada);
+    color: #c62828;
+    mat-icon { color: #e64545; }
+  }
+}
+
+// ── CHARTS ────────────────────────────────────────
+.charts-container {
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 16px;
-  width: 100%;
+  gap: 22px;
 
   .chart-card {
-    flex: 1 1 calc(33.333% - 16px);
-    min-width: 280px;
-    max-width: 100%;
+    flex: 1 1 calc(33.333% - 22px);
+    min-width: 300px;
     background: #fff;
-    padding: 16px;
-    border-radius: 12px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+    padding: 24px 26px;
+    border-radius: 20px;
+    box-shadow: 0 6px 20px rgba(31, 45, 90, 0.07);
     display: flex;
     flex-direction: column;
     align-items: center;
+    border-top: 4px solid #5b6cff;
 
     h3 {
-      font-size: 16px;
-      margin-bottom: 8px;
-      font-weight: 600;
-      text-align: center;
+      align-self: flex-start;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 17px;
+      font-weight: 800;
+      color: #1f2438;
+      margin-bottom: 20px;
+    }
+
+    &__icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #eef1ff, #dfe4ff);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      mat-icon { font-size: 18px; width: 18px; height: 18px; color: #5b6cff; }
     }
 
     canvas {
       width: 100% !important;
       height: auto !important;
-      max-height: 300px; /* Adjust this for better sizing */
+      max-height: 280px;
     }
-
-    
   }
+
+  // Give the 3 chart cards distinct accent colors like a real dashboard
+  .chart-card:nth-child(1) { border-top-color: #4facfe; }
+  .chart-card:nth-child(1) h3 .chart-card__icon { background: linear-gradient(135deg, #e5f3ff, #d3ebff); mat-icon { color: #2f8fe0; } }
+
+  .chart-card:nth-child(2) { border-top-color: #43e97b; }
+  .chart-card:nth-child(2) h3 .chart-card__icon { background: linear-gradient(135deg, #e6faf0, #d3f4e2); mat-icon { color: #24a862; } }
+
+  .chart-card:nth-child(3) { border-top-color: #ff6b6b; }
+  .chart-card:nth-child(3) h3 .chart-card__icon { background: linear-gradient(135deg, #ffeeee, #ffe0e0); mat-icon { color: #e6413f; } }
 }
 
-/* ✅ Responsive behavior */
+// ── RESPONSIVE ────────────────────────────────────
+@media (max-width: 1200px) {
+  .stats-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
 @media (max-width: 1024px) {
-  .charts-container .chart-card {
-    flex: 1 1 calc(50% - 16px); /* 2 charts per row */
+  .charts-container .chart-card { flex: 1 1 calc(50% - 22px); }
+}
+
+@media (max-width: 768px) {
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .info-grid.four-col { grid-template-columns: repeat(2, 1fr); }
+  .info-grid.three-col { grid-template-columns: repeat(2, 1fr); }
+  .two-col-grid { grid-template-columns: 1fr; }
+  .charts-container .chart-card { flex: 1 1 100%; }
+  .stat-card { border-radius: 26px; height: auto; padding: 18px 22px; }
+}
+
+@media (max-width: 480px) {
+  .stats-grid { grid-template-columns: 1fr; }
+  .info-grid.three-col,
+  .info-grid.four-col { grid-template-columns: repeat(2, 1fr); }
+}
+
+
+.nrd-tooltip {
+  white-space: pre-line !important;
+  text-align: left;
+}
+
+
+
+// ── ENVIRONMENT MONITORING — dummy readout cards ─────
+.env-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+
+.env-card__details {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+  margin-top: 4px;
+  padding-top: 10px;
+  border-top: 1px dashed #d9deee;
+}
+
+.env-chip {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  padding: 6px 4px;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 2px 6px rgba(31, 45, 90, 0.05);
+
+  &__value { font-size: 14px; font-weight: 800; color: #1f2438; line-height: 1.1; }
+  &__label { font-size: 10px; font-weight: 700; color: #6b7280; }
+}
+
+.env-card__source {
+  font-size: 10px;
+  font-weight: 700;
+  color: #9aa1b8;
+}
+
+.env-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 18px 10px;
+  border-radius: 18px;
+  background: #f4f6fb;
+  border: 1px solid #e4e8f4;
+  text-align: center;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 22px rgba(31, 45, 90, 0.10);
+  }
+
+  &__icon-circle {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 6px 14px rgba(0,0,0,0.12);
+
+    mat-icon {
+      font-size: 24px;
+      width: 24px;
+      height: 24px;
+      color: #fff;
+    }
+
+    &--blue   { background: linear-gradient(135deg, #4facfe, #3f8ff5); }
+    &--teal   { background: linear-gradient(135deg, #34d3c4, #14a89b); }
+    &--orange { background: linear-gradient(135deg, #ffb74d, #ff9800); }
+  }
+
+  &__label {
+    font-size: 12.5px;
+    font-weight: 700;
+    color: #1f2438;
+    line-height: 1.2;
+  }
+
+  &__value {
+    font-size: 24px;
+    font-weight: 800;
+    color: #1f2438;
+    line-height: 1;
+  }
+
+  &__unit {
+    font-size: 12px;
+    font-weight: 700;
+    color: #9aa1b8;
+    margin-left: 3px;
+  }
+
+  &__status {
+    font-size: 11px;
+    font-weight: 800;
+    padding: 3px 10px;
+    border-radius: 100px;
+
+    &--good     { background: #e6f9ee; color: #1a7f4b; }
+    &--moderate { background: #fff4e0; color: #b8720a; }
+    &--poor     { background: #ffeaea; color: #c62828; }
   }
 }
 
 @media (max-width: 768px) {
-  .charts-container {
-    flex-direction: column;
+  .env-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+// ── AMENITIES ────────────────────────────────────
+.amenity-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+}
+
+.amenity-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 18px;
+  border-radius: 18px;
+  background: #f4f6fb;
+  border: 1px solid #e4e8f4;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 22px rgba(31, 45, 90, 0.10);
+  }
+
+  &--closed { opacity: 0.6; }
+
+  &__top { display: flex; align-items: center; gap: 12px; }
+
+  &__icon {
+    flex-shrink: 0;
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    display: flex;
     align-items: center;
+    justify-content: center;
+    box-shadow: 0 6px 14px rgba(0,0,0,0.12);
+
+    mat-icon { font-size: 24px; width: 24px; height: 24px; color: #fff; }
   }
 
-  .charts-container .chart-card {
-    flex: 1 1 100%;
-    max-width: 90%;
-  }
-}}
+  &__title { flex: 1; min-width: 0; }
 
+  &__name {
+    font-size: 15px;
+    font-weight: 800;
+    color: #1f2438;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__access {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 3px;
+    font-size: 10.5px;
+    font-weight: 800;
+    padding: 2px 8px;
+    border-radius: 100px;
+    background: #fff4e0;
+    color: #b8720a;
+
+    mat-icon { font-size: 12px; width: 12px; height: 12px; }
+
+    &--book { background: #eef1ff; color: #4a55d6; }
+  }
+
+  &__state {
+    font-size: 10.5px;
+    font-weight: 800;
+    padding: 3px 9px;
+    border-radius: 100px;
+    background: #ffeaea;
+    color: #c62828;
+  }
+
+  &__main { display: flex; align-items: center; justify-content: center; gap: 8px; }
+
+   &__count {
+    font-size: 40px;
+    font-weight: 800;
+    line-height: 1;
+    color: #1f2438;
+  }
+
+  &__label { font-size: 12.5px; font-weight: 700; color: #9aa1b8; }
+
+  &__splits {
+    display: flex;
+    gap: 8px;
+    padding-top: 12px;
+    border-top: 1px dashed #d9deee;
+  }
+}
+
+.amenity-split {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 8px 4px;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 2px 6px rgba(31, 45, 90, 0.05);
+
+  mat-icon { font-size: 18px; width: 18px; height: 18px; color: #5b6cff; }
+
+  &__value { font-size: 16px; font-weight: 800; color: #1f2438; line-height: 1.1; }
+  &__label { font-size: 10.5px; font-weight: 700; color: #6b7280; }
+}
+
+@media (max-width: 1200px) {
+  .amenity-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 600px) {
+  .amenity-grid { grid-template-columns: 1fr; }
+}
+
+
+// ── VEHICLE CARD — 2W / 4W / Sticker tiles ───────
+.vehicle-tiles {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.vehicle-tile {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 12px 6px;
+  border-radius: 16px;
+  background: #f4f6fb;
+  border: 1px solid #e4e8f4;
+  text-align: center;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 18px rgba(31, 45, 90, 0.10);
+    z-index: 50;
+  }
+
+  &__icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+
+    mat-icon { font-size: 18px; width: 18px; height: 18px; color: #fff; }
+  }
+
+  &__count { font-size: 22px; font-weight: 800; color: #1f2438; line-height: 1; }
+  &__label { font-size: 11.5px; font-weight: 700; color: #1f2438; }
+  &__sub   { font-size: 11.5px; font-weight: 800; }
+  &__sub--muted { color: #9aa1b8; font-weight: 700; }
+  &__on  { color: #22b168; }
+  &__off { color: #e64545; }
+
+  &--blue   .vehicle-tile__icon { background: linear-gradient(135deg, #4facfe, #3f8ff5); }
+  &--purple .vehicle-tile__icon { background: linear-gradient(135deg, #8e7bff, #6a5cf0); }
+  &--green  .vehicle-tile__icon { background: linear-gradient(135deg, #43e97b, #2fb96a); }
+  &--orange .vehicle-tile__icon { background: linear-gradient(135deg, #ffb74d, #ff9800); }
+
+  .nrd-popover { text-align: left; }
+}
+
+// show the tile's own popover on hover
+.vehicle-tile:hover > .nrd-popover {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(-50%) translateY(0);
+  transition: opacity 0.18s ease 0.05s, transform 0.18s ease 0.05s;
+  z-index: 60;
+}
+
+// while a tile is hovered, hide the card-level Active/Inactive popover so they never overlap
+.section-card:has(.vehicle-tile:hover) > .nrd-popover {
+  opacity: 0;
+  pointer-events: none;
+}
+
+@media (max-width: 600px) {
+  .vehicle-tiles { grid-template-columns: repeat(2, 1fr); }
+}
+
+.alert-card {
+  background: #fff7ed;
+  border: 1px solid #fdba74;
+  border-left: 6px solid #f97316;
+  border-radius: 14px;
+  padding: 14px 18px;
+  margin: 16px 0;
+
+  &--ok {
+    background: #f0fdf4;
+    border-color: #86efac;
+    border-left-color: #22c55e;
+  }
+
+  &__head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+  }
+
+  &__icon mat-icon { color: #ea580c; font-size: 30px; width: 30px; height: 30px; }
+  &--ok &__icon mat-icon { color: #16a34a; }
+
+  &__title {
+    flex: 1;
+    font-weight: 700;
+    font-size: 16px;
+    small { display: block; font-weight: 400; font-size: 12px; color: #6b7280; }
+  }
+
+  &__total { font-size: 30px; font-weight: 800; color: #ea580c; }
+  &--ok &__total { color: #16a34a; }
+
+  &__list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 12px;
+  }
+
+  &__row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #fff;
+    border: 1px solid #fed7aa;
+    border-radius: 999px;
+    padding: 6px 14px;
+    cursor: pointer;
+
+    mat-icon { font-size: 18px; width: 18px; height: 18px; color: #ea580c; }
+    &:hover { background: #ffedd5; }
+  }
+
+  &__loc { font-weight: 600; }
+  &__count {
+    background: #ea580c;
+    color: #fff;
+    border-radius: 999px;
+    padding: 1px 10px;
+    font-weight: 700;
+    font-size: 13px;
+  }
+}

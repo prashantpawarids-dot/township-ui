@@ -17,9 +17,9 @@
         <div class="row col-10 px-0 mx-0">
             <div class="col-4">
                 <mat-form-field class="full-width">
-                    <mat-label>First Name</mat-label>
+                   <mat-label>First Name </mat-label>
                     <input [disabled]="disableFields" [(ngModel)]="landOwner.firstName" name="fname" #fname="ngModel"
-                        matInput autoCapitalizeFirst />
+                        matInput autoCapitalizeFirst required />
                 </mat-form-field>
             </div>
             <div class="col-4">
@@ -31,9 +31,9 @@
             </div>
             <div class="col-4">
                 <mat-form-field class="full-width">
-                    <mat-label>Last Name</mat-label>
+                 <mat-label>Last Name </mat-label>
                     <input [disabled]="disableFields" [(ngModel)]="landOwner.lastName" name="lname" #lname="ngModel"
-                        matInput autoCapitalizeFirst />
+                        matInput autoCapitalizeFirst required  />
                 </mat-form-field>
             </div>
             <div class="col-3">
@@ -69,9 +69,9 @@
                 </mat-form-field>
             </div>
             <div class="col-3">
-    <label id="gender-label" class="gender-label">Gender</label>
+   <label id="gender-label" class="gender-label">Gender </label>
     <mat-radio-group [disabled]="disableFields" [(ngModel)]="landOwner.gender" name="gender" #gender="ngModel"
-        aria-label="Gender" style="display: flex; gap: 10px;">
+        aria-label="Gender" style="display: flex; gap: 10px;" required>
         <mat-radio-button value="Male">Male</mat-radio-button>
         <mat-radio-button value="Female">Female</mat-radio-button>
     </mat-radio-group>
@@ -91,7 +91,7 @@
             <mat-form-field class="full-width">
                 <mat-label>Date of Birth</mat-label>
                 <input [disabled]="disableFields" [(ngModel)]="landOwner.dob" name="dob" #dob="ngModel"  matInput
-                    [matDatepicker]="picker">
+                    [matDatepicker]="picker" required>
                 <mat-hint>DD/mm/YYYY</mat-hint>
                 <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
                 <mat-datepicker #picker></mat-datepicker>
@@ -101,14 +101,14 @@
             <mat-form-field class="full-width">
                 <mat-label>Email ID </mat-label>
                 <input [disabled]="disableFields" [(ngModel)]="landOwner.emailID" name="emailid" #emailid="ngModel"
-                    matInput />
+                    matInput required email />
             </mat-form-field>
         </div>
         <div class="col-md-3">
             <mat-form-field class="full-width">
-                <mat-label>Mobile No</mat-label>
+              <mat-label>Mobile No </mat-label>
                 <input [disabled]="disableFields" [(ngModel)]="landOwner.mobileNo" name="mobile" #mobile="ngModel"
-                    matInput type="text" maxlength="10" data-for="phoneNumber" />
+                    matInput type="text" maxlength="10" data-for="phoneNumber" required />
             </mat-form-field>
         </div>
         <div class="col-md-3" *ngIf="!isEmployee">
@@ -186,7 +186,7 @@
 
         <div class="col-md-3">
   <mat-form-field class="full-width">
-    <mat-label>Neighbourhood</mat-label>
+    <mat-label>Neighbourhood </mat-label>
     <input
       [disabled]="disableFields"
       type="text"
@@ -199,7 +199,7 @@
       readonly
       (click)="neighbourLandOwnerTrigger.openPanel()"
       [matAutocomplete]="autoNeighbour"
-      #neighbourLandOwnerTrigger="matAutocompleteTrigger">
+      #neighbourLandOwnerTrigger="matAutocompleteTrigger" required>
     <!-- ✅ Use (optionSelected) on mat-autocomplete instead of (change) on input -->
     <mat-autocomplete
       #autoNeighbour="matAutocomplete"
@@ -213,13 +213,13 @@
 </div>
         <div class="col-md-3">
             <mat-form-field class="full-width">
-                <mat-label>Building</mat-label>
+                <mat-label>Building </mat-label>
                 <input [disabled]="disableFields" (change)="filterResident()" type="text" placeholder="Select building" aria-label="Building"
                     matInput name="buildingForm" #buildingForm="ngModel" [(ngModel)]="landOwner.building"
                     readonly
                     (click)="buildingLandOwnerTrigger.openPanel()"
                     [matAutocomplete]="autobuilding"
-                    #buildingLandOwnerTrigger="matAutocompleteTrigger">
+                    #buildingLandOwnerTrigger="matAutocompleteTrigger" required>
                 <mat-autocomplete #autobuilding="matAutocomplete"  [displayWith]="displayBuilding">
                     @for (option of buildingOptions; track option) {
                     <mat-option [value]="option.id">{{option.name}}</mat-option>
@@ -229,9 +229,9 @@
         </div>
         <div class="col-md-3">
             <mat-form-field class="full-width">
-                <mat-label>Flat No</mat-label>
+              <mat-label>Flat No </mat-label>
                 <input [disabled]="disableFields" (input)="filterResident()" [(ngModel)]="landOwner.flatNumber" name="flatNo" #flatNo="ngModel"
-                    matInput />
+                    matInput required />
             </mat-form-field>
         </div>
     </div>
@@ -415,35 +415,14 @@
 
 
     <div *ngIf="isContractor" class="row">
-    <!-- <div class="col-md-3">
-    <mat-form-field class="full-width">
-        <mat-label>Select Neighbourhood</mat-label>
-        <mat-select [disabled]="disableFields" 
-                    name="contractorNeighbourhood" 
-                    [(ngModel)]="landOwner.neighbourhood" 
-                    multiple>
-            <mat-select-trigger>
-                {{landOwner.neighbourhood?.[0] || 'Select Neighbourhood'}}
-                @if ((landOwner.neighbourhood?.length || 0) > 1) {
-                <span class="additional-selection">
-                    (+{{(landOwner.neighbourhood?.length || 0) - 1}}
-                    {{landOwner.neighbourhood?.length === 2 ? 'other' : 'others'}})
-                </span>
-                }
-            </mat-select-trigger>
-            @for (option of neighbourhoodOptions; track option) {
-            <mat-option [value]="option.name">{{option.name}}</mat-option>
-            }
-        </mat-select>
-    </mat-form-field>
-</div> -->
+    
 
 <div class="col-md-3">
     <mat-form-field class="full-width">
-        <mat-label>Select Neighbourhood</mat-label>
+        <mat-label>Select Neighbourhood </mat-label>
         <mat-select [disabled]="disableFields" 
                     name="contractorNeighbourhood" 
-                    [(ngModel)]="landOwner.neighbourhood">
+                    [(ngModel)]="landOwner.nbr">
             @for (option of neighbourhoodOptions; track option) {
             <mat-option [value]="option.id">{{option.name}}</mat-option>
             }
@@ -472,7 +451,7 @@
 
     <div class="col-md-3">
     <mat-form-field class="full-width">
-        <mat-label>Service type</mat-label>
+      <mat-label>Service type </mat-label>
         <input [disabled]="disableFields" type="text" placeholder="Select Service type"
             aria-label="Contractor type" matInput name="contactorType" #neighbourForm="ngModel"
             [(ngModel)]="landOwner.contactorType"
@@ -543,7 +522,7 @@
     <div *ngIf="isEmployee" class="row">
         <div class="col-md-3">
             <mat-form-field class="full-width">
-                <mat-label>Date of Joining</mat-label>
+                <mat-label>Date of Joining </mat-label>
                 <input [disabled]="disableFields" [(ngModel)]="landOwner.doj" name="doj" #dob="ngModel" matInput
                     [matDatepicker]="picker">
                 <mat-hint>DD/mm/YYYY</mat-hint>

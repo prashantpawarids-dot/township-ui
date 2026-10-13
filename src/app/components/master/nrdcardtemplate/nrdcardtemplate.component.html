@@ -1,0 +1,77 @@
+<div class="container mt-4 pt-2 px-0">
+
+  <h4 class="mb-3">{{ isViewMode ? 'View' : (selectedNRDId && !isViewMode) ? 'Edit' : 'Add New' }} NRD Card Template</h4>
+
+  <div class="row mt-4 align-items-end">
+
+  <div class="col-md-3 pe-0">
+    <mat-form-field class="full-width">
+      <mat-label>Select Neighbourhood</mat-label>
+      <mat-select [(ngModel)]="selectedNRDId"
+                  (ngModelChange)="onNRDChange()"
+                  [disabled]="isViewMode">
+        <mat-option [value]="null">-- Select --</mat-option>
+        <mat-option *ngFor="let n of neighbourhoods" [value]="n.id">{{ n.name }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+
+  <div class="col-md-4" *ngIf="!isViewMode">
+    <div class="d-flex align-items-center gap-2 mb-3">
+      <label class="btn btn-outline-secondary btn-sm mb-0">
+        📁 Choose Image
+        <input type="file" accept=".jpg,.jpeg,.png"
+               (change)="onFileChange($event)" style="display:none" />
+      </label>
+      <span *ngIf="selectedFile" class="text-muted small">{{ selectedFile.name }}</span>
+      <button *ngIf="selectedFile" class="btn btn-sm btn-outline-danger"
+              (click)="clearFile()">✕</button>
+    </div>
+  </div>
+
+  <div class="col-md-3 d-flex gap-2 mb-3">
+    <button class="btn btn-primary" *ngIf="!isViewMode"
+            (click)="save()"
+            [disabled]="!selectedNRDId || !selectedFile || isSaving">
+     {{ isSaving ? '⏳ Uploading...' : 'Save' }}
+    </button>
+    <button class="btn btn-secondary" (click)="navigateBack()">Cancel</button>
+  </div>
+
+</div>
+
+  <!-- LOADING -->
+  <div class="mt-3 text-muted" *ngIf="isLoading">Loading template...</div>
+
+  <!-- ERROR -->
+  <div class="alert alert-danger mt-3" *ngIf="errorMsg">{{ errorMsg }}</div>
+
+  <!-- CURRENT TEMPLATE PREVIEW -->
+  <div class="row mt-4" *ngIf="currentTemplate && !previewUrl">
+    <div class="col-md-3">
+      <label class="form-label">Current Template</label>
+      <div class="nrd-img-wrap">
+        <img [src]="currentTemplate" class="nrd-img" alt="Current Template" />
+        <span class="badge bg-success nrd-badge">Current</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- NEW PREVIEW -->
+  <div class="row mt-4" *ngIf="previewUrl">
+    <div class="col-md-3">
+      <label class="form-label">New Template Preview</label>
+      <div class="nrd-img-wrap">
+        <img [src]="previewUrl" class="nrd-img" alt="Preview" />
+        <span class="badge bg-primary nrd-badge">New</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- NO TEMPLATE -->
+  <div class="mt-3 text-muted fst-italic"
+       *ngIf="selectedNRDId && !currentTemplate && !previewUrl && !isLoading">
+    No template uploaded yet for this neighbourhood.
+  </div>
+
+</div>

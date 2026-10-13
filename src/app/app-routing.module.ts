@@ -29,6 +29,11 @@ const routes: Routes = [
             canActivate: [authGuard],
             loadComponent: () => import('./components/master/company/company.component').then((c) => c.CompanyComponent)
           },
+          {
+            path: 'card-design',
+            // canActivate: [authGuard],
+            loadComponent: () => import('./components/master/card-design/card-design.component').then((c) => c.CardDesignComponent)
+          },
           
           {
             path: 'profile',
@@ -56,6 +61,11 @@ const routes: Routes = [
             loadComponent: () => import('./components/master/neighbourhood/neighbourhood.component').then((c) => c.NeighbourhoodComponent)
           },
           {
+            path: 'nrdcardtemplate',
+            canActivate: [authGuard],
+            loadComponent: () => import('./components/master/nrdcardtemplate/nrdcardtemplate.component').then((c) => c.NrdcardtemplateComponent)
+          },
+          {
             path: 'building',
             canActivate: [authGuard],
             loadComponent: () => import('./components/master/building/building.component').then((c) => c.BuildingComponent)
@@ -70,9 +80,8 @@ const routes: Routes = [
             canActivate: [authGuard],
             loadComponent: () => import('./components/master/service-type/service-type.component').then((c) => c.ServiceTypeComponent)
           },
-          {
+         {
   path: 'contrator-type',
-  canActivate: [authGuard],
   loadComponent: () =>
     import('./components/master/contrator-type/contrator-type.component')
       .then((c) => c.ContractorTypeComponent)
@@ -87,6 +96,34 @@ const routes: Routes = [
             path: 'reader-relay',
             canActivate: [authGuard],
             loadComponent: () => import('./components/master/reader-relay/reader-relay.component').then((c) => c.ReaderRelayComponent)
+          },
+          {
+            path: 'camera',
+            canActivate: [authGuard],
+            loadComponent: () => import('./components/master/camera/camera.component').then((c) => c.CameraComponent)
+          },
+           {
+            path: 'camera-live',
+            // canActivate: [authGuard],
+            loadComponent: () => import('./components/master/camera-live/camera-live.component').then((c) => c.CameraLiveComponent)
+          },
+
+           {
+            path: 'turnstile-live-transactions',
+            // canActivate: [authGuard],
+            loadComponent: () => import('./components/master/turnstile-live-transaction/turnstile-live-transaction.component').then((c) => c.TurnstileLiveTransactionComponent)
+          },
+
+          {
+            path: 'backup-maintenance',
+            // canActivate: [authGuard],
+            loadComponent: () => import('./components/master/backup-maintenance/backup-maintenance.component').then((c) => c.BackupMaintenanceComponent)
+          },
+
+          {
+            path: 'parking-managament',
+            // canActivate: [authGuard],
+            loadComponent: () => import('./components/master/parking-managament/parking-managament.component').then((c) => c.ParkingManagamentComponent)
           },
         ]
       },
@@ -220,6 +257,10 @@ const routes: Routes = [
             path: 'visitorInOutLog',
             loadComponent: () => import('./components/reports/visitor-in-out-log/visitor-in-out-log.component').then((c) => c.VisitorInOutLogComponent)
           },
+           {
+            path: 'card-summary',
+            loadComponent: () => import('./components/reports/card-summary/card-summary.component').then((c) => c.CardSummaryComponent)
+          },
           {
             path: 'cardEncodingLog',
             loadComponent: () => import('./components/reports/card-encoding-log/card-encoding-log.component').then((c) => c.CardEncodingLogComponent)
@@ -300,6 +341,10 @@ const routes: Routes = [
             path: 'guestInOutLog',
             loadComponent: () => import('./components/reports/guest-in-out-log/guest-in-out-log.component').then((c) => c.GuestInOutLogComponent)
           },
+          {
+            path: 'guestList',
+            loadComponent: () => import('./components/reports/guestlist/guestlist.component').then((c) => c.GuestInOutLogComponent)
+          }
         ]
       },
       {
@@ -334,6 +379,12 @@ const routes: Routes = [
     path: '',
     component: AdminLayoutComponent,
     children: [
+      {
+    path: 'card-preview',
+    loadComponent: () =>
+      import('./components/card-preview/card-preview.component')
+        .then(c => c.CardPreviewComponent)
+  },
       {
         path: '',
         redirectTo: 'login',

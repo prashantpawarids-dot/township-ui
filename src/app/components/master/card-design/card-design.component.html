@@ -1,0 +1,252 @@
+<div class="cpe-wrapper">
+
+  <div class="cpe-header">
+    <div class="cpe-header__title">
+      <span class="cpe-header__icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/>
+        </svg>
+      </span>
+      <h2>Card Design</h2>
+    </div>
+    <div class="cpe-header__filters">
+      <div class="pro-filter-group">
+        <label class="pro-filter-label">Category</label>
+        <select class="pro-select" [(ngModel)]="filterCategory" (ngModelChange)="applyFilter()">
+          <option value="ALL">All Categories</option>
+          <option *ngFor="let cat of categoryOptions" [value]="cat.value">{{ cat.label }}</option>
+        </select>
+      </div>
+      <div class="pro-filter-group">
+        <label class="pro-filter-label">Neighbourhood</label>
+        <select class="pro-select" [(ngModel)]="filterNRDId" (ngModelChange)="applyFilter()">
+          <option [ngValue]="null">All Neighbourhoods</option>
+          <option *ngFor="let n of neighbourhoods | slice:1" [ngValue]="n.id">{{ n.name }}</option>
+        </select>
+      </div>
+      <button class="btn-search" (click)="openLogoManager()">🖼 Manage NRD Logos</button>
+      <button class="btn-search" (click)="openNewPicker()">+ New Design</button>
+    </div>
+  </div>
+
+  <div class="cpe-filterbar">
+    <div class="filterbar__right">
+      <span class="record-badge"><span class="record-badge__count">{{ savedRows.length }}</span> Design(s)</span>
+    </div>
+  </div>
+
+  <div class="cpe-body">
+    <div class="table-container">
+      <table mat-table [dataSource]="savedRows" class="cpe-table">
+        <ng-container matColumnDef="category">
+          <th mat-header-cell *matHeaderCellDef>Category</th>
+          <td mat-cell *matCellDef="let row">{{ row.categoryLabel }}</td>
+        </ng-container>
+        <ng-container matColumnDef="neighbourhood">
+          <th mat-header-cell *matHeaderCellDef>Neighbourhood</th>
+          <td mat-cell *matCellDef="let row">{{ row.nrdName }}</td>
+        </ng-container>
+        <ng-container matColumnDef="action">
+          <th mat-header-cell *matHeaderCellDef>Action</th>
+          <td mat-cell *matCellDef="let row">
+            <button class="btn-view" (click)="openDesign(row)">CardDesign</button>
+          </td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+      <div class="table-empty" *ngIf="savedRows.length === 0">
+        <p>No card designs yet. Click "+ New Design" to create one.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- NEW DESIGN PICKER -->
+  <div class="preview-overlay" *ngIf="showNewPicker" (click)="closeNewPicker()">
+    <div class="preview-modal" style="width:380px;" (click)="$event.stopPropagation()">
+      <div class="preview-modal__header">
+        <span>+ New Card Design</span>
+        <button class="preview-close-btn" (click)="closeNewPicker()">✕</button>
+      </div>
+      <div class="preview-modal__body" style="align-items:stretch;">
+        <div class="pro-filter-group">
+          <label class="pro-filter-label">Category</label>
+          <select class="pro-select" [(ngModel)]="newCategory">
+            <option value="">-- Select --</option>
+            <option *ngFor="let cat of newDesignCategoryOptions" [value]="cat.value">{{ cat.label }}</option>
+          </select>
+        </div>
+        <div class="pro-filter-group" *ngIf="isNrdSpecific(newCategory)">
+          <label class="pro-filter-label">Neighbourhood</label>
+          <select class="pro-select" [(ngModel)]="newNRDId">
+            <option [ngValue]="null">-- Select --</option>
+            <option *ngFor="let n of neighbourhoods | slice:1" [ngValue]="n.id">{{ n.name }}</option>
+          </select>
+        </div>
+        <div class="pro-filter-group" *ngIf="isCompanySpecific(newCategory)">
+          <label class="pro-filter-label">Company</label>
+          <select class="pro-select" [(ngModel)]="newNRDId">
+            <option [ngValue]="null">-- Select --</option>
+            <option *ngFor="let c of companies" [ngValue]="c.id">{{ c.name }}</option>
+          </select>
+        </div>
+        <p *ngIf="newCategory && !isNrdSpecific(newCategory) && !isCompanySpecific(newCategory)" style="font-size:12px; color:#8899aa;">
+          This category shares one design across all neighbourhoods. Logo differs per neighbourhood — manage via "Manage NRD Logos".
+        </p>
+        <button class="btn-save-preview"
+                [disabled]="!newCategory || ((isNrdSpecific(newCategory) || isCompanySpecific(newCategory)) && !newNRDId)"
+                (click)="startNewDesign()">Continue →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DESIGN CANVAS MODAL -->
+  <div class="preview-overlay" *ngIf="showDesignPanel" (click)="closeDesignPanel()">
+    <div class="preview-modal" (click)="$event.stopPropagation()">
+
+      <div class="preview-modal__header">
+        <span>🎨 {{ activeRow?.categoryLabel }} — {{ activeRow?.nrdName }}</span>
+        <button class="preview-close-btn" (click)="closeDesignPanel()">✕</button>
+      </div>
+
+      <div class="preview-modal__body">
+
+        <div style="display:flex; gap:8px; width:100%;">
+          <label class="cam-upload-btn" style="cursor:pointer; flex:1;">
+            ⬆ {{ hasTemplate ? 'Replace Template' : 'Upload Template' }}
+            <input type="file" accept="image/*" (change)="onTemplateFileSelected($event)" style="display:none" />
+          </label>
+         <label class="cam-upload-btn" style="cursor:pointer; flex:1;" *ngIf="isNrdSpecificActive">
+            🖼 {{ hasLogo ? 'Replace Logo' : 'Add Logo (optional)' }}
+            <input type="file" accept="image/*" (change)="onLogoFileSelected($event)" style="display:none" />
+          </label>
+          <span class="pro-filter-label" style="flex:1; align-self:center;" *ngIf="!isNrdSpecificActive">
+            Logo is set per Neighbourhood via "Manage NRD Logos"
+          </span>
+          <label class="custom-check" style="align-self:center;">
+            <input type="checkbox" [(ngModel)]="logoEnabled" />
+            <span class="checkmark"></span> Include Logo
+          </label>
+        </div>
+
+        <div class="preview-card-wrap">
+          <div class="preview-card-container" #previewContainer [class.blank-card-bg]="!hasTemplate">
+
+            <img *ngIf="hasTemplate" class="preview-card-bg" [src]="templatePreviewUrl" alt="card template" />
+
+            <!-- Photo box -->
+            <div class="preview-photo-drag"
+                 [style.top.px]="previewPhoto.top" [style.left.px]="previewPhoto.left"
+                 [style.width.px]="previewPhoto.width" [style.height.px]="previewPhoto.height"
+                 (mousedown)="onBoxDragStart($event, 'photo')">
+              <div class="photo-placeholder-box" [class.photo-placeholder-box--dark]="!hasTemplate">📷 Photo</div>
+              <div class="resize-handle resize-handle--se" (mousedown)="onBoxResizeStart($event, 'se', 'photo')"></div>
+              <div class="resize-handle resize-handle--sw" (mousedown)="onBoxResizeStart($event, 'sw', 'photo')"></div>
+              <div class="resize-handle resize-handle--ne" (mousedown)="onBoxResizeStart($event, 'ne', 'photo')"></div>
+              <div class="resize-handle resize-handle--nw" (mousedown)="onBoxResizeStart($event, 'nw', 'photo')"></div>
+            </div>
+
+          <!-- Logo position box (non-Contractor): position only, no image here -->
+            <div class="preview-photo-drag" *ngIf="!isNrdSpecificActive && logoEnabled"
+                 [style.top.px]="previewLogo.top" [style.left.px]="previewLogo.left"
+                 [style.width.px]="previewLogo.width" [style.height.px]="previewLogo.height"
+                 (mousedown)="onBoxDragStart($event, 'logo')">
+              <div class="photo-placeholder-box">🖼 Logo</div>
+              <div class="resize-handle resize-handle--se" (mousedown)="onBoxResizeStart($event, 'se', 'logo')"></div>
+              <div class="resize-handle resize-handle--sw" (mousedown)="onBoxResizeStart($event, 'sw', 'logo')"></div>
+              <div class="resize-handle resize-handle--ne" (mousedown)="onBoxResizeStart($event, 'ne', 'logo')"></div>
+              <div class="resize-handle resize-handle--nw" (mousedown)="onBoxResizeStart($event, 'nw', 'logo')"></div>
+            </div>
+
+           <!-- Contractor: real logo image shown, unchanged -->
+            <div class="preview-photo-drag" *ngIf="isNrdSpecificActive && hasLogo && logoEnabled"
+                 [style.top.px]="previewLogo.top" [style.left.px]="previewLogo.left"
+                 [style.width.px]="previewLogo.width" [style.height.px]="previewLogo.height"
+                 (mousedown)="onBoxDragStart($event, 'logo')">
+              <img [src]="logoUrl" style="width:100%; height:100%; object-fit:contain; pointer-events:none;" />
+              <div class="resize-handle resize-handle--se" (mousedown)="onBoxResizeStart($event, 'se', 'logo')"></div>
+              <div class="resize-handle resize-handle--sw" (mousedown)="onBoxResizeStart($event, 'sw', 'logo')"></div>
+              <div class="resize-handle resize-handle--ne" (mousedown)="onBoxResizeStart($event, 'ne', 'logo')"></div>
+              <div class="resize-handle resize-handle--nw" (mousedown)="onBoxResizeStart($event, 'nw', 'logo')"></div>
+            </div>
+
+            <!-- Enabled text fields -->
+            <div class="preview-text-field" *ngFor="let f of enabledFields"
+                 [class.preview-text-field--selected]="selectedFieldId === f.id"
+                 [style.left.%]="f.x" [style.top.%]="f.y" [style.color]="f.color"
+                 [style.font-weight]="f.bold ? 'bold' : 'normal'" [style.font-size.px]="f.size * 200"
+                 (mousedown)="onTextDragStart($event, f.id)">
+              {{ f.label }}
+            </div>
+
+          </div>
+        </div>
+
+        <div class="preview-controls">
+
+          <div class="text-style-panel">
+            <label class="pro-filter-label">Card Fields</label>
+            <div style="display:flex; flex-wrap:wrap; gap:6px;">
+              <label class="custom-check" *ngFor="let f of activeFields">
+                <input type="checkbox" [checked]="f.enabled" (change)="toggleField(f.id)" />
+                <span class="checkmark"></span> {{ f.label }}
+              </label>
+            </div>
+
+            <ng-container *ngIf="selectedField">
+              <div class="text-style-row">
+                <label class="pro-filter-label">Color</label>
+                <input type="color" [(ngModel)]="selectedField!.color" class="color-picker" />
+                <span class="color-val">{{ selectedField?.color }}</span>
+              </div>
+              <div class="text-style-row">
+                <label class="pro-filter-label">Size</label>
+                <input type="range" min="0.020" max="0.120" step="0.005"
+                       [ngModel]="selectedField?.size" (ngModelChange)="selectedField!.size = +$event" class="size-slider" />
+                <span class="size-val">{{ ((selectedField?.size ?? 0) * 100).toFixed(1) }}</span>
+              </div>
+              <div class="text-style-row">
+                <label class="pro-filter-label">Bold</label>
+                <label class="toggle-switch">
+                  <input type="checkbox" [(ngModel)]="selectedField!.bold" />
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+            </ng-container>
+          </div>
+
+          <div class="preview-actions">
+            <button class="btn-reset-preview" (click)="resetPreviewPhoto()">↺ Reset Photo</button>
+            <button class="btn-save-preview" (click)="saveDesign()">✅ Save Design</button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NRD LOGO MANAGER -->
+  <div class="preview-overlay" *ngIf="showLogoManager" (click)="closeLogoManager()">
+    <div class="preview-modal" style="width:460px;" (click)="$event.stopPropagation()">
+      <div class="preview-modal__header">
+        <span>🖼 Manage NRD Logos</span>
+        <button class="preview-close-btn" (click)="closeLogoManager()">✕</button>
+      </div>
+      <div class="preview-modal__body" style="align-items:stretch; max-height:60vh; overflow-y:auto;">
+        <div *ngFor="let row of logoManagerRows" style="display:flex; align-items:center; gap:12px; padding:8px 0; border-bottom:1px solid #2d3748;">
+          <div style="width:50px; height:50px; background:#1a2332; border-radius:6px; display:flex; align-items:center; justify-content:center; overflow:hidden;">
+            <img *ngIf="row.logoUrl" [src]="row.logoUrl" style="width:100%; height:100%; object-fit:contain;" />
+            <span *ngIf="!row.logoUrl" style="font-size:11px; color:#667;">No Logo</span>
+          </div>
+          <span style="flex:1; color:#cdd9e5; font-size:13px;">{{ row.nrdName }}</span>
+          <label class="cam-upload-btn" style="cursor:pointer;">
+            ⬆ {{ row.logoUrl ? 'Replace' : 'Upload' }}
+            <input type="file" accept="image/*" (change)="onNrdLogoFileSelected($event, row)" style="display:none" />
+          </label>
+          <button class="cam-clear-btn" *ngIf="row.logoUrl" (click)="deleteNrdLogo(row)">✕</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>

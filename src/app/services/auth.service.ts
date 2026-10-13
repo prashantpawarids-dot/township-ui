@@ -126,7 +126,50 @@ get roleId(): string | null {
   );
 }
 
+  // ─── Camera (ANPR) ─────────────────────────────────────────────
 
+  getCameras(): Observable<any[]> {
+    const url = `${this.baseUrl}ANPR/camera/list`;
+    return this.http.get<any[]>(url).pipe(
+      map(res => res),
+      catchError(this.handleError)
+    );
+  }
+
+  postCamera(payload: any): Observable<any> {
+    const url = `${this.baseUrl}ANPR/camera/add`;
+    return this.http.post(url, payload).pipe(
+      map(res => res),
+      catchError(this.handleError)
+    );
+  }
+
+  updateCamera(payload: any): Observable<any> {
+    const url = `${this.baseUrl}ANPR/camera/update/${payload.id}`;
+    return this.http.put(url, payload).pipe(
+      map(res => res),
+      catchError(this.handleError)
+    );
+  }
+
+
+  getVehicleImage(uniqueId: string): Observable<any> {
+    const url = `${this.baseUrl}ANPR/vehicleImage?uniqueId=${encodeURIComponent(uniqueId)}`;
+    return this.http.get<any>(url).pipe(
+      map(res => res),
+      catchError(this.handleError)
+    );
+  }
+
+
+   // Dashboard alert: aaj ke Not Exited unknown vehicles (camera location wise)
+  getNotExitedToday(): Observable<any> {
+    const url = `${this.baseUrl}Report/UnAuthorisedNotExitedToday`;
+    return this.http.get<any>(url).pipe(
+      map(res => res),
+      catchError(this.handleError)
+    );
+  }
 
   getAmenitiesById(id: number): Observable<any> {
     let url = this.baseUrl + 'Amenities/GetAmenity/' + id;
@@ -163,19 +206,53 @@ get roleId(): string | null {
   // }
 
 
+  // getNeighbourhood(): Observable<any> {
+  //   let url = this.baseUrl + 'NRD'
+  //   const roleid = localStorage.getItem('roleid');
+  //   return this.http.get<any[]>(url).pipe(
+  //   map(res => {
+  //     // Admin sees all, others see only active
+  //     return roleid === '100'
+  //       ? res
+  //       : res.filter(item => item.isactive === true);
+  //   }),
+  //     catchError(this.handleError));
+  // }
+
+
+  // getNeighbourhood(): Observable<any> {
+  //   const roleid = localStorage.getItem('roleid');
+  //   const companyId = localStorage.getItem('companyID');
+  //   let url = this.baseUrl + 'NRD';
+  //   if (roleid !== '100' && companyId) {
+  //     url += `?companyId=${companyId}`;
+  //   }
+  //   return this.http.get<any[]>(url).pipe(
+  //   map(res => {
+  //     return roleid === '100'
+  //       ? res
+  //       : res.filter(item => item.isactive === true);
+  //   }),
+  //     catchError(this.handleError));
+  // }
+
+
   getNeighbourhood(): Observable<any> {
-    let url = this.baseUrl + 'NRD'
     const roleid = localStorage.getItem('roleid');
+    const isAdmin = roleid === '1';
+    const companyId = localStorage.getItem('companyID');
+    let url = this.baseUrl + 'NRD';
+    if (!isAdmin && companyId) {
+      url += `?companyId=${companyId}`;
+    }
     return this.http.get<any[]>(url).pipe(
     map(res => {
-      // Admin sees all, others see only active
-      return roleid === '100'
+      return isAdmin
         ? res
         : res.filter(item => item.isactive === true);
     }),
       catchError(this.handleError));
   }
-
   getNeighbourhoodById(id: number): Observable<any> {
     let url = this.baseUrl + 'NRD/GetNRD/' + id;
     return this.http.get(url).pipe(map(res => {
@@ -183,6 +260,26 @@ get roleId(): string | null {
     }),
       catchError(this.handleError));
   }
+
+
+  uploadNRDTemplate(nrdId: number, nrdName: string, file: File): Observable<any> {
+  const formData = new FormData();
+  formData.append('file', file);
+  return this.http.post(
+    `${this.baseUrl}NRDTemplate/Upload?nrdId=${nrdId}&nrdName=${encodeURIComponent(nrdName)}`,
+    formData
+  ).pipe(map(res => res), catchError(this.handleError));
+}
+
+getNRDTemplate(nrdId: number): Observable<any> {
+  return this.http.get(`${this.baseUrl}NRDTemplate/Get/${nrdId}`)
+    .pipe(map(res => res), catchError(this.handleError));
+}
+
+getAllNRDTemplates(): Observable<any[]> {
+  return this.http.get<any[]>(`${this.baseUrl}NRDTemplate/GetAll`)
+    .pipe(map(res => res), catchError(this.handleError));
+}
 
   // postNeighbourhood(payload: any): Observable<any> {
   //   let url = this.baseUrl + 'NRD/AddNRD';
@@ -585,6 +682,14 @@ deleteVehicle(id: string | number): Observable<any> {
     catchError(this.handleError)
   );
 }
+
+  saveVehicleNRDAccess(vehicleId: number, nrdIDs: number[]) {
+    return this.http.post(`${this.baseUrl}Vehicle/SaveVehicleNRDAccess`, { vehicleID: vehicleId, nrdIDs: nrdIDs });
+  }
+
+    getVehicleNRDs(vehicleId: number) {
+    return this.http.get(`${this.baseUrl}Vehicle/GetVehicleNRDs/${vehicleId}`);
+  }
   // land owner access rights
   postLandOwnerAccessRights(payload: any): Observable<any> {
     // console.log('postLandOwnerAccessRights Payload being sent:', payload);
@@ -707,17 +812,51 @@ getTenant(): Observable<any[]> {
       catchError(this.handleError));
   }
 
+  // updateTenant(payload: any): Observable<any> {
+  //   payload.id = payload.id == undefined ? "0" : payload.id;
+  //   payload.building = payload.building.toString();
+  //   let url = this.baseUrl + 'Tenent/UpdateTenent/' + payload.id
+  //   return this.http.post(url, payload).pipe(map(res => {
+  //     return res;
+  //   }),
+  //     catchError(this.handleError));
+  // }
+
+uploadCardMasterTemplate(file: File, holderType: string): Observable<any> {
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('holderType', holderType);
+  return this.http.post(`${this.baseUrl}CardMasterTemplate/Upload`, formData).pipe(
+    map(res => res),
+    catchError(this.handleError)
+  );
+}
+
+getCardMasterTemplate(holderType: string): Observable<any> {
+  return this.http.get(`${this.baseUrl}CardMasterTemplate/Get/${holderType}`).pipe(
+    map(res => res),
+    catchError(this.handleError)
+  );
+}
   updateTenant(payload: any): Observable<any> {
-    payload.id = payload.id == undefined ? "0" : payload.id;
-    payload.building = payload.building.toString();
-    let url = this.baseUrl + 'Tenent/UpdateTenent/' + payload.id
-    return this.http.post(url, payload).pipe(map(res => {
-      return res;
-    }),
-      catchError(this.handleError));
-  }
+  payload.id = payload.id == undefined ? "0" : payload.id;
+  payload.nrd = payload.nrd.toString();
+  payload.building = payload.building.toString();
+  let url = this.baseUrl + 'Tenent/UpdateTenent/' + payload.id
+  return this.http.post(url, payload).pipe(map(res => {
+    return res;
+  }),
+    catchError(this.handleError));
+}
  
 
+  getTurnstileLiveTransactions(page: number = 1, pageSize: number = 20): Observable<any> {
+    const url = this.baseUrl + `IDSsemac/live-transactions?page=${page}&pageSize=${pageSize}`;
+    return this.http.get<any>(url).pipe(
+      map(res => res),
+      catchError(this.handleError)
+    );
+  }
 
 
   // Service Provider
@@ -1582,6 +1721,22 @@ postProfileDetails(uid: number, payload: any): Observable<any> {
     }),
       catchError(this.handleError));
   }
+getCardPrintSettings(holderType: string): Observable<any> {
+  return this.http.get(`${this.baseUrl}CardPrintSettings/${holderType}`)
+    .pipe(map(res => res), catchError(this.handleError));
+}
+
+saveCardPrintSettings(holderType: string, settingsJson: string): Observable<any> {
+  return this.http.post(`${this.baseUrl}CardPrintSettings/Save`, 
+    { holderType, settingsJson })
+    .pipe(map(res => res), catchError(this.handleError));
+}
+uploadCardMasterTemplateLogo(templateKey: string, file: File) {
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('holderType', templateKey);
+  return this.http.post(`${environment.apiurl}CardMasterTemplate/UploadLogo`, formData);
+}
 
 
 
@@ -1669,7 +1824,12 @@ deleteNeighbourhood(id: number): Observable<any> {
     catchError(this.handleError)
   );
 }
-
+deleteNRDTemplate(nrdId: number): Observable<any> {
+  return this.http.delete(`${this.baseUrl}NRDTemplate/Delete/${nrdId}`).pipe(
+    map(res => res),
+    catchError(this.handleError)
+  );
+}
 /**
  * Delete Company by ID
  */
@@ -1799,7 +1959,7 @@ deleteUser(id: number): Observable<any> {
  * Delete Contractor Type
  */
 deleteContractorType(id: number): Observable<any> {
-  return this.http.delete(`${this.baseUrl}ContractorType/DeleteID/${id}`).pipe(
+  return this.http.post(`${this.baseUrl}ContractorType/DeleteID/${id}`, {}).pipe(
     map(res => res),
     catchError(this.handleError)
   );
@@ -1810,12 +1970,11 @@ deleteContractorType(id: number): Observable<any> {
  * Delete Service Type
  */
 deleteServiceType(id: number): Observable<any> {
-  return this.http.delete(`${this.baseUrl}ServiceType/DeleteServiceType/${id}`).pipe(
+  return this.http.post(`${this.baseUrl}ServiceType/DeleteID/${id}`, {}).pipe(
     map(res => res),
     catchError(this.handleError)
   );
 }
-
 /**
  * Delete Reader Relay by ID
  */
@@ -1874,17 +2033,42 @@ getCardBlockRevokeStatus() {
   return this.http.get<any[]>(url);
 }
 
-getAuthorityModules(Name: string): Observable<any[]> {
- const url = `${this.baseUrl}Auth/GetAuthorityModules/${Name}`;
+// getAuthorityModules(Name: string): Observable<any[]> {
+//  const url = `${this.baseUrl}Auth/GetAuthorityModules/${Name}`;
 
+//   return this.http.get<any[]>(url).pipe(
+//     map(res => res.filter(m => m.viewreadonly === false)),
+//     // map(res =>
+//     //   res.map(m => ({
+//     //     moduleKey: m.moduleId,
+//     //     authorityLevel: m.authority
+//     //   }))
+//     // )
+
+
+//     map(res =>
+//   res.map(m => ({
+//     moduleKey: m.moduleId,
+//     authorityLevel: m.authority,
+//     canInsert: m.canInsert,
+//     canUpdate: m.canUpdate,
+//     canDelete: m.canDelete,
+//     canView: m.canview
+//   }))
+// )
+//   );
+// }
+
+getAuthorityModules(Name: string): Observable<any[]> {
+  const url = `${this.baseUrl}Auth/GetAuthorityModules/${Name}`;
   return this.http.get<any[]>(url).pipe(
-    map(res => res.filter(m => m.viewreadonly === false)),
-    map(res =>
-      res.map(m => ({
-        moduleKey: m.moduleId,
-        authorityLevel: m.authority
-      }))
-    )
+    map(res => res.map(m => ({
+      moduleKey: m.moduleId,
+      canInsert: m.canInsert === true || m.canInsert === 1,
+      canUpdate: m.canUpdate === true || m.canUpdate === 1,
+      canDelete: m.canDelete === true || m.canDelete === 1,
+      canView:   m.canview  === true || m.canview  === 1
+    })))
   );
 }
 //services/auth.service.ts
@@ -1988,6 +2172,9 @@ getIDCardData(idNumber: string): Observable<any> {
     catchError(this.handleError)
   );
 }
+deleteCardMasterTemplateLogo(holderType: string) {
+  return this.http.delete(`${environment.apiurl}CardMasterTemplate/DeleteLogo/${holderType}`);
+}
 
 getNRDCardAccess(): Observable<any[]> {
   const url = `${this.baseUrl}A_IDCardPrint/GetNRDCardAccess`;
@@ -2061,5 +2248,134 @@ private base64ToBlob(base64: string): Blob {
   }
   return new Blob([ab], { type: 'image/jpeg' });
 }
-  
+
+askAI(message: string): Observable<any> {
+  // const url = `${this.baseUrl}AI/ask`;
+   const url = `${this.baseUrl}AI/`;
+  return this.http.post(url, { message }).pipe(
+    map(res => res),
+    catchError(this.handleError)
+  );
 }
+
+
+
+  // ─── Backup & Maintenance ─────────────────────────────────────────────
+
+  getBackupSettings(): Observable<any> {
+    const url = `${this.baseUrl}backup/settings`;
+    return this.http.get(url).pipe(
+      map(res => res),
+      catchError(this.handleError)
+    );
+  }
+
+  saveBackupSettings(payload: any): Observable<any> {
+    const url = `${this.baseUrl}backup/settings`;
+    return this.http.put(url, payload).pipe(
+      map(res => res),
+      catchError(this.handleError)
+    );
+  }
+
+  getBackupHistory(): Observable<any[]> {
+    const url = `${this.baseUrl}backup/history`;
+    return this.http.get<any[]>(url).pipe(
+      map(res => res),
+      catchError(this.handleError)
+    );
+  }
+
+  runBackupNow(): Observable<any> {
+    const url = `${this.baseUrl}backup/run-now`;
+    return this.http.post(url, {}).pipe(
+      map(res => res),
+      catchError(this.handleError)
+    );
+  }
+
+  browseBackupFolders(path: string): Observable<any> {
+    const url = `${this.baseUrl}backup/browse-folders?path=${encodeURIComponent(path)}`;
+    return this.http.get(url).pipe(
+      map(res => res),
+      catchError(this.handleError)
+    );
+  }
+
+
+
+
+  // ===== PASTE INSIDE class AuthService in src/app/services/auth.service.ts =====
+// (put it next to getVehicleImage). Uses EXISTING APIs only.
+
+  // Camera IN/OUT register  -> GET Report/vehicleInoutRegister
+  // date format: 01-Oct-2026
+  getVehicleInoutRegister(fromDate: string, toDate: string, pageNumber: number = 1, pageSize: number = 2000): Observable<any> {
+    const url = `${this.baseUrl}Report/vehicleInoutRegister`
+      + `?fromDateTime=${encodeURIComponent(fromDate)}`
+      + `&toDateTime=${encodeURIComponent(toDate)}`
+      + `&pageNumber=${pageNumber}&pageSize=${pageSize}`;
+    return this.http.get<any>(url).pipe(
+      map(res => res),
+      catchError(this.handleError)
+    );
+  }
+
+  // Registered vehicle master -> GET ANPR/vehicle
+  getAnprVehicles(): Observable<any[]> {
+    const url = `${this.baseUrl}ANPR/vehicle`;
+    return this.http.get<any[]>(url).pipe(
+      map(res => res),
+      catchError(this.handleError)
+    );
+  }
+
+
+    // Card Summary report (server-side filter + paging)
+  getCardSummaryReport(p: {
+    status: string; nrd: string; building: string; cardType: string;
+    search: string; pageNumber: number; pageSize: number;
+  }): Observable<any> {
+    const url = `${this.baseUrl}Report/CardSummaryReport`
+      + `?status=${encodeURIComponent(p.status)}`
+      + `&nrd=${encodeURIComponent(p.nrd)}`
+      + `&building=${encodeURIComponent(p.building)}`
+      + `&cardType=${encodeURIComponent(p.cardType)}`
+      + `&search=${encodeURIComponent(p.search)}`
+      + `&pageNumber=${p.pageNumber}&pageSize=${p.pageSize}`;
+    return this.http.get<any>(url).pipe(map(res => res), catchError(this.handleError));
+  }
+
+  // Card Summary filter lists (NRD, Building by NRD, Card Type)
+  getCardSummaryFilters(nrd: string = ''): Observable<any> {
+    const url = `${this.baseUrl}Report/CardSummaryFilters?nrd=${encodeURIComponent(nrd)}`;
+    return this.http.get<any>(url).pipe(map(res => res), catchError(this.handleError));
+  }
+
+  // Dashboard alert: aaj ke Not Exited unknown vehicles (camera location wise)
+
+// ===== DASHBOARD CARD (paste into your dashboard component) =====
+// ts:
+//   import { ParkingService, ParkingSummary } from 'src/app/services/parking.service';
+//   parkingCards: { nrd: string; s: ParkingSummary }[] = [];
+//   constructor(..., private parking: ParkingService) {}
+//   ngOnInit() {
+//     this.parking.load(1).subscribe(list => {
+//       const nrds = Array.from(new Set(list.map(v => v.nrd)));
+//       this.parkingCards = nrds.map(n => ({ nrd: n, s: ParkingService.summarize(list, n) }));
+//     });
+//   }
+//
+// html:
+//   <div class="card" routerLink="/parking-management" style="cursor:pointer">
+//     <h6>Parking available</h6>
+//     <div *ngFor="let p of parkingCards" class="d-flex justify-content-between">
+//       <span>{{ p.nrd }}</span>
+//       <b>{{ p.s.available }} / {{ p.s.total }}</b>
+//     </div>
+//   </div>
+
+}
+
+  
+

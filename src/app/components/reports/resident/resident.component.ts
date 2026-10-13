@@ -60,7 +60,8 @@ buildingLabelMap: { [key: string]: string } = {};
   searchType = [
     { value: 'firstName', label: 'First Name' },
     { value: 'lastName', label: 'Last Name' },
-    { value: 'shortName', label: 'Short Name' },
+    // { value: 'shortName', label: 'Short Name' },
+    {value: 'flatNumber', label: 'Flat Number'},
     { value: 'idNumber', label: 'ID Number' }
   ];
 

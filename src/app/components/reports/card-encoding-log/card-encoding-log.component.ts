@@ -83,21 +83,28 @@ this.reportForm = this.fb.group({
     this.loadAllCardData();
   }
 
+  // private loadAllCardData(): void {
+  //   this.http.get<any[]>(`${environment.apiurl}Report/CardEncodingLog`).subscribe({
+  //     next: data => {
+  //       this.allData = data;
+  //       this.filteredData = [];
+  //       this.displayedData = [];
+  //     },
+  //     error: err => {
+  //       console.error('Failed to load card data:', err);
+  //       this.allData = [];
+  //       this.filteredData = [];
+  //       this.displayedData = [];
+  //     }
+  //   });
+  // }
+
+
   private loadAllCardData(): void {
-    this.http.get<any[]>(`${environment.apiurl}Report/CardEncodingLog`).subscribe({
-      next: data => {
-        this.allData = data;
-        this.filteredData = [];
-        this.displayedData = [];
-      },
-      error: err => {
-        console.error('Failed to load card data:', err);
-        this.allData = [];
-        this.filteredData = [];
-        this.displayedData = [];
-      }
-    });
-  }
+    this.allData = [];
+    this.filteredData = [];
+    this.displayedData = [];
+}
 
 // onCardTypeChange(event: any) {
 //   const selected = event.value;
@@ -126,14 +133,28 @@ onCardTypeChange(event: any) {
   }
 }
 
+  // applyFilters(): void {
+  // const { dateField, fromDate, toDate, cardType, searchBy, searchValue } = this.reportForm.value;
+  // let filtered = [...this.allData];
+
+
   applyFilters(): void {
   const { dateField, fromDate, toDate, cardType, searchBy, searchValue } = this.reportForm.value;
-  let filtered = [...this.allData];
+
+  const from = fromDate ? new Date(fromDate).toISOString().split('T')[0] : '';
+  const to   = toDate   ? new Date(toDate).toISOString().split('T')[0]   : '';
+
+  this.http.get<any[]>(
+    `${environment.apiurl}Report/CardEncodingLog?fromDateTime=${from}&toDateTime=${to}&dateField=${dateField}`
+  ).subscribe({
+    next: data => {
+      this.allData = Array.isArray(data) ? data : [];
+      let filtered = [...this.allData];
 
   // CARD TYPE FILTER
   if (cardType && cardType.length > 0) {
     let apiTypes: string[] = [];
-    if (cardType.includes('all')) {
+  if (cardType.includes('ALL')) {
       apiTypes = this.allData.map(d => d.cardType);
     } else {
       cardType.forEach(ct => apiTypes = apiTypes.concat(this.cardTypeMap[ct] || []));
@@ -182,7 +203,9 @@ this.paginator.length = this.filteredData.length;
 
 this.paginator.firstPage();
 this.updateDisplayedData(0, this.paginator.pageSize || this.pageSizes[0]);
-
+    },
+    error: err => console.error('Failed to load card data:', err)
+  });
 }
 
 public sortColumn(column: string) {

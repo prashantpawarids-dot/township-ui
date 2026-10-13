@@ -1,6 +1,9 @@
 <ul class="list-unstyled">
   <li class="pc-h-item pc-sidebar-collapse">
-    <a href="javascript:" title="click to menu collapse" class="pc-head-link ms-0" [ngClass]="{ on: navCollapsed() }"
+    <!-- <a href="javascript:" title="click to menu collapse" class="pc-head-link ms-0" [ngClass]="{ on: navCollapsed() }"
+      id="sidebar-hide mobile-collapse" (click)="navCollapse()"> -->
+
+          <a href="javascript:" [title]="navCollapsed() ? 'Open sidebar' : 'Close sidebar'" class="pc-head-link ms-0" [ngClass]="{ on: navCollapsed() }"
       id="sidebar-hide mobile-collapse" (click)="navCollapse()">
       @if (navCollapsed() === true) {
       <i antIcon type="menu-unfold" theme="outline"></i>

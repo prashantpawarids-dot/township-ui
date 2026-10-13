@@ -7,6 +7,31 @@
   <h4 *ngIf="title" class="mb-3"> {{ title }} </h4>
   <!-- Search Controls -->
   <div class="row mt-4">
+    <!-- Neighbourhood Filter -->
+    <div class="col-md-3 pe-0" *ngIf="showLocationFilters">
+      <mat-form-field class="full-width">
+        <mat-label>Neighbourhood </mat-label>
+        <mat-select [(ngModel)]="selectedNeighbourhoods" multiple (selectionChange)="onNeighbourhoodFilterChange()">
+          @for (option of neighbourhoodOptions; track option) {
+          <mat-option [value]="option.name ?? option.nrdname ?? option.Name">{{ option.name ?? option.nrdname ?? option.Name }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <!-- Building Filter -->
+   <!-- Building Filter -->
+    <div class="col-md-3 pe-0" *ngIf="showBuildingFilter">
+      <mat-form-field class="full-width">
+        <mat-label>Building</mat-label>
+        <mat-select [(ngModel)]="selectedBuildings" multiple (selectionChange)="onBuildingFilterChange()">
+          @for (option of buildingOptions; track option) {
+          <mat-option [value]="option.name ?? option.buildingname ?? option.Name">{{ option.name ?? option.buildingname ?? option.Name }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </div>
+
     <!-- Search Type Dropdown -->
     <div class="col-md-2 pe-0">
       <mat-form-field class="full-width">
@@ -171,6 +196,21 @@
   <td mat-cell *matCellDef="let element"> {{ element.readerip }} </td>
 </ng-container>
 
+<ng-container matColumnDef="anprip">
+  <th mat-header-cell *matHeaderCellDef> Camera IP </th>
+  <td mat-cell *matCellDef="let element"> {{ element.anprip }} </td>
+</ng-container>
+
+<ng-container matColumnDef="anprLocation">
+  <th mat-header-cell *matHeaderCellDef> Location </th>
+  <td mat-cell *matCellDef="let element"> {{ element.anprLocation }} </td>
+</ng-container>
+
+<ng-container matColumnDef="anprMode">
+  <th mat-header-cell *matHeaderCellDef> Mode </th>
+  <td mat-cell *matCellDef="let element"> {{ element.anprMode }} </td>
+</ng-container>
+
 <ng-container matColumnDef="readerport">
   <th mat-header-cell *matHeaderCellDef> Reader Port </th>
   <td mat-cell *matCellDef="let element"> {{ element.readerport }} </td>
@@ -181,11 +221,35 @@
   <td mat-cell *matCellDef="let element"> {{ element.readermode }} </td>
 </ng-container>
 
+<!-- <ng-container matColumnDef="readertype">
+  <th mat-header-cell *matHeaderCellDef> Reader Type </th>
+  <td mat-cell *matCellDef="let element"> {{ element.readertype }} </td>
+</ng-container> -->
+
+
 <ng-container matColumnDef="readertype">
   <th mat-header-cell *matHeaderCellDef> Reader Type </th>
   <td mat-cell *matCellDef="let element"> {{ element.readertype }} </td>
 </ng-container>
-      <ng-container matColumnDef="actions">
+
+<!-- <ng-container matColumnDef="status">
+  <th mat-header-cell *matHeaderCellDef> Status </th>
+  <td mat-cell *matCellDef="let element">
+  <span class="status-pill" [ngClass]="(element.status === 'Connected' || element.status === 'Online') ? 'status-pill--on' : 'status-pill--off'">
+      {{ element.status || 'Disconnected' }}
+    </span>
+  </td>
+</ng-container> -->
+
+<ng-container matColumnDef="status">
+  <th mat-header-cell *matHeaderCellDef> Status </th>
+  <td mat-cell *matCellDef="let element">
+  <span class="status-pill" [ngClass]="(element.status === 'Connected' || element.status === 'Online') ? 'status-pill--on' : 'status-pill--off'">
+      {{ element.status || 'Disconnected' }}
+    </span>
+  </td>
+</ng-container>
+      <!-- <ng-container matColumnDef="actions">
   <th mat-header-cell *matHeaderCellDef> Actions </th>
   <td mat-cell *matCellDef="let element">
 
@@ -213,7 +277,47 @@
       Delete
     </button>
 
+   
+
+  </td>
+</ng-container> -->
+
+
+      <ng-container matColumnDef="actions">
+  <th mat-header-cell *matHeaderCellDef> Actions </th>
+  <td mat-cell *matCellDef="let element">
+
     <button
+      mat-icon-button
+      class="action-icon-btn action-icon-btn--view"
+      matTooltip="View"
+      title="View"
+      (click)="viewData(element)"
+      *ngIf="auth.canView(MODULE_KEY)">
+      <mat-icon>visibility</mat-icon>
+    </button>
+
+    <button
+      mat-icon-button
+      class="action-icon-btn action-icon-btn--edit"
+      matTooltip="Edit"
+      title="Edit"
+      (click)="editData(element)"
+      *ngIf="auth.canUpdate(MODULE_KEY)">
+      <mat-icon>edit</mat-icon>
+    </button>
+
+    <button
+      mat-icon-button
+      class="action-icon-btn action-icon-btn--delete"
+      matTooltip="Delete"
+      title="Delete"
+      (click)="deleteData(element)"
+      *ngIf="auth.canDelete(MODULE_KEY)">
+      <mat-icon>delete</mat-icon>
+    </button>
+
+    <!-- <button
       mat-stroked-button
       class="m-l-10"
       color="primary"
@@ -225,7 +329,7 @@
         returnPath === '/service-provider'
       )">
       {{ element.isBlocked ? 'Revoke' : 'Block' }}
-    </button>
+    </button> -->
 
   </td>
 </ng-container>
@@ -278,6 +382,12 @@
         <td mat-cell *matCellDef="let element"> {{element.isResident ? "Yes" : "No"}} </td>
       </ng-container>
 
+            <!-- Reference (tenant / resident) Column -->
+      <ng-container matColumnDef="referenceName">
+        <th mat-header-cell *matHeaderCellDef> Reference </th>
+        <td mat-cell *matCellDef="let element"> {{element.referenceName}} </td>
+      </ng-container>
+
       <!-- Flat number Column -->
       <ng-container matColumnDef="flatNumber">
         <th mat-header-cell *matHeaderCellDef> Flat Number </th>
@@ -322,7 +432,7 @@
       
 
       <ng-container matColumnDef="nrdName">
-        <th mat-header-cell *matHeaderCellDef> Neighbourhood </th>
+        <th mat-header-cell *matHeaderCellDef> Neighbourhood</th>
         <td mat-cell *matCellDef="let element"> {{element.nrdName}} </td>
       </ng-container>
 

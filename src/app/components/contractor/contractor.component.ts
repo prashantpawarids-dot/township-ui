@@ -98,7 +98,7 @@ export class ContractorComponent implements OnInit, OnDestroy  {
   this.authService.getContractorType().subscribe({
     next: (res: any[]) => {
       // Filter out items where isactive is false
-      this.contractorOptions = res.filter(item => item.isactive !== false);
+     this.contractorOptions = res.filter((item: any) => item.isactive === 1 || item.isactive === true);
     },
     error: (err: any) => {
       this.errorHandlerService.handleError(err);
@@ -411,6 +411,9 @@ export class ContractorComponent implements OnInit, OnDestroy  {
     this.contractor.id = this.contractor.id == undefined ? "0" : this.contractor.id
     this.contractor.mobileNo = this.contractor.mobileNo.toString(); 
       
+    console.log('SAVE PAYLOAD neighbourhood:', this.contractor.neighbourhood); // ← ADD THIS
+  console.log('FULL PAYLOAD:', JSON.stringify(this.contractor));             // ← ADD THIS
+
      let photo = this.contractor.photo; 
     delete this.contractor.photo;
     this.authService.postContractor(this.contractor).subscribe({
@@ -438,6 +441,8 @@ export class ContractorComponent implements OnInit, OnDestroy  {
 
   updateContractor() {
     this.contractor.mobileNo = this.contractor.mobileNo.toString();
+     console.log('UPDATE PAYLOAD neighbourhood:', this.contractor.neighbourhood); // ← ADD THIS
+
     this.authService.updateContractor(this.contractor).subscribe({
       next: (res) => {
         this.alertService.openSuccess('Successfully Updated');

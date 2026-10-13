@@ -56,11 +56,19 @@
     <div class="col-12 col-md-2">
       <mat-form-field appearance="outline" class="w-100">
         <mat-label>Neighbourhood</mat-label>
-        <mat-select multiple formControlName="project" (selectionChange)="onProjectChange()">
+        <!-- <mat-select multiple formControlName="project" (selectionChange)="onProjectChange()">
           <mat-select-trigger>
             {{ reportForm.get('project')?.value | arrayJoin }}
           </mat-select-trigger>
           <mat-option value="ALL" (click)="selectAll('project')">All</mat-option>
+          <mat-option *ngFor="let p of projectList" [value]="p">{{ p }}</mat-option>
+        </mat-select> -->
+
+                <mat-select multiple formControlName="project" (selectionChange)="onProjectChange()">
+          <mat-select-trigger>
+            {{ reportForm.get('project')?.value | arrayJoin }}
+          </mat-select-trigger>
+          <mat-option value="ALL">All</mat-option>
           <mat-option *ngFor="let p of projectList" [value]="p">{{ p }}</mat-option>
         </mat-select>
       </mat-form-field>
@@ -70,11 +78,11 @@
     <div class="col-12 col-md-2">
       <mat-form-field appearance="outline" class="w-100">
         <mat-label>Building</mat-label>
-        <mat-select multiple formControlName="building" (selectionChange)="onBuildingChange()">
+                <mat-select multiple formControlName="building" (selectionChange)="onBuildingChange()">
           <mat-select-trigger>
             {{ reportForm.get('building')?.value | arrayJoin }}
           </mat-select-trigger>
-          <mat-option value="ALL" (click)="selectAll('building')">All</mat-option>
+          <mat-option value="ALL">All</mat-option>
           <!-- <mat-option *ngFor="let b of buildingList" [value]="b">{{ b }}</mat-option> -->
            <mat-option *ngFor="let b of buildingList" [value]="b">{{ buildingLabelMap[b] || b }}</mat-option>
         </mat-select>
@@ -86,7 +94,9 @@
       <mat-form-field appearance="outline" class="w-100">
         <mat-label>Search By</mat-label>
         <mat-select formControlName="searchBy">
-          <mat-option value="vehicleNumber">Reg No</mat-option>
+          <mat-option value="vehicleNumber">Vehicle Number</mat-option>
+          <mat-option value="ownerName">Owner Name</mat-option>
+          <mat-option value="flatNumber">Flat Number</mat-option>
           <mat-option value="stickerNo">Vehicle StickerNo</mat-option>
           <mat-option value="vMake">Vehicle Make</mat-option>
           <mat-option value="vColor">Color</mat-option>
@@ -162,17 +172,16 @@
             Color
             <span *ngIf="getSortColumn() === 'vColor'">{{ getSortDirection() === 'asc' ? '▲' : '▼' }}</span>
           </th>
-          <th (click)="sortColumn('nrdName')">
+        <th (click)="sortColumn('nrdName')">
             Neighbourhood
             <span *ngIf="getSortColumn() === 'nrdName'">{{ getSortDirection() === 'asc' ? '▲' : '▼' }}</span>
           </th>
-          <th>Image</th>
         </tr>
       </thead>
 
       <tbody>
-        <tr *ngIf="!pagedData.length">
-          <td colspan="15" class="text-center">No Data Found</td>
+       <tr *ngIf="!pagedData.length">
+          <td colspan="13" class="text-center">No Data Found</td>
         </tr>
         <tr *ngFor="let d of pagedData; let i = index">
           <td>{{ i + 1 + paginator.pageIndex * paginator.pageSize }}</td>
@@ -188,25 +197,6 @@
           <td>{{ d.stickerNo }}</td>
           <td>{{ d.vColor }}</td>
           <td>{{ d.nrdName }}</td>
-
-          <!-- Image cell -->
-          <td style="white-space:nowrap;">
-            <div style="display:flex; align-items:center; gap:8px;">
-              <img
-                *ngIf="d.numberPlateImage"
-                [src]="d.numberPlateImage"
-                style="height:32px; width:auto; border:1px solid #ccc; border-radius:3px;"
-                [title]="d.vehicleNumber"
-              />
-              <mat-icon
-                *ngIf="d.fullVehicleImage"
-                title="Click to view frame"
-                (click)="openVehiclePopup(d)"
-                style="cursor:pointer; font-size:28px; width:28px; height:28px; color:#1e40af; vertical-align:middle;">
-                {{ d.vehicleCategory === 'Two Wheeler' ? 'two_wheeler' : d.vehicleCategory === 'Three Wheeler' ? 'electric_rickshaw' : 'directions_car' }}
-              </mat-icon>
-            </div>
-          </td>
         </tr>
       </tbody>
     </table>
@@ -236,7 +226,7 @@
     <div class="vp-img-container">
 
       <img
-        [src]="selectedVehicle.cameraFrameImage || selectedVehicle.fullVehicleImage"
+        [src]="selectedPopupImage"
         class="vp-img"
         alt="Vehicle Image"
       />

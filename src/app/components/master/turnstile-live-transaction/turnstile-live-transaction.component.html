@@ -1,0 +1,88 @@
+<div class="ids-panel">
+
+  <div class="reader-table-wrapper card">
+    <div class="reader-table-body">
+      <table class="reader-table">
+        <thead>
+          <tr>
+            <th></th>
+            <th>IP Address</th>
+            <th>NRD</th>
+            <th>Location</th>
+            <th>ModelName</th>
+            <th>Status</th>
+
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            *ngFor="let r of readers"
+            [class.active]="r.code === selectedReaderCode"
+            (click)="selectReader(r.code)"
+          >
+            <td>
+              <span class="status-dot" [class.online]="r.status === 'Connected' || r.status === 'On Line'"></span>
+            </td>
+            <td class="ip-cell">{{ r.readerip }}</td>
+            <td><span class="reader-nrd-badge">{{ r.nrdName }}</span></td>
+            <td>{{ r.readerLocation }}</td>
+             <td>IDS-Controller</td>
+            <td>
+              <span class="reader-status-badge" [class.online]="r.status === 'Connected' || r.status === 'On Line'">
+                {{ r.status }}
+              </span>
+            </td>
+          
+          </tr>
+           
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="user-fields card">
+    <label>User Id <input type="number" [(ngModel)]="userId" /></label>
+    <label>Card No <input type="text" [(ngModel)]="cardNo" /></label>
+    <label>User Name <input type="text" [(ngModel)]="userName" /></label>
+    <label>Employee Id <input type="text" [(ngModel)]="employeeId" /></label>
+
+    <label class="radio-row">
+      Status:
+      <span><input type="radio" [(ngModel)]="activate" [value]="true" name="stat"> Activate</span>
+      <span><input type="radio" [(ngModel)]="activate" [value]="false" name="stat"> DeActivate</span>
+    </label>
+
+    <div class="btn-row">
+      <button (click)="getUser()" class="btn btn-secondary">Get User</button>
+      <button (click)="saveUser()" class="btn btn-primary">Save</button>
+      <button (click)="accessLogUpload()" class="btn btn-light-blue">Access Log Upload</button>
+      <button (click)="accessLogDownload()" class="btn btn-light-blue">Access Log Download</button>
+      <button (click)="openDoor()" class="btn btn-light-blue btn-emergency-outline">Open Door (Emergency)</button>
+    </div>
+
+    
+  </div>
+
+  <div class="status-line" *ngIf="statusMessage">{{ statusMessage }}</div>
+
+  <div class="live-feed card">
+    <div class="feed-header">
+      <span>Live Transactions</span>
+      <button (click)="clearLog()" class="btn btn-clear">Clear</button>
+    </div>
+    <div class="feed-body">
+      <table>
+        <thead>
+          <tr><th>Time</th><th>Detail</th></tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let tx of transactions">
+            <td>{{ tx.time | date:'HH:mm:ss' }}</td>
+            <td>[{{ tx.code }}] {{ tx.detail }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>

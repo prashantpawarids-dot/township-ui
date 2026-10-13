@@ -102,6 +102,13 @@
           </span>
         </th>
 
+              <th (click)="sortColumn('referenceName')">
+          Reference Name
+          <span *ngIf="getSortColumn() === 'referenceName'">
+            {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+          </span>
+        </th>
+
         <th (click)="sortColumn('validFrom')">
           Valid From
           <span *ngIf="getSortColumn() === 'validFrom'">
@@ -134,14 +141,15 @@
 
     <tbody>
       <tr *ngIf="!dataSource.data.length">
-        <td colspan="8" class="text-center fw-bold text-danger">No Data Available</td>
+        <td colspan="9" class="text-center fw-bold text-danger">No Data Available</td>
       </tr>
 
       <tr *ngFor="let row of dataSource.connect() | async; let i = index">
         <td>{{ i + 1 + (paginator.pageIndex * paginator.pageSize) }}</td>
         <td>{{ row.shortName }}</td>
         <td>{{ row.mobileNo }}</td>
-        <td>{{ row.flatNumber }}</td>
+                <td>{{ row.flatNumber }}</td>
+        <td>{{ row.referenceName }}</td>
         <td>{{ row.validFrom | date:'dd-MM-yyyy' }}</td>
         <td>{{ row.validTill | date:'dd-MM-yyyy' }}</td>
         <td>{{ row.buildingName }}</td>

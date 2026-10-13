@@ -82,12 +82,44 @@ export class EmployeeComponent implements OnInit, OnDestroy  {
     }
   }
 
-  addVehicle(vehicle: Vehicle) {
+  // addVehicle(vehicle: Vehicle) {
+  //   vehicle['tagUID'] = this.employee.idNumber;
+  //   this.authService.postLandOwnerVehicle(vehicle).subscribe({
+  //     next: (res) => {
+  //       this.alertService.openSuccess('Vehicle added successfully');
+  //       this.getEmployeeById(Number(this.employee.id));
+  //     },
+  //     error: (err: any) => {
+  //       console.log(err);
+  //       this.errorHandlerService.handleError(err);
+  //       this.cd.detectChanges();
+  //     }
+  //   });
+  // }
+
+
+    addVehicle(vehicle: Vehicle) {
     vehicle['tagUID'] = this.employee.idNumber;
+    const nrdIDs = vehicle.nrdIDs || [];
     this.authService.postLandOwnerVehicle(vehicle).subscribe({
-      next: (res) => {
-        this.alertService.openSuccess('Vehicle added successfully');
-        this.getEmployeeById(Number(this.employee.id));
+      next: (res: any) => {
+        const newVehicleId = res?.id;
+        if (newVehicleId && nrdIDs.length) {
+          this.authService.saveVehicleNRDAccess(newVehicleId, nrdIDs).subscribe({
+            next: () => {
+              this.alertService.openSuccess('Vehicle added and synced to selected project camera(s)');
+              this.getEmployeeById(Number(this.employee.id));
+            },
+            error: (err: any) => {
+              console.log(err);
+              this.alertService.openSuccess('Vehicle added, but project sync failed — edit vehicle to retry');
+              this.getEmployeeById(Number(this.employee.id));
+            }
+          });
+        } else {
+          this.alertService.openSuccess('Vehicle added successfully');
+          this.getEmployeeById(Number(this.employee.id));
+        }
       },
       error: (err: any) => {
         console.log(err);
@@ -97,12 +129,38 @@ export class EmployeeComponent implements OnInit, OnDestroy  {
     });
   }
 
-  updateVehicle(vehicle: Vehicle) {
+  // updateVehicle(vehicle: Vehicle) {
+  //   this.authService.updateLandOwnerVehicle(vehicle).subscribe({
+  //     next: (res) => {
+  //       console.log("Vehicle updated successfully", res);
+  //       this.alertService.openSuccess('Vehicle updated successfully');
+  //       this.getEmployeeById(Number(this.employee.id));
+  //     },
+  //     error: (err: any) => {
+  //       console.log(err);
+  //       this.errorHandlerService.handleError(err);
+  //       this.cd.detectChanges();
+  //     }
+  //   });
+  // }
+
+
+    updateVehicle(vehicle: Vehicle) {
+    const nrdIDs = vehicle.nrdIDs || [];
     this.authService.updateLandOwnerVehicle(vehicle).subscribe({
       next: (res) => {
         console.log("Vehicle updated successfully", res);
-        this.alertService.openSuccess('Vehicle updated successfully');
-        this.getEmployeeById(Number(this.employee.id));
+               this.authService.saveVehicleNRDAccess(Number(vehicle.id), nrdIDs).subscribe({
+          next: () => {
+            this.alertService.openSuccess('Vehicle updated and synced to selected project camera(s)');
+            this.getEmployeeById(Number(this.employee.id));
+          },
+          error: (err: any) => {
+            console.log(err);
+            this.alertService.openSuccess('Vehicle updated, but project sync failed — edit vehicle to retry');
+            this.getEmployeeById(Number(this.employee.id));
+          }
+        });
       },
       error: (err: any) => {
         console.log(err);

@@ -22,6 +22,7 @@ import { DateTimeUtil } from 'src/app/_core/shared/utils//datetime.util';
 import { TableSortService } from 'src/app/_core/shared/services/table-sort.services';
 import { DateAdapter } from '@angular/material/core';
 import { CustomDateAdapter } from 'src/app/_core/shared/utils/custom-date-adapter';
+import { LoaderService } from 'src/app/_core/shared/utils/loader.service';
 
 // ── Pipe: joins array values for mat-select-trigger display ──────────────────
 @Pipe({ name: 'arrayJoin', standalone: true })
@@ -73,9 +74,24 @@ export class VehicleInOutLogComponent implements OnInit, AfterViewInit {
   filteredData: any[] = [];
 
   // ─── Popup ───────────────────────────────────────────────────
+  // selectedVehicle: any = null;
+  // openVehiclePopup(d: any) { this.selectedVehicle = d; }
+  // closeVehiclePopup() { this.selectedVehicle = null; }
+
+
+  // ─── Popup ───────────────────────────────────────────────────
   selectedVehicle: any = null;
-  openVehiclePopup(d: any) { this.selectedVehicle = d; }
-  closeVehiclePopup() { this.selectedVehicle = null; }
+  selectedPopupImage: string = '';
+  openVehiclePopup(d: any, type: 'plate' | 'frame' = 'frame') {
+    this.selectedVehicle = d;
+    this.selectedPopupImage = type === 'plate'
+      ? (d.numberPlateImage || d.cameraFrameImage || d.fullVehicleImage)
+      : (d.cameraFrameImage || d.fullVehicleImage);
+  }
+  closeVehiclePopup() {
+    this.selectedVehicle = null;
+    this.selectedPopupImage = '';
+  }
 
   vehicleTypes = [
     { value: 'ALL', label: 'ALL' },
@@ -90,10 +106,11 @@ export class VehicleInOutLogComponent implements OnInit, AfterViewInit {
     { value: 'OUT', label: 'OUT' }
   ];
 
-  constructor(
+constructor(
     private fb: FormBuilder,
     private http: HttpClient,
-    private sortService: TableSortService
+    private sortService: TableSortService,
+    private loaderService: LoaderService
   ) {
     const today = new Date();
     this.reportForm = this.fb.group({
@@ -211,50 +228,37 @@ export class VehicleInOutLogComponent implements OnInit, AfterViewInit {
 
   getSortColumn(): string { return this.sortService.getSortColumn(); }
   getSortDirection(): 'asc' | 'desc' { return this.sortService.getSortDirection(); }
-
+totalRecords: number = 0;
   //Real API call to fetch vehicle data based on date range and other filters
-  loadVehicleData(fromDate?: Date, toDate?: Date, onLoaded?: (data: any[]) => void) {
+  loadVehicleData(fromDate?: Date, toDate?: Date, onLoaded?: (data: any[]) => void, pageNumber: number = 1, pageSize: number = 50) {
 
-    const from = fromDate || new Date();
-    const to   = toDate   || new Date();
+  const from = fromDate || new Date();
+  const to   = toDate   || new Date();
 
-    const formatDate = (d: Date) => {
-      const day   = String(d.getDate()).padStart(2, '0');
-      const month = d.toLocaleString('en-US', { month: 'short' });
-      const year  = d.getFullYear();
-      return `${day} ${month} ${year}`;
-    };
+  const formatDate = (d: Date) => {
+    const year  = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day   = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
 
-    const apiUrl =
-      `${environment.apiurl}Report/vehicleInoutLog?cameraId=1` +
-      `&fromDateTime=${encodeURIComponent(formatDate(from))}` +
-      `&toDateTime=${encodeURIComponent(formatDate(to))}`;
+const apiUrl =
+    `${environment.apiurl}Report/vehicleInoutLog?cameraId=0` +
+    `&fromDateTime=${encodeURIComponent(formatDate(from))}` +
+    `&toDateTime=${encodeURIComponent(formatDate(to))}`;
 
-    this.http.get<any[]>(apiUrl).subscribe({
+    this.loaderService.show();
+
+   this.http.get<any>(apiUrl).subscribe({
       next: (data) => {
 
-        this.vehicleData = Array.isArray(data)
-          ? data.map(v => {
+       const rows: any[] = Array.isArray(data)
+          ? data
+          : (data?.data ?? []);
+        const totalCount: number = data?.totalCount ?? rows.length;
 
-            let finalImg = '';
-            const img      = v.cameraImage;
-            const frameImg = v.cameraFrameImage;
-            let finalFrameImg = '';
-
-            if (frameImg) {
-              if (frameImg.startsWith('data:image'))   finalFrameImg = frameImg;
-              else if (frameImg.startsWith('http'))     finalFrameImg = frameImg;
-              else if (frameImg.length > 50)            finalFrameImg = `data:image/jpeg;base64,${frameImg}`;
-              else                                      finalFrameImg = this.resolveImageUrl(frameImg);
-            }
-
-            if (img) {
-              if (img.startsWith('data:image'))  finalImg = img;
-              else if (img.startsWith('http'))   finalImg = img;
-              else if (img.length > 50)          finalImg = `data:image/jpeg;base64,${img}`;
-              else                               finalImg = this.resolveImageUrl(img);
-            }
-
+        this.vehicleData = rows
+          ? rows.map((v: any) => {
             return {
               vehicleNumber:   v.vehicleNumber   || '',
               ownerName:       v.ownerName       || '',
@@ -266,9 +270,6 @@ export class VehicleInOutLogComponent implements OnInit, AfterViewInit {
               inoutTime:       v.inoutTime       || '',
               nrdName:         v.nrd             || '',
               vehicleCategory: v.vType           || '',
-              numberPlateImage: finalImg || this.generatePlateImg(v.vehicleNumber || 'UNKNOWN'),
-              fullVehicleImage:  finalImg      || 'assets/images/demo-vehicle.jpg',
-              cameraFrameImage:  finalFrameImg || finalImg || 'assets/images/demo-vehicle.jpg',
               vMake:     v.vMake    || '',
               stickerNo: v.stickerNo || '',
               vColor:    v.vColor   || ''
@@ -276,422 +277,114 @@ export class VehicleInOutLogComponent implements OnInit, AfterViewInit {
           })
           : [];
 
-        this.filteredData         = this.vehicleData;
+       this.filteredData         = this.vehicleData;
         this.displayedData.data   = this.vehicleData;
+        this.totalRecords         = totalCount;
 
         if (this.paginator) {
-          this.paginator.firstPage();
           this.updatePagination();
         }
 
-        if (onLoaded) onLoaded(this.vehicleData);
+     if (onLoaded) onLoaded(this.vehicleData);
+        this.loaderService.hide();
       },
       error: (err) => {
         console.error('❌ PRODUCTION API ERROR:', err);
+        this.loaderService.hide();
       }
     });
   }
 
 
-// Mock data loader for development/testing without real API
-//   loadVehicleData(fromDate?: Date, toDate?: Date, onLoaded?: (data: any[]) => void) {
-//   const today = new Date();
-//   const yesterday = new Date();
-//   yesterday.setDate(today.getDate() - 1);
 
-//   const mockApiData = [
-//     // ===== TODAY (10 records) =====
-//     {
-//       vehicleNumber: 'MH14AB1234',
-//       ownerName: 'Prashant Pawar',
-//       building: 'A Wing',
-//       flatNumber: '101',
-//       cardType: 'Resident',
-//       cameraLocation: 'Gate 1',
-//       inoutFlag: 'IN',
-//       inoutTime: new Date(today.getFullYear(), today.getMonth(), today.getDate(), 8, 15, 0).toISOString(),
-//       nrd: 'Green Valley',
-//       vType: 'Four Wheeler',
-//       vMake: 'Hyundai',
-//       stickerNo: 'ST101',
-//       vColor: 'White',
-//       cameraImage: '',
-//       cameraFrameImage: ''
-//     },
-//     {
-//       vehicleNumber: 'MH12CD5678',
-//       ownerName: 'Amit Sharma',
-//       building: 'B Wing',
-//       flatNumber: '202',
-//       cardType: 'Visitor',
-//       cameraLocation: 'Gate 2',
-//       inoutFlag: 'OUT',
-//       inoutTime: new Date(today.getFullYear(), today.getMonth(), today.getDate(), 9, 5, 0).toISOString(),
-//       nrd: 'Green Valley',
-//       vType: 'Two Wheeler',
-//       vMake: 'Honda',
-//       stickerNo: 'ST102',
-//       vColor: 'Black',
-//       cameraImage: '',
-//       cameraFrameImage: ''
-//     },
-//     {
-//       vehicleNumber: 'MH04EF9012',
-//       ownerName: 'Sneha Patil',
-//       building: 'C Wing',
-//       flatNumber: '303',
-//       cardType: 'Resident',
-//       cameraLocation: 'Main Gate',
-//       inoutFlag: 'IN',
-//       inoutTime: new Date(today.getFullYear(), today.getMonth(), today.getDate(), 10, 20, 0).toISOString(),
-//       nrd: 'Blue Residency',
-//       vType: 'Four Wheeler',
-//       vMake: 'Tata',
-//       stickerNo: 'ST103',
-//       vColor: 'Silver',
-//       cameraImage: '',
-//       cameraFrameImage: ''
-//     },
-//     {
-//       vehicleNumber: 'MH01GH3456',
-//       ownerName: 'Rohit Jain',
-//       building: 'D Wing',
-//       flatNumber: '404',
-//       cardType: 'Guest',
-//       cameraLocation: 'Gate 1',
-//       inoutFlag: 'OUT',
-//       inoutTime: new Date(today.getFullYear(), today.getMonth(), today.getDate(), 11, 45, 0).toISOString(),
-//       nrd: 'Blue Residency',
-//       vType: 'Three Wheeler',
-//       vMake: 'Bajaj',
-//       stickerNo: 'ST104',
-//       vColor: 'Yellow',
-//       cameraImage: '',
-//       cameraFrameImage: ''
-//     },
-//     {
-//       vehicleNumber: 'MH16IJ7890',
-//       ownerName: 'Pooja More',
-//       building: 'E Wing',
-//       flatNumber: '505',
-//       cardType: 'Resident',
-//       cameraLocation: 'Parking Gate',
-//       inoutFlag: 'IN',
-//       inoutTime: new Date(today.getFullYear(), today.getMonth(), today.getDate(), 12, 10, 0).toISOString(),
-//       nrd: 'Palm Court',
-//       vType: 'Two Wheeler',
-//       vMake: 'TVS',
-//       stickerNo: 'ST105',
-//       vColor: 'Red',
-//       cameraImage: '',
-//       cameraFrameImage: ''
-//     },
-//     {
-//       vehicleNumber: 'MH20KL1122',
-//       ownerName: 'Vikas Singh',
-//       building: 'F Wing',
-//       flatNumber: '606',
-//       cardType: 'Vendor',
-//       cameraLocation: 'Service Gate',
-//       inoutFlag: 'OUT',
-//       inoutTime: new Date(today.getFullYear(), today.getMonth(), today.getDate(), 13, 25, 0).toISOString(),
-//       nrd: 'Palm Court',
-//       vType: 'Four Wheeler',
-//       vMake: 'Mahindra',
-//       stickerNo: 'ST106',
-//       vColor: 'Blue',
-//       cameraImage: '',
-//       cameraFrameImage: ''
-//     },
-//     {
-//       vehicleNumber: 'MH21MN3344',
-//       ownerName: 'Neha Kulkarni',
-//       building: 'A Wing',
-//       flatNumber: '107',
-//       cardType: 'Resident',
-//       cameraLocation: 'Gate 2',
-//       inoutFlag: 'IN',
-//       inoutTime: new Date(today.getFullYear(), today.getMonth(), today.getDate(), 14, 5, 0).toISOString(),
-//       nrd: 'Green Valley',
-//       vType: 'Four Wheeler',
-//       vMake: 'Kia',
-//       stickerNo: 'ST107',
-//       vColor: 'Grey',
-//       cameraImage: '',
-//       cameraFrameImage: ''
-//     },
-//     {
-//       vehicleNumber: 'MH22OP5566',
-//       ownerName: 'Karan Mehta',
-//       building: 'B Wing',
-//       flatNumber: '208',
-//       cardType: 'Visitor',
-//       cameraLocation: 'Main Gate',
-//       inoutFlag: 'OUT',
-//       inoutTime: new Date(today.getFullYear(), today.getMonth(), today.getDate(), 15, 30, 0).toISOString(),
-//       nrd: 'Green Valley',
-//       vType: 'Two Wheeler',
-//       vMake: 'Yamaha',
-//       stickerNo: 'ST108',
-//       vColor: 'Blue',
-//       cameraImage: '',
-//       cameraFrameImage: ''
-//     },
-//     {
-//       vehicleNumber: 'MH23QR7788',
-//       ownerName: 'Anjali Deshmukh',
-//       building: 'C Wing',
-//       flatNumber: '309',
-//       cardType: 'Resident',
-//       cameraLocation: 'Parking Gate',
-//       inoutFlag: 'IN',
-//       inoutTime: new Date(today.getFullYear(), today.getMonth(), today.getDate(), 16, 40, 0).toISOString(),
-//       nrd: 'Blue Residency',
-//       vType: 'Four Wheeler',
-//       vMake: 'Maruti',
-//       stickerNo: 'ST109',
-//       vColor: 'White',
-//       cameraImage: '',
-//       cameraFrameImage: ''
-//     },
-//     {
-//       vehicleNumber: 'MH24ST9900',
-//       ownerName: 'Rahul Verma',
-//       building: 'D Wing',
-//       flatNumber: '410',
-//       cardType: 'Guest',
-//       cameraLocation: 'Gate 1',
-//       inoutFlag: 'OUT',
-//       inoutTime: new Date(today.getFullYear(), today.getMonth(), today.getDate(), 18, 0, 0).toISOString(),
-//       nrd: 'Blue Residency',
-//       vType: 'Three Wheeler',
-//       vMake: 'Piaggio',
-//       stickerNo: 'ST110',
-//       vColor: 'Green',
-//       cameraImage: '',
-//       cameraFrameImage: ''
-//     },
 
-//     // ===== YESTERDAY (10 records) =====
-//     {
-//       vehicleNumber: 'MH11AA1111',
-//       ownerName: 'Suresh Patil',
-//       building: 'A Wing',
-//       flatNumber: '102',
-//       cardType: 'Resident',
-//       cameraLocation: 'Gate 1',
-//       inoutFlag: 'IN',
-//       inoutTime: new Date(yesterday.getFullYear(), yesterday.getMonth(), yesterday.getDate(), 8, 10, 0).toISOString(),
-//       nrd: 'Green Valley',
-//       vType: 'Two Wheeler',
-//       vMake: 'Hero',
-//       stickerNo: 'ST201',
-//       vColor: 'Black',
-//       cameraImage: '',
-//       cameraFrameImage: ''
-//     },
-//     {
-//       vehicleNumber: 'MH11BB2222',
-//       ownerName: 'Meera Joshi',
-//       building: 'B Wing',
-//       flatNumber: '203',
-//       cardType: 'Visitor',
-//       cameraLocation: 'Gate 2',
-//       inoutFlag: 'OUT',
-//       inoutTime: new Date(yesterday.getFullYear(), yesterday.getMonth(), yesterday.getDate(), 9, 20, 0).toISOString(),
-//       nrd: 'Green Valley',
-//       vType: 'Four Wheeler',
-//       vMake: 'Toyota',
-//       stickerNo: 'ST202',
-//       vColor: 'Silver',
-//       cameraImage: '',
-//       cameraFrameImage: ''
-//     },
-//     {
-//       vehicleNumber: 'MH11CC3333',
-//       ownerName: 'Akash More',
-//       building: 'C Wing',
-//       flatNumber: '304',
-//       cardType: 'Resident',
-//       cameraLocation: 'Main Gate',
-//       inoutFlag: 'IN',
-//       inoutTime: new Date(yesterday.getFullYear(), yesterday.getMonth(), yesterday.getDate(), 10, 0, 0).toISOString(),
-//       nrd: 'Blue Residency',
-//       vType: 'Four Wheeler',
-//       vMake: 'Skoda',
-//       stickerNo: 'ST203',
-//       vColor: 'Blue',
-//       cameraImage: '',
-//       cameraFrameImage: ''
-//     },
-//     {
-//       vehicleNumber: 'MH11DD4444',
-//       ownerName: 'Ritika Shah',
-//       building: 'D Wing',
-//       flatNumber: '405',
-//       cardType: 'Guest',
-//       cameraLocation: 'Gate 1',
-//       inoutFlag: 'OUT',
-//       inoutTime: new Date(yesterday.getFullYear(), yesterday.getMonth(), yesterday.getDate(), 11, 15, 0).toISOString(),
-//       nrd: 'Blue Residency',
-//       vType: 'Two Wheeler',
-//       vMake: 'Suzuki',
-//       stickerNo: 'ST204',
-//       vColor: 'Red',
-//       cameraImage: '',
-//       cameraFrameImage: ''
-//     },
-//     {
-//       vehicleNumber: 'MH11EE5555',
-//       ownerName: 'Nitin Kale',
-//       building: 'E Wing',
-//       flatNumber: '506',
-//       cardType: 'Resident',
-//       cameraLocation: 'Parking Gate',
-//       inoutFlag: 'IN',
-//       inoutTime: new Date(yesterday.getFullYear(), yesterday.getMonth(), yesterday.getDate(), 12, 35, 0).toISOString(),
-//       nrd: 'Palm Court',
-//       vType: 'Three Wheeler',
-//       vMake: 'Bajaj',
-//       stickerNo: 'ST205',
-//       vColor: 'Yellow',
-//       cameraImage: '',
-//       cameraFrameImage: ''
-//     },
-//     {
-//       vehicleNumber: 'MH11FF6666',
-//       ownerName: 'Komal Patne',
-//       building: 'F Wing',
-//       flatNumber: '607',
-//       cardType: 'Vendor',
-//       cameraLocation: 'Service Gate',
-//       inoutFlag: 'OUT',
-//       inoutTime: new Date(yesterday.getFullYear(), yesterday.getMonth(), yesterday.getDate(), 13, 40, 0).toISOString(),
-//       nrd: 'Palm Court',
-//       vType: 'Four Wheeler',
-//       vMake: 'Ford',
-//       stickerNo: 'ST206',
-//       vColor: 'White',
-//       cameraImage: '',
-//       cameraFrameImage: ''
-//     },
-//     {
-//       vehicleNumber: 'MH11GG7777',
-//       ownerName: 'Priya Nair',
-//       building: 'A Wing',
-//       flatNumber: '108',
-//       cardType: 'Resident',
-//       cameraLocation: 'Gate 2',
-//       inoutFlag: 'IN',
-//       inoutTime: new Date(yesterday.getFullYear(), yesterday.getMonth(), yesterday.getDate(), 14, 25, 0).toISOString(),
-//       nrd: 'Green Valley',
-//       vType: 'Two Wheeler',
-//       vMake: 'Activa',
-//       stickerNo: 'ST207',
-//       vColor: 'Grey',
-//       cameraImage: '',
-//       cameraFrameImage: ''
-//     },
-//     {
-//       vehicleNumber: 'MH11HH8888',
-//       ownerName: 'Sameer Khan',
-//       building: 'B Wing',
-//       flatNumber: '209',
-//       cardType: 'Visitor',
-//       cameraLocation: 'Main Gate',
-//       inoutFlag: 'OUT',
-//       inoutTime: new Date(yesterday.getFullYear(), yesterday.getMonth(), yesterday.getDate(), 15, 10, 0).toISOString(),
-//       nrd: 'Green Valley',
-//       vType: 'Four Wheeler',
-//       vMake: 'Honda',
-//       stickerNo: 'ST208',
-//       vColor: 'Brown',
-//       cameraImage: '',
-//       cameraFrameImage: ''
-//     },
-//     {
-//       vehicleNumber: 'MH11II9999',
-//       ownerName: 'Deepali Chavan',
-//       building: 'C Wing',
-//       flatNumber: '310',
-//       cardType: 'Resident',
-//       cameraLocation: 'Parking Gate',
-//       inoutFlag: 'IN',
-//       inoutTime: new Date(yesterday.getFullYear(), yesterday.getMonth(), yesterday.getDate(), 16, 50, 0).toISOString(),
-//       nrd: 'Blue Residency',
-//       vType: 'Four Wheeler',
-//       vMake: 'MG',
-//       stickerNo: 'ST209',
-//       vColor: 'Black',
-//       cameraImage: '',
-//       cameraFrameImage: ''
-//     },
-//     {
-//       vehicleNumber: 'MH11JJ0000',
-//       ownerName: 'Arun Salunkhe',
-//       building: 'D Wing',
-//       flatNumber: '411',
-//       cardType: 'Guest',
-//       cameraLocation: 'Gate 1',
-//       inoutFlag: 'OUT',
-//       inoutTime: new Date(yesterday.getFullYear(), yesterday.getMonth(), yesterday.getDate(), 18, 5, 0).toISOString(),
-//       nrd: 'Blue Residency',
-//       vType: 'Three Wheeler',
-//       vMake: 'Atul',
-//       stickerNo: 'ST210',
-//       vColor: 'Blue',
-//       cameraImage: '',
-//       cameraFrameImage: ''
-//     }
-//   ];
+  // onProjectChange() {
+  //   let selected: string[] = this.reportForm.get('project')?.value || [];
 
-//   this.vehicleData = mockApiData.map(v => {
-//     const plateImg = this.generatePlateImg(v.vehicleNumber || 'UNKNOWN');
+  //   if (selected.includes('ALL')) {
+  //     // ALL just checked — select all real items
+  //     selected = ['ALL', ...this.projectList];
+  //     this.reportForm.get('project')?.setValue(selected);
+  //   } else {
+  //     // A real item was unchecked — remove ALL, keep only real selected
+  //     const withoutAll = selected.filter(p => p !== 'ALL');
+  //     this.reportForm.get('project')?.setValue(withoutAll);
+  //     selected = withoutAll;
+  //   }
 
-//     return {
-//       vehicleNumber: v.vehicleNumber || '',
-//       ownerName: v.ownerName || '',
-//       building: v.building || '',
-//       flatNumber: v.flatNumber || '',
-//       cardType: v.cardType || '',
-//       cameraLocation: v.cameraLocation || '',
-//       inoutFlag: v.inoutFlag || '',
-//       inoutTime: v.inoutTime || '',
-//       nrdName: v.nrd || '',
-//       vehicleCategory: v.vType || '',
-//       numberPlateImage: plateImg,
-//       fullVehicleImage: 'assets/images/demo-vehicle.jpg',
-//       cameraFrameImage: 'assets/images/demo-vehicle.jpg',
-//       vMake: v.vMake || '',
-//       stickerNo: v.stickerNo || '',
-//       vColor: v.vColor || ''
-//     };
-//   });
+  //   const realSelected = selected.filter(p => p !== 'ALL');
 
-//   this.filteredData = this.vehicleData;
-//   this.displayedData.data = this.vehicleData;
+  //   if (!realSelected.length) {
+  //     this.buildingList = [...new Set(this.allBuildings.map(b => b.name))];
+  //   } else {
+  //     const filtered = this.allBuildings
+  //       .filter(b => realSelected.includes(b.nrdName))
+  //       .map(b => b.name);
+  //     this.buildingList = [...new Set(filtered)];
+  //   }
+  // }
 
-//   if (this.paginator) {
-//     this.paginator.firstPage();
-//     this.updatePagination();
-//   }
+  // onBuildingChange() {
+  //   let selected: string[] = this.reportForm.get('building')?.value || [];
+  //   if (selected.includes('ALL')) {
+  //     selected = ['ALL', ...this.buildingList];
+  //     this.reportForm.get('building')?.setValue(selected);
+  //   } else {
+  //     const withoutAll = selected.filter(b => b !== 'ALL');
+  //     this.reportForm.get('building')?.setValue(withoutAll);
+  //   }
+  // }
 
-//   if (onLoaded) onLoaded(this.vehicleData);
-// }
+  // onVehicleTypeChange() {
+  //   let selected: string[] = this.reportForm.get('vehicleType')?.value || [];
+  //   if (selected.includes('ALL')) {
+  //     const allValues = ['ALL', ...this.vehicleTypes.filter(v => v.value !== 'ALL').map(v => v.value)];
+  //     this.reportForm.get('vehicleType')?.setValue(allValues);
+  //   } else {
+  //     const withoutAll = selected.filter(v => v !== 'ALL');
+  //     this.reportForm.get('vehicleType')?.setValue(withoutAll);
+  //   }
+  // }
+
+  // onInOutChange() {
+  //   let selected: string[] = this.reportForm.get('inOut')?.value || [];
+  //   if (selected.includes('ALL')) {
+  //     const allValues = ['ALL', ...this.inOutOptions.filter(v => v.value !== 'ALL').map(v => v.value)];
+  //     this.reportForm.get('inOut')?.setValue(allValues);
+  //   } else {
+  //     const withoutAll = selected.filter(v => v !== 'ALL');
+  //     this.reportForm.get('inOut')?.setValue(withoutAll);
+  //   }
+  // }
+
+
+
+
+    // ── track previous selection so we know if ALL was just checked/unchecked
+  //    vs an individual item being toggled while ALL was already selected ──
+  prevProjectSelection: string[] = [];
+  prevBuildingSelection: string[] = [];
+  prevVehicleTypeSelection: string[] = [];
+  prevInOutSelection: string[] = [];
 
   onProjectChange() {
     let selected: string[] = this.reportForm.get('project')?.value || [];
+    const hadAll = this.prevProjectSelection.includes('ALL');
+    const hasAll = selected.includes('ALL');
 
-    if (selected.includes('ALL')) {
-      // ALL just checked — select all real items
+    if (hasAll && !hadAll) {
+      // ALL just checked → select everything
       selected = ['ALL', ...this.projectList];
-      this.reportForm.get('project')?.setValue(selected);
-    } else {
-      // A real item was unchecked — remove ALL, keep only real selected
-      const withoutAll = selected.filter(p => p !== 'ALL');
-      this.reportForm.get('project')?.setValue(withoutAll);
-      selected = withoutAll;
+    } else if (!hasAll && hadAll) {
+      // ALL just unchecked → clear everything
+      selected = [];
+    } else if (hasAll && selected.length <= this.projectList.length) {
+      // an individual item unchecked while ALL was already selected → drop ALL token
+      selected = selected.filter(p => p !== 'ALL');
     }
+
+        this.prevProjectSelection = selected;
+    setTimeout(() => this.reportForm.get('project')?.setValue(selected, { emitEvent: false }));
 
     const realSelected = selected.filter(p => p !== 'ALL');
 
@@ -707,38 +400,56 @@ export class VehicleInOutLogComponent implements OnInit, AfterViewInit {
 
   onBuildingChange() {
     let selected: string[] = this.reportForm.get('building')?.value || [];
-    if (selected.includes('ALL')) {
+    const hadAll = this.prevBuildingSelection.includes('ALL');
+    const hasAll = selected.includes('ALL');
+
+    if (hasAll && !hadAll) {
       selected = ['ALL', ...this.buildingList];
-      this.reportForm.get('building')?.setValue(selected);
-    } else {
-      const withoutAll = selected.filter(b => b !== 'ALL');
-      this.reportForm.get('building')?.setValue(withoutAll);
+    } else if (!hasAll && hadAll) {
+      selected = [];
+    } else if (hasAll && selected.length <= this.buildingList.length) {
+      selected = selected.filter(b => b !== 'ALL');
     }
+
+        this.prevVehicleTypeSelection = selected;
+    this.reportForm.get('vehicleType')?.setValue(selected, { emitEvent: false });
   }
 
   onVehicleTypeChange() {
     let selected: string[] = this.reportForm.get('vehicleType')?.value || [];
-    if (selected.includes('ALL')) {
-      const allValues = ['ALL', ...this.vehicleTypes.filter(v => v.value !== 'ALL').map(v => v.value)];
-      this.reportForm.get('vehicleType')?.setValue(allValues);
-    } else {
-      const withoutAll = selected.filter(v => v !== 'ALL');
-      this.reportForm.get('vehicleType')?.setValue(withoutAll);
+    const realOptions = this.vehicleTypes.filter(v => v.value !== 'ALL').map(v => v.value);
+    const hadAll = this.prevVehicleTypeSelection.includes('ALL');
+    const hasAll = selected.includes('ALL');
+
+    if (hasAll && !hadAll) {
+      selected = ['ALL', ...realOptions];
+    } else if (!hasAll && hadAll) {
+      selected = [];
+    } else if (hasAll && selected.length <= realOptions.length) {
+      selected = selected.filter(v => v !== 'ALL');
     }
+
+        this.prevVehicleTypeSelection = selected;
+    setTimeout(() => this.reportForm.get('vehicleType')?.setValue(selected, { emitEvent: false }));
   }
 
   onInOutChange() {
     let selected: string[] = this.reportForm.get('inOut')?.value || [];
-    if (selected.includes('ALL')) {
-      const allValues = ['ALL', ...this.inOutOptions.filter(v => v.value !== 'ALL').map(v => v.value)];
-      this.reportForm.get('inOut')?.setValue(allValues);
-    } else {
-      const withoutAll = selected.filter(v => v !== 'ALL');
-      this.reportForm.get('inOut')?.setValue(withoutAll);
-    }
-  }
+    const realOptions = this.inOutOptions.filter(v => v.value !== 'ALL').map(v => v.value);
+    const hadAll = this.prevInOutSelection.includes('ALL');
+    const hasAll = selected.includes('ALL');
 
-  selectAll(type: 'project' | 'building') {
+    if (hasAll && !hadAll) {
+      selected = ['ALL', ...realOptions];
+    } else if (!hasAll && hadAll) {
+      selected = [];
+    } else if (hasAll && selected.length <= realOptions.length) {
+      selected = selected.filter(v => v !== 'ALL');
+    }
+    this.prevInOutSelection = selected;
+    setTimeout(() => this.reportForm.get('inOut')?.setValue(selected, { emitEvent: false }));
+  }
+   selectAll(type: 'project' | 'building') {
     if (type === 'project') {
       this.reportForm.get('project')?.setValue(['ALL', ...this.projectList]);
       this.onProjectChange();
@@ -753,6 +464,8 @@ export class VehicleInOutLogComponent implements OnInit, AfterViewInit {
     if (/T\d{2}:\d{2}:\d{2}\.\d{2}$/.test(dateStr)) dateStr = dateStr + '0';
     return new Date(dateStr);
   }
+
+  
 
   // ── PRODUCTION showReports ─────────────────────────────────────────────────
   showReports() {
@@ -777,13 +490,15 @@ export class VehicleInOutLogComponent implements OnInit, AfterViewInit {
 
         // ── Date range filter ─────────────────────────────────────────────────
         if (fromDate) {
-          const from = new Date(fromDate);
+          const fd = new Date(fromDate);
+          const from = new Date(fd.getFullYear(), fd.getMonth(), fd.getDate());
           from.setHours(0, 0, 0, 0);
           filtered = filtered.filter(x => this.fixDateFormat(x.inoutTime).getTime() >= from.getTime());
         }
 
         if (toDate) {
-          const to = new Date(toDate);
+          const td = new Date(toDate);
+          const to = new Date(td.getFullYear(), td.getMonth(), td.getDate());
           to.setHours(23, 59, 59, 999);
           filtered = filtered.filter(x => this.fixDateFormat(x.inoutTime).getTime() <= to.getTime());
         }
@@ -822,7 +537,17 @@ export class VehicleInOutLogComponent implements OnInit, AfterViewInit {
           );
         }
 
-        filtered = sortByTimeOnly(filtered, 'inoutTime', 'asc');
+  //       filtered = sortByTimeOnly(filtered, 'inoutTime', 'asc');
+  //       this.filteredData       = filtered;
+  //       this.displayedData.data = filtered;
+  //       this.paginator.firstPage();
+  //       this.updatePagination();
+  //     }
+  //   );
+  // }
+
+          this.sortService.setSortColumn('inoutTime', 'asc');
+        filtered = this.sortService.sortData([...filtered], 'inoutTime');
         this.filteredData       = filtered;
         this.displayedData.data = filtered;
         this.paginator.firstPage();

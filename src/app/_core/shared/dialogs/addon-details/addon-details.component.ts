@@ -1,4 +1,6 @@
-import { Component, ElementRef, inject, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+// import { Component, ElementRef, inject, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+// import { MatDialogTitle, MatDialogContent, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { Component, ElementRef, inject, OnInit, ViewChild, ViewEncapsulation, Inject } from '@angular/core';
 import { MatDialogTitle, MatDialogContent, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MaterialModule } from '../../material/material.module';
 import { FormsModule } from '@angular/forms';
@@ -27,10 +29,26 @@ export class AddonDetailsComponent implements OnInit {
     
     // dataSourceVehicle = new AddonDataSource(this.vehicleList);
     // add access rights
+  // isView: boolean = true;
+  // tenantType!: number;
+  // constructor(private dialogRef: MatDialogRef<AddonDetailsComponent>, private authService: AuthService) {
+  //   // console.log("addonData", this.addonData)
+  // }
+  // ngOnInit(): void {
+
+
   isView: boolean = true;
   tenantType!: number;
-  constructor(private dialogRef: MatDialogRef<AddonDetailsComponent>, private authService: AuthService) {
-    // console.log("addonData", this.addonData)
+  constructor(
+    private dialogRef: MatDialogRef<AddonDetailsComponent>,
+    private authService: AuthService,
+    @Inject(MAT_DIALOG_DATA) public dialogData: any
+  ) {
+    if (this.dialogData) {
+      this.addonData = this.dialogData.addonData;
+      this.isView = this.dialogData.isView;
+      this.tenantType = this.dialogData.tenantType;
+    }
   }
   ngOnInit(): void {
     // console.log("addonData", this.addonData)

@@ -22,7 +22,9 @@ import { DateTimeUtil } from 'src/app/_core/shared/utils//datetime.util';
 import { TableSortService } from 'src/app/_core/shared/services/table-sort.services';
 import { DateAdapter } from '@angular/material/core';
 import { CustomDateAdapter } from 'src/app/_core/shared/utils/custom-date-adapter';
+// import { LoaderService } from 'src/app/_core/shared/utils/loader.service';
 import { LoaderService } from 'src/app/_core/shared/utils/loader.service';
+import { AuthService } from 'src/app/services/auth.service';
 
 // ── Pipe: joins array values for mat-select-trigger display ──────────────────
 @Pipe({ name: 'arrayJoin', standalone: true })
@@ -69,68 +71,121 @@ export class UnauthorizedComponent implements OnInit, AfterViewInit {
 
   // ─── Popup ───────────────────────────────────────────────────
   selectedVehicle: any = null;
-  selectedVehicleImage: string = '';
+  // selectedVehicleImage: string = '';
+    selectedVehicleImage: string = '';
+  selectedPlateImage: string = '';
+  imageLoading: boolean = false;
+  imageSyncing: boolean = false;
   private prevInOut: string[] = [];
 
 openVehiclePopup(d: any, type: 'in' | 'out') {
-  this.selectedVehicle = d;
+    this.selectedVehicle = d;
+  this.selectedPlateImage = '';
+  this.selectedVehicleImage = '';
+  this.imageSyncing = false;
 
-  const rawImage = type === 'out'
-    ? (d.outCameraImageRaw || d.inCameraImageRaw)
-    : d.inCameraImageRaw;
+  const uniqueId = type === 'out' ? d.outUniqueId : d.inUniqueId;
 
-  if (!rawImage) {
-    this.selectedVehicleImage = 'assets/images/demo-vehicle.jpg';
+  // Koi unique_id hi nahi hai — matlab image link kabhi bana hi nahi
+  if (!uniqueId) {
+    this.imageLoading = false;
+    this.imageSyncing = true;
     return;
   }
 
-  if (rawImage.startsWith('data:image')) {
-    this.selectedVehicleImage = rawImage;
-    return;
-  }
+  this.imageLoading = true;
 
-  if (rawImage.startsWith('http')) {
-    this.selectedVehicleImage = rawImage;
-    return;
-  }
+  // this.http.get<any>(`${environment.apiurl}Report/VehicleImage/${uniqueId}`).subscribe({
+    this.authService.getVehicleImage(uniqueId).subscribe({
+    next: (res) => {
+      this.imageLoading = false;
+      // if (res?.image) {
+            if (res?.frameImage) {
 
-  if (rawImage.startsWith('assets/')) {
-    this.selectedVehicleImage = rawImage;
-    return;
-  }
-
-  if (rawImage.length > 50) {
-    this.selectedVehicleImage = `data:image/jpeg;base64,${rawImage}`;
-    return;
-  }
-
-  this.selectedVehicleImage = this.resolveImageUrl(rawImage);
+                      this.selectedVehicleImage = res.frameImage;
+        this.selectedPlateImage = res?.plateImage || '';
+        this.imageSyncing = false;
+      } else {
+        this.imageSyncing = true;
+      }
+    },
+    error: () => {
+      // Image abhi tak camera se sync nahi hui, ya permanently missing
+      this.imageLoading = false;
+      this.imageSyncing = true;
+    }
+  });
 }
 
-  closeVehiclePopup() {
-    this.selectedVehicle = null;
+    closeVehiclePopup() {
+    // this.selectedVehicle = null;
+        this.selectedVehicle = null;
+    this.selectedPlateImage = '';
     this.selectedVehicleImage = '';
+    this.imageLoading = false;
+    this.imageSyncing = false;
+  }
+
+  getVehicleIcon(vehicleTypeLabel: string): string {
+    const type = (vehicleTypeLabel || '').toLowerCase();
+    if (type.includes('two')) {
+      return 'two_wheeler';
+    }
+    if (type.includes('three') || type.includes('auto') || type.includes('rickshaw')) {
+      return 'electric_rickshaw';
+    }
+    return 'directions_car'; // Four Wheeler / Unknown
   }
 
   // IN/OUT filter options — no "ALL" toggle needed, kept simple with ALL option
-  inOutOptions = [
+  // inOutOptions = [
+  //   { value: 'ALL', label: 'ALL' },
+  //   { value: 'IN',  label: 'IN'  },
+  //   { value: 'OUT', label: 'OUT' }
+  // ];
+
+
+    inOutOptions = [
     { value: 'ALL', label: 'ALL' },
     { value: 'IN',  label: 'IN'  },
     { value: 'OUT', label: 'OUT' }
+  ];
+
+  neighbourhoodOptions = [
+    { value: 'ALL',           label: 'All' },
+    { value: 'Falcon Towers', label: 'Falcon Towers' },
+    { value: 'Skylark',       label: 'Skylark' }
+  ];
+
+   private currentFromDate: Date | null = null;
+  private currentToDate: Date | null = null;
+  private currentSearchValue: string = '';
+  private currentNeighbourhood: string = 'ALL';
+   private currentInOut: string[] = [];
+   private currentExitStatus: string = 'ALL';
+
+  exitStatusOptions = [
+    { value: 'ALL',        label: 'All' },
+        { value: 'NOT_EXITED', label: 'Not Exited' },
+        { value: 'EXITED',     label: 'Exited' },
+    { value: 'EXIT_ONLY',  label: 'Exit only (no entry)' }
   ];
 
   constructor(
     private fb: FormBuilder,
     private http: HttpClient,
     private sortService: TableSortService,
-     private loaderService: LoaderService
+     private loaderService: LoaderService,
+    private authService: AuthService
   ) {
     const today = new Date();
-    this.reportForm = this.fb.group({
-      fromDate:    [today],
-      toDate:      [today],
-      inOut:       [[]],
-      searchValue: ['']
+        this.reportForm = this.fb.group({
+      fromDate:      [today],
+      toDate:        [today],
+      inOut:         [[]],
+            searchValue:   [''],
+      neighbourhood: ['ALL'],
+      exitStatus:    ['ALL']
     });
   }
 
@@ -212,9 +267,80 @@ openVehiclePopup(d: any, type: 'in' | 'out') {
   getSortColumn(): string { return this.sortService.getSortColumn(); }
   getSortDirection(): 'asc' | 'desc' { return this.sortService.getSortDirection(); }
 
-  //Production version would call API with filters and get already filtered/sorted/paged data. Here we load all and do it client-side for demo/testing purposes.
+  
 
-loadVehicleData(fromDate?: Date, toDate?: Date, onLoaded?: (data: any[]) => void) {
+
+
+// totalCount = 0;
+
+// loadVehicleData(fromDate?: Date, toDate?: Date, pageNumber = 1, pageSize = 25, searchVehicle = '', onLoaded?: (data: any[]) => void) {
+//   const from = fromDate || new Date();
+//   const to   = toDate   || new Date();
+
+//   const formatDate = (d: Date) => {
+//     const day   = String(d.getDate()).padStart(2, '0');
+//     const month = d.toLocaleString('en-US', { month: 'short' });
+//     const year  = d.getFullYear();
+//     return `${day} ${month} ${year}`;
+//   };
+
+//   const apiUrl =
+//     `${environment.apiurl}Report/UnAuthorisedVehicleInoutRegister` +
+//     `?fromDateTime=${encodeURIComponent(formatDate(from))}` +
+//     `&toDateTime=${encodeURIComponent(formatDate(to))}` +
+//     `&pageNumber=${pageNumber}` +
+//     `&pageSize=${pageSize}` +
+//     `&searchVehicle=${encodeURIComponent(searchVehicle)}`;
+
+//   this.loaderService.show();
+
+//   this.http.get<any>(apiUrl).subscribe({
+//     next: (res) => {
+//       const data = res?.data ?? [];
+//       this.totalCount = res?.totalCount ?? 0;
+
+//       this.vehicleData = data.map((v: any) => ({
+//         id:                v.id || v.vehicleNumber || '',
+//         vehicleNumber:     v.vehicleNumber     || '',
+//         tagUID:            v.tagUID            || '',
+//         idNumber:          v.idNumber          || '',
+//         ownerName:         v.ownerName         || '',
+//         building:          v.building          || '',
+//         cardType:          v.cardType          || '',
+//         flatNumber:        v.flatNumber        || '',
+//         inCameraLocation:  v.inCameraLocation  || '',
+//         outCameraLocation: v.outCameraLocation || '',
+//         inTime:            v.inTime            || '',
+//         outTime:           v.outTime           || '',
+//         inoutFlag:         v.outTime && !v.inTime ? 'OUT' : 'IN',
+//         inCameraImageRaw:  v.inCameraImage     || '',
+//         outCameraImageRaw: v.outCameraImage    || '',
+//         numberPlateImage:  this.generatePlateImg(v.vehicleNumber || 'UNKNOWN'),
+//         inCameraImage:     '',
+//         outCameraImage:    ''
+//       }));
+
+//       this.filteredData       = this.vehicleData;
+//       this.displayedData.data = this.vehicleData;
+//       this.paginator.length   = this.totalCount;
+//       this.pagedData          = this.vehicleData;
+
+//       if (onLoaded) onLoaded(this.vehicleData);
+//       this.loaderService.hide();
+//     },
+//     error: (err) => {
+//       console.error('❌ API ERROR (Unauthorized):', err);
+//       this.loaderService.hide();
+//     }
+//   });
+// }
+
+
+// loadVehicleData(fromDate?: Date, toDate?: Date, pageNumber = 1, pageSize = 25, searchVehicle = '', onLoaded?: (data: any[]) => void) {
+//   const from = fromDate || new Date();
+//   const to   = toDate   || new Date();
+
+loadVehicleData(fromDate?: Date, toDate?: Date, pageNumber = 1, pageSize = 25, searchVehicle = '', neighbourhood = 'ALL', onLoaded?: (data: any[]) => void) {
   const from = fromDate || new Date();
   const to   = toDate   || new Date();
 
@@ -225,57 +351,68 @@ loadVehicleData(fromDate?: Date, toDate?: Date, onLoaded?: (data: any[]) => void
     return `${day} ${month} ${year}`;
   };
 
-  const apiUrl =
+  
+
+
+    // const apiUrl =
+    // `${environment.apiurl}Report/UnAuthorisedVehicleInoutRegister` +
+    // `?fromDateTime=${encodeURIComponent(formatDate(from))}` +
+    // `&toDateTime=${encodeURIComponent(formatDate(to))}` +
+    // `&pageNumber=${pageNumber}&pageSize=${pageSize}` +
+    // `&searchVehicle=${encodeURIComponent(searchVehicle)}`;
+
+
+                const apiUrl =
     `${environment.apiurl}Report/UnAuthorisedVehicleInoutRegister` +
     `?fromDateTime=${encodeURIComponent(formatDate(from))}` +
-    `&toDateTime=${encodeURIComponent(formatDate(to))}`;
-
+    `&toDateTime=${encodeURIComponent(formatDate(to))}` +
+    `&pageNumber=${pageNumber}&pageSize=${pageSize}` +
+    `&searchVehicle=${encodeURIComponent(searchVehicle)}` +
+    `&neighbourhood=${encodeURIComponent(neighbourhood === 'ALL' ? '' : neighbourhood)}` +
+        `&inOut=${encodeURIComponent(this.currentInOut.join(','))}` +
+        `&exitStatus=${this.currentExitStatus}`;
   this.loaderService.show();
 
-  this.http.get<any[]>(apiUrl).subscribe({
-    next: (data) => {
-      this.vehicleData = Array.isArray(data)
-        ? data.map(v => {
-            const inoutFlag = v.outTime && !v.inTime ? 'OUT' : 'IN';
+  this.http.get<any>(apiUrl).subscribe({
+    next: (res) => {
+      const data = res?.data ?? [];
 
-            return {
-              id:                v.id || v.vehicleNumber || '',
-              vehicleNumber:     v.vehicleNumber     || '',
-              tagUID:            v.tagUID            || '',
-              idNumber:          v.idNumber          || '',
-              ownerName:         v.ownerName         || '',
-              building:          v.building          || '',
-              cardType:          v.cardType          || '',
-              flatNumber:        v.flatNumber        || '',
-              inCameraLocation:  v.inCameraLocation  || '',
-              outCameraLocation: v.outCameraLocation || '',
-              inTime:            v.inTime            || '',
-              outTime:           v.outTime           || '',
-              inoutFlag,
+         let mapped = data.map((v: any) => ({
+    id:                v.id || v.vehicleNumber || '',
+    vehicleNumber:     v.vehicleNumber     || '',
+    tagUID:            v.tagUID            || '',
+    idNumber:          v.idNumber          || '',
+    ownerName:         v.ownerName         || '',
+    building:          v.building          || '',
+    cardType:          v.cardType          || '',
+    flatNumber:        v.flatNumber        || '',
+    inCameraLocation:  v.inCameraLocation  || '',
+    outCameraLocation: v.outCameraLocation || '',
+    inTime:            v.inTime            || '',
+    outTime:           v.outTime           || '',
+    inoutFlag:         v.outTime ? 'OUT' : 'IN',
+          inUniqueId:        v.inUniqueId  || '',
+    outUniqueId:       v.outUniqueId || '',
+  vehicleTypeLabel:  v.vehicleTypeLabel || 'Four Wheeler',
+    numberPlateImage:  this.generatePlateImg(v.vehicleNumber || 'UNKNOWN'),
+    inCameraImage:     '',
+    outCameraImage:    ''
+  }));
 
-              // Keep table data light for fast search/filter
-              inCameraImageRaw:  v.inCameraImage || '',
-              outCameraImageRaw: v.outCameraImage || '',
+           // ── IN/OUT aur Neighbourhood ab backend (SQL) mein filter ho rahe hain,
+      //    isliye yahan client-side filtering ki zaroorat nahi — mapped as-is use hoga.
 
-              // Lightweight default image for number plate export/display
-              numberPlateImage: this.generatePlateImg(v.vehicleNumber || 'UNKNOWN'),
+      
+      this.sortService.setSortColumn('inTime', 'asc');
+      const sortedMapped = this.sortService.sortData([...mapped], 'inTime');
 
-              // Do not process heavy images here
-              inCameraImage: '',
-              outCameraImage: ''
-            };
-          })
-        : [];
+      this.totalCount    = res?.totalCount ?? sortedMapped.length;
+      this.pagedData      = sortedMapped;
+      this.vehicleData    = sortedMapped;
+      this.displayedData.data = sortedMapped;
+      if (this.paginator) this.paginator.length = this.totalCount;
 
-      this.filteredData       = this.vehicleData;
-      this.displayedData.data = this.vehicleData;
-
-      if (this.paginator) {
-        this.paginator.firstPage();
-        this.updatePagination();
-      }
-
-      if (onLoaded) onLoaded(this.vehicleData);
+      if (onLoaded) onLoaded(this.pagedData);
       this.loaderService.hide();
     },
     error: (err) => {
@@ -285,59 +422,9 @@ loadVehicleData(fromDate?: Date, toDate?: Date, onLoaded?: (data: any[]) => void
   });
 }
 
+totalCount = 0;
 
-// ── Mock data loader with 3 sec delay to test loader and performance with large data ───────────────
-// loadVehicleData(fromDate?: Date, toDate?: Date, onLoaded?: (data: any[]) => void) {
-//   const from = fromDate || new Date();
-//   const to   = toDate   || new Date();
 
-//   this.loaderService.show();
-
-//   setTimeout(() => {
-//     const testData = Array.from({ length: 5000 }, (_, i) => {
-//       const hasOut = i % 3 === 0;
-
-//       return {
-//         id: i + 1,
-//         vehicleNumber: `MH12AB${String(i).padStart(4, '0')}`,
-//         tagUID: `TAG${i + 1000}`,
-//         idNumber: `ID${i + 1}`,
-//         ownerName: `Owner ${i + 1}`,
-//         building: `Building ${((i % 5) + 1)}`,
-//         cardType: 'Visitor',
-//         flatNumber: `${(i % 20) + 1}0${(i % 10) + 1}`,
-//         inCameraLocation: 'Main Gate IN',
-//         outCameraLocation: hasOut ? 'Main Gate OUT' : '',
-//         inTime: new Date(from.getTime() + i * 60000).toISOString(),
-//         outTime: hasOut ? new Date(to.getTime() + i * 60000).toISOString() : '',
-//         inoutFlag: hasOut ? 'OUT' : 'IN',
-
-//         // fake raw image text
-//         inCameraImageRaw: '',
-//         outCameraImageRaw: '',
-
-//         // lightweight plate image
-//         numberPlateImage: this.generatePlateImg(`MH12AB${String(i).padStart(4, '0')}`),
-
-//         inCameraImage: '',
-//         outCameraImage: ''
-//       };
-//     });
-
-//     this.vehicleData = testData;
-//     this.filteredData = testData;
-//     this.displayedData.data = testData;
-
-//     if (this.paginator) {
-//       this.paginator.firstPage();
-//       this.updatePagination();
-//     }
-
-//     if (onLoaded) onLoaded(this.vehicleData);
-
-//     this.loaderService.hide();
-//   }, 3000); // 3 sec delay to test loader properly
-// }
 
   fixDateFormat(dateStr: string): Date {
     if (!dateStr) return new Date('');
@@ -345,58 +432,37 @@ loadVehicleData(fromDate?: Date, toDate?: Date, onLoaded?: (data: any[]) => void
     return new Date(dateStr);
   }
 
-  showReports() {
-    const { fromDate, toDate, inOut, searchValue } = this.reportForm.value;
+ 
 
-    this.loadVehicleData(
-      fromDate ? new Date(fromDate) : new Date(),
-      toDate   ? new Date(toDate)   : new Date(),
-      (data) => {
-        let filtered = [...data];
+showReports() {
+  const { fromDate, toDate, searchValue, neighbourhood, inOut, exitStatus } = this.reportForm.value;
 
-        // ── Date range filter (on inTime) ─────────────────────────────────────
-        if (fromDate) {
-          const from = new Date(fromDate);
-          from.setHours(0, 0, 0, 0);
-          filtered = filtered.filter(x => this.fixDateFormat(x.inTime).getTime() >= from.getTime());
-        }
+  this.currentFromDate      = fromDate ? new Date(fromDate) : new Date();
+  this.currentToDate        = toDate   ? new Date(toDate)   : new Date();
+  this.currentSearchValue   = searchValue || '';
+  this.currentNeighbourhood = neighbourhood || 'ALL';
+  this.currentInOut         = (inOut || []).filter((v: string) => v !== 'ALL');
+    this.currentExitStatus    = exitStatus || 'ALL';
 
-        if (toDate) {
-          const to = new Date(toDate);
-          to.setHours(23, 59, 59, 999);
-          filtered = filtered.filter(x => this.fixDateFormat(x.inTime).getTime() <= to.getTime());
-        }
+  if (this.paginator) this.paginator.pageIndex = 0;
 
-        // ── IN/OUT filter ─────────────────────────────────────────────────────
-        if (inOut?.length && !inOut.includes('ALL')) {
-          filtered = filtered.filter(x =>
-            inOut.includes((x.inoutFlag || '').toUpperCase())
-          );
-        }
-
-        // ── Vehicle No search — DB-style LIKE %text% (contains anywhere) ──────
-        const text = (searchValue || '').trim().toLowerCase();
-        if (text) {
-          filtered = filtered.filter(x =>
-            (x.vehicleNumber || '').toLowerCase().includes(text)
-          );
-        }
-
-        filtered = sortByTimeOnly(filtered, 'inTime', 'asc');
-        this.filteredData       = filtered;
-        this.displayedData.data = filtered;
-        this.paginator.firstPage();
-        this.updatePagination();
-      }
-    );
-  }
-
+  this.loadVehicleData(
+    this.currentFromDate,
+    this.currentToDate,
+    1,
+    this.paginator.pageSize,
+    this.currentSearchValue,
+    this.currentNeighbourhood
+  );
+}
   showAll() {
     this.reportForm.reset({
-      fromDate:    '',
+            fromDate:    '',
+            exitStatus:  'ALL',
       toDate:      '',
       inOut:       [],
-      searchValue: ''
+      searchValue: '',
+      neighbourhood: 'ALL'
     }, { emitEvent: false });
 
     this.displayedData.data = [];
@@ -408,53 +474,72 @@ loadVehicleData(fromDate?: Date, toDate?: Date, onLoaded?: (data: any[]) => void
     this.updatePagination();
   }
 
-//   showAll() {
-//   this.reportForm.reset({
-//     fromDate:    null,
-//     toDate:      null,
-//     inOut:       [],
-//     searchValue: ''
-//   }, { emitEvent: false });
 
-//   // load all data with wide range
-//   this.loadVehicleData(new Date('2000-01-01'), new Date('2099-12-31'), (data) => {
-//     this.filteredData       = data;
-//     this.displayedData.data = data;
-//     if (this.paginator) this.paginator.firstPage();
-//     this.updatePagination();
-//   });
+
+
+All() {
+  this.reportForm.reset({
+       fromDate:      null,
+    exitStatus:    'ALL',
+    toDate:        null,
+    inOut:         [],
+    searchValue:   '',
+    neighbourhood: 'ALL'
+  }, { emitEvent: false });
+
+  this.prevInOut = [];
+
+  this.currentFromDate      = new Date('2000-01-01');
+  this.currentToDate        = new Date('2099-12-31');
+  this.currentSearchValue   = '';
+  this.currentNeighbourhood = 'ALL';
+    this.currentInOut         = [];
+   this.currentExitStatus    = 'ALL';
+  if (this.paginator) this.paginator.pageIndex = 0;
+
+  this.loadVehicleData(
+    this.currentFromDate,
+    this.currentToDate,
+    1,
+    this.paginator.pageSize,
+    this.currentSearchValue,
+    this.currentNeighbourhood
+  );
+}
+// onPageChange(event: any) {
+//   const start = event.pageIndex * event.pageSize;
+//   this.pagedData          = this.filteredData.slice(start, start + event.pageSize);
+//   this.vehicleData        = this.pagedData;
+//   this.displayedData.data = this.pagedData;
 // }
 
 
-  All() {
-  this.reportForm.reset({
-    fromDate:    null,
-    toDate:      null,
-    inOut:       [],
-    searchValue: ''
-  }, { emitEvent: false });
-
-  // load all data with wide range
-  this.loadVehicleData(new Date('2000-01-01'), new Date('2099-12-31'), (data) => {
-    this.filteredData       = data;
-    this.displayedData.data = data;
-    if (this.paginator) this.paginator.firstPage();
-    this.updatePagination();
-  });
+onPageChange(event: any) {
+  this.loadVehicleData(
+    this.currentFromDate || new Date(),
+    this.currentToDate   || new Date(),
+    event.pageIndex + 1,
+    event.pageSize,
+    this.currentSearchValue,
+    this.currentNeighbourhood
+  );
 }
+  // updatePagination() {
+  //   if (!this.paginator) return;
 
+  //   this.paginator.length = this.displayedData.data.length;
 
+  //   const start = this.paginator.pageIndex * this.paginator.pageSize;
+  //   const end   = start + this.paginator.pageSize;
 
-  updatePagination() {
-    if (!this.paginator) return;
+  //   this.pagedData = this.displayedData.data.slice(start, end);
+  // }
 
-    this.paginator.length = this.displayedData.data.length;
-
-    const start = this.paginator.pageIndex * this.paginator.pageSize;
-    const end   = start + this.paginator.pageSize;
-
-    this.pagedData = this.displayedData.data.slice(start, end);
-  }
+ updatePagination() {
+  if (!this.paginator) return;
+  this.paginator.length = this.totalCount;
+  this.pagedData = this.displayedData.data;
+}
 
   private generatePlateImg(text: string): string {
     const canvas = document.createElement('canvas');
@@ -502,188 +587,428 @@ private resolveImageUrl(imageUrl: string): string {
     }
   }
 
-  exportPDF() {
-    if (!this.filteredData.length) return;
+//   private fetchExportData(callback: (data: any[]) => void) {
+//   const { fromDate, toDate, searchValue } = this.reportForm.value;
 
-    const doc  = new jsPDF('l', 'mm', 'a4');
-    const logo = new Image();
-    logo.src   = 'assets/images/logo/logo.jpeg';
+//   const from = fromDate ? new Date(fromDate) : new Date();
+//   const to   = toDate   ? new Date(toDate)   : new Date();
 
-    logo.onload = () => {
-      const pageWidth  = doc.internal.pageSize.getWidth();
-      const pageHeight = doc.internal.pageSize.getHeight();
+//   const formatDate = (d: Date) => {
+//     const day   = String(d.getDate()).padStart(2, '0');
+//     const month = d.toLocaleString('en-US', { month: 'short' });
+//     const year  = d.getFullYear();
+//     return `${day} ${month} ${year}`;
+//   };
 
-      doc.addImage(logo, 'JPEG', 10, 10, 25, 25);
+//   const apiUrl =
+//     `${environment.apiurl}Report/UnAuthorisedVehicleInoutRegister` +
+//     `?fromDateTime=${encodeURIComponent(formatDate(from))}` +
+//     `&toDateTime=${encodeURIComponent(formatDate(to))}` +
+//     `&pageNumber=1&pageSize=100000` +
+//     `&searchVehicle=${encodeURIComponent(searchValue || '')}`;
 
-      const now = new Date();
-      doc.setFontSize(9);
-      doc.text(
-        `Printed On: ${now.toLocaleDateString()} ${now.toLocaleTimeString()}`,
-        pageWidth - 10, 20, { align: 'right' }
-      );
+//   this.loaderService.show();
 
-      doc.setFontSize(18);
-      doc.setFont(undefined, 'bold');
-      doc.text('UNAUTHORIZED VEHICLE REPORT', pageWidth / 2, 20, { align: 'center' });
-      doc.setFont(undefined, 'normal');
+//   this.http.get<any>(apiUrl).subscribe({
+//     next: (res) => {
+//       const data = res?.data ?? [];
+//       const mapped = data.map((v: any) => ({
+//         id:                v.id || v.vehicleNumber || '',
+//         vehicleNumber:     v.vehicleNumber     || '',
+//         tagUID:            v.tagUID            || '',
+//         idNumber:          v.idNumber          || '',
+//         ownerName:         v.ownerName         || '',
+//         building:          v.building          || '',
+//         cardType:          v.cardType          || '',
+//         flatNumber:        v.flatNumber        || '',
+//         inCameraLocation:  v.inCameraLocation  || '',
+//         outCameraLocation: v.outCameraLocation || '',
+//         inTime:            v.inTime            || '',
+//         outTime:           v.outTime           || '',
+//         inoutFlag:         v.outTime && !v.inTime ? 'OUT' : 'IN',
+//         numberPlateImage:  this.generatePlateImg(v.vehicleNumber || 'UNKNOWN')
+//       }));
+//       this.loaderService.hide();
+//       callback(mapped);
+//     },
+//     error: (err) => {
+//       console.error('❌ Export fetch error:', err);
+//       this.loaderService.hide();
+//     }
+//   });
+// }
 
-      const dates = this.filteredData
-        .map(d => new Date(d.inTime))
-        .filter(d => !isNaN(d.getTime()));
+//   exportPDF() {
+//     const data = this.filteredData;
+//     if (!data.length) return;
 
-      if (dates.length) {
-        const minDate = new Date(Math.min(...dates.map(d => d.getTime())));
-        const maxDate = new Date(Math.max(...dates.map(d => d.getTime())));
-        doc.setFontSize(10);
-        doc.text(
-          `From: ${minDate.toLocaleDateString()} to ${maxDate.toLocaleDateString()}`,
-          pageWidth / 2, 30, { align: 'center' }
-        );
-      }
+//     const doc  = new jsPDF('l', 'mm', 'a4');
+//     const logo = new Image();
+//     logo.src   = 'assets/images/logo/logo.jpeg';
 
-      autoTable(doc, {
-        startY: 40,
-        styles: { minCellHeight: 14 },
-        head: [[
-          'Sr No', 'Vehicle No', 'Tag UID', 'Name',
-           'IN Location', 'OUT Location', 'IN Time', 'OUT Time', 'Image'
-        ]],
-        body: this.filteredData.map((v, i) => [
-          i + 1,
-          v.vehicleNumber,
-          v.tagUID,
-          v.ownerName,
+//     logo.onload = () => {
+//       const pageWidth  = doc.internal.pageSize.getWidth();
+//       const pageHeight = doc.internal.pageSize.getHeight();
+
+//       doc.addImage(logo, 'JPEG', 10, 10, 25, 25);
+
+//       const now = new Date();
+//       doc.setFontSize(9);
+//       doc.text(
+//         `Printed On: ${now.toLocaleDateString()} ${now.toLocaleTimeString()}`,
+//         pageWidth - 10, 20, { align: 'right' }
+//       );
+
+//       doc.setFontSize(18);
+//       doc.setFont(undefined, 'bold');
+//       doc.text('UNAUTHORIZED VEHICLE REPORT', pageWidth / 2, 20, { align: 'center' });
+//       doc.setFont(undefined, 'normal');
+
+//   const dates = data
+//         .map(d => new Date(d.inTime))
+//         .filter(d => !isNaN(d.getTime()));
+
+//       if (dates.length) {
+//         const minDate = new Date(Math.min(...dates.map(d => d.getTime())));
+//         const maxDate = new Date(Math.max(...dates.map(d => d.getTime())));
+//         doc.setFontSize(10);
+//         doc.text(
+//           `From: ${minDate.toLocaleDateString()} to ${maxDate.toLocaleDateString()}`,
+//           pageWidth / 2, 30, { align: 'center' }
+//         );
+//       }
+
+//       autoTable(doc, {
+//         startY: 40,
+//         styles: { minCellHeight: 14 },
+//         head: [[
+//           'Sr No', 'Vehicle No', 'Tag UID', 'Name',
+//            'IN Location', 'OUT Location', 'IN Time', 'OUT Time', 'Image'
+//         ]],
+//        body: data.map((v, i) => [
+//           i + 1,
+//           v.vehicleNumber,
+//           v.tagUID,
+//           v.ownerName,
          
-          v.inCameraLocation,
-          v.outCameraLocation,
-          v.inTime  ? new Date(v.inTime).toLocaleString()  : '',
-          v.outTime ? new Date(v.outTime).toLocaleString() : '',
-          ''
-        ]),
-        columnStyles: { 11: { cellWidth: 38 } },
-        headStyles: { fillColor: [220, 220, 220], textColor: 0, fontStyle: 'bold' },
-        theme: 'grid',
-        bodyStyles: { fontSize: 9, textColor: [0, 0, 0], fontStyle: 'normal' },
-        didDrawCell: (data: any) => {
-          if (data.section === 'body' && data.column.index === 11) {
-            const v = this.filteredData[data.row.index];
-            if (v?.numberPlateImage) {
-              doc.addImage(
-                v.numberPlateImage, 'PNG',
-                data.cell.x + 1, data.cell.y + 1,
-                data.cell.width - 2, data.cell.height - 2
-              );
-            }
-          }
-        },
-        didDrawPage: (data: any) => {
-          const currentPage = data.pageNumber;
-          const pageCount   = (doc as any).internal.pages.length - 1;
-          doc.setFontSize(9);
-          doc.text(`Page ${currentPage} of ${pageCount}`, pageWidth - 10, pageHeight - 10, { align: 'right' });
-          doc.text('©IDS ID Smart Tech', 10, pageHeight - 10);
-        }
-      });
+//           v.inCameraLocation,
+//           v.outCameraLocation,
+//           v.inTime  ? new Date(v.inTime).toLocaleString()  : '',
+//           v.outTime ? new Date(v.outTime).toLocaleString() : '',
+//           ''
+//         ]),
+//         columnStyles: { 11: { cellWidth: 38 } },
+//         headStyles: { fillColor: [220, 220, 220], textColor: 0, fontStyle: 'bold' },
+//         theme: 'grid',
+//         bodyStyles: { fontSize: 9, textColor: [0, 0, 0], fontStyle: 'normal' },
+//         didDrawCell: (cellData: any) => {
+//           if (cellData.section === 'body' && cellData.column.index === 11) {
+//             const v = data[cellData.row.index];
+//            if (v?.numberPlateImage) {
+//               doc.addImage(
+//                 v.numberPlateImage, 'PNG',
+//                 cellData.cell.x + 1, cellData.cell.y + 1,
+//                 cellData.cell.width - 2, cellData.cell.height - 2
+//               );
+//             }
+//           }
+//         },
+//         didDrawPage: (pageData: any) => {
+//           const currentPage = pageData.pageNumber;
+//           const pageCount   = (doc as any).internal.pages.length - 1;
+//           doc.setFontSize(9);
+//           doc.text(`Page ${currentPage} of ${pageCount}`, pageWidth - 10, pageHeight - 10, { align: 'right' });
+//           doc.text('©IDS ID Smart Tech', 10, pageHeight - 10);
+//         }
+//       });
 
-      doc.save('UnauthorizedVehicleReport.pdf');
+//     doc.save('UnauthorizedVehicleReport.pdf');
+//     };
+//   }
+
+// exportExcel() {
+//     const data = this.filteredData;
+//     if (!data.length) return;
+
+//     const f         = this.reportForm.value;
+//     const from      = f.fromDate ? new Date(f.fromDate).toLocaleDateString() : null;
+//     const to        = f.toDate   ? new Date(f.toDate).toLocaleDateString()   : null;
+//     const generated = new Date().toLocaleString();
+
+//     const workbook  = new ExcelJS.Workbook();
+//     const worksheet = workbook.addWorksheet('UnauthorizedVehicle');
+
+//     // ── Heading row ───────────────────────────────────────────────────────────
+//     worksheet.mergeCells('A1:L1');
+//     const headingCell     = worksheet.getCell('A1');
+//     headingCell.value     = 'UNAUTHORIZED VEHICLE REPORT';
+//     headingCell.font      = { bold: true, size: 18 };
+//     headingCell.alignment = { horizontal: 'center' };
+
+//     let currentRow = 2;
+
+//     if (from && to) {
+//       worksheet.mergeCells(`A${currentRow}:L${currentRow}`);
+//       const dateCell     = worksheet.getCell(`A${currentRow}`);
+//       dateCell.value     = `from: ${from} to ${to}`;
+//       dateCell.alignment = { horizontal: 'center' };
+//       currentRow++;
+//     }
+
+//     currentRow++; // blank spacer row
+
+//     // ── Column header row ─────────────────────────────────────────────────────
+//     // ── Column header row ─────────────────────────────────────────────────────
+//     const headerRow = worksheet.addRow([
+//       'SR NO', 'VEHICLE NUMBER', 'TAG UID', 'NAME',  'IN LOCATION', 'OUT LOCATION', 'IN TIME', 'OUT TIME', 'NUMBER PLATE'
+//     ]);
+//     headerRow.font      = { bold: true, size: 12 };
+//     headerRow.alignment = { horizontal: 'center' };
+//     headerRow.eachCell((cell) => {
+//       cell.fill   = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'DDEBF7' } };
+//       cell.border = {
+//         top:    { style: 'thin', color: { argb: '000000' } },
+//         left:   { style: 'thin', color: { argb: '000000' } },
+//         right:  { style: 'thin', color: { argb: '000000' } },
+//         bottom: { style: 'thin', color: { argb: '000000' } }
+//       };
+//     });
+
+//     currentRow++;
+
+//     // ── Data rows ─────────────────────────────────────────────────────────────
+//    // ── Data rows ─────────────────────────────────────────────────────────────
+//    data.forEach((v, i) => {
+//       const inFormatted  = DateTimeUtil.formatDateTime(v.inTime);
+//       const outFormatted = v.outTime ? DateTimeUtil.formatDateTime(v.outTime) : '';
+
+//       const row = worksheet.addRow([
+//         i + 1,
+//         v.vehicleNumber,
+//         v.tagUID,
+//         v.ownerName,
+       
+//         v.inCameraLocation,
+//         v.outCameraLocation,
+//         inFormatted,
+//         outFormatted,
+//         ''
+//       ]);
+
+//       row.height = 38;
+
+//       // ── Only embed image if it is real base64 data ────────────────────────
+//       if (v.numberPlateImage && v.numberPlateImage.startsWith('data:image')) {
+//         const imgId = workbook.addImage({
+//           base64:    v.numberPlateImage.split(',')[1],
+//           extension: 'png'
+//         });
+//         worksheet.addImage(imgId, {
+//           tl:     { col: 11, row: row.number - 1 },
+//           br:     { col: 12, row: row.number },
+//           editAs: 'oneCell'
+//         } as any);
+//       }
+//     });
+
+//     // ── Footer: printed on ────────────────────────────────────────────────────
+//     currentRow = worksheet.lastRow!.number + 1;
+//     worksheet.mergeCells(`A${currentRow}:L${currentRow}`);
+//     const genCell     = worksheet.getCell(`A${currentRow}`);
+//     genCell.value     = `printed on: ${generated}`;
+//     genCell.alignment = { horizontal: 'center' };
+
+//     worksheet.columns.forEach(col => { col.width = 20; });
+
+//   workbook.xlsx.writeBuffer().then(buffer => {
+//       saveAs(new Blob([buffer]), 'UnauthorizedVehicleReport.xlsx');
+//     });
+//   }
+
+
+
+  // ── Export: API se saara filtered data (page nahi) ──────────────────────────
+  private fetchExportData(callback: (data: any[]) => void) {
+    const from = this.currentFromDate || new Date();
+    const to   = this.currentToDate   || new Date();
+
+    const formatDate = (d: Date) => {
+      const day   = String(d.getDate()).padStart(2, '0');
+      const month = d.toLocaleString('en-US', { month: 'short' });
+      const year  = d.getFullYear();
+      return `${day} ${month} ${year}`;
     };
+
+    const apiUrl =
+      `${environment.apiurl}Report/UnAuthorisedVehicleInoutRegister` +
+      `?fromDateTime=${encodeURIComponent(formatDate(from))}` +
+      `&toDateTime=${encodeURIComponent(formatDate(to))}` +
+      `&pageNumber=1&pageSize=1000000` +
+      `&searchVehicle=${encodeURIComponent(this.currentSearchValue)}` +
+      `&neighbourhood=${encodeURIComponent(this.currentNeighbourhood === 'ALL' ? '' : this.currentNeighbourhood)}` +
+      `&inOut=${encodeURIComponent(this.currentInOut.join(','))}` +
+      `&exitStatus=${this.currentExitStatus}`;
+
+    this.loaderService.show();
+
+    this.http.get<any>(apiUrl).subscribe({
+      next: (res) => {
+        const data = res?.data ?? [];
+        const mapped = data.map((v: any) => ({
+          vehicleNumber:     v.vehicleNumber     || '',
+          tagUID:            v.tagUID            || '',
+          ownerName:         v.ownerName         || '',
+          inCameraLocation:  v.inCameraLocation  || '',
+          outCameraLocation: v.outCameraLocation || '',
+          inTime:            v.inTime            || '',
+          outTime:           v.outTime           || ''
+        }));
+        this.loaderService.hide();
+        callback(mapped);
+      },
+      error: (err) => {
+        console.error('❌ Export fetch error:', err);
+        this.loaderService.hide();
+      }
+    });
   }
 
- exportExcel() {
-    if (!this.filteredData.length) return;
+  private getRangeText(): string {
+    const f = this.currentFromDate;
+    const t = this.currentToDate;
+    if (!f || !t || f.getFullYear() <= 2000) return 'All Dates';
+    return `${f.toLocaleDateString()} to ${t.toLocaleDateString()}`;
+  }
 
-    const f         = this.reportForm.value;
-    const from      = f.fromDate ? new Date(f.fromDate).toLocaleDateString() : null;
-    const to        = f.toDate   ? new Date(f.toDate).toLocaleDateString()   : null;
-    const generated = new Date().toLocaleString();
+  private getExitStatusText(): string {
+    if (this.currentExitStatus === 'NOT_EXITED') return 'Not Exited';
+        if (this.currentExitStatus === 'EXITED')     return 'Exited';
+    if (this.currentExitStatus === 'EXIT_ONLY')  return 'Exit only (no entry)';
+    return 'All';
+  }
 
-    const workbook  = new ExcelJS.Workbook();
-    const worksheet = workbook.addWorksheet('UnauthorizedVehicle');
+  exportPDF() {
+    this.fetchExportData((data) => {
+      if (!data.length) return;
 
-    // ── Heading row ───────────────────────────────────────────────────────────
-    worksheet.mergeCells('A1:L1');
-    const headingCell     = worksheet.getCell('A1');
-    headingCell.value     = 'UNAUTHORIZED VEHICLE REPORT';
-    headingCell.font      = { bold: true, size: 18 };
-    headingCell.alignment = { horizontal: 'center' };
-
-    let currentRow = 2;
-
-    if (from && to) {
-      worksheet.mergeCells(`A${currentRow}:L${currentRow}`);
-      const dateCell     = worksheet.getCell(`A${currentRow}`);
-      dateCell.value     = `from: ${from} to ${to}`;
-      dateCell.alignment = { horizontal: 'center' };
-      currentRow++;
-    }
-
-    currentRow++; // blank spacer row
-
-    // ── Column header row ─────────────────────────────────────────────────────
-    worksheet.addRow([
-      'SR NO', 'VEHICLE NUMBER', 'TAG UID', 'NAME',  'IN LOCATION', 'OUT LOCATION', 'IN TIME', 'OUT TIME', 'NUMBER PLATE'
-    ]);
-
-    const headerRow = worksheet.getRow(currentRow);
-    headerRow.font      = { bold: true, size: 12 };
-    headerRow.alignment = { horizontal: 'center' };
-    headerRow.eachCell((cell) => {
-      cell.fill   = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'DDEBF7' } };
-      cell.border = {
-        top:    { style: 'thin', color: { argb: '000000' } },
-        left:   { style: 'thin', color: { argb: '000000' } },
-        right:  { style: 'thin', color: { argb: '000000' } },
-        bottom: { style: 'thin', color: { argb: '000000' } }
-      };
+      const logo = new Image();
+      logo.onload  = () => this.buildPdf(data, logo);
+      logo.onerror = () => this.buildPdf(data, null);   // logo na mile tab bhi PDF bane
+      logo.src = 'assets/images/logo/logo.jpeg';
     });
+  }
 
-    currentRow++;
+  private buildPdf(data: any[], logo: HTMLImageElement | null) {
+    const doc        = new jsPDF('l', 'mm', 'a4');
+    const pageWidth  = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
 
-    // ── Data rows ─────────────────────────────────────────────────────────────
-    this.filteredData.forEach((v, i) => {
-      const inFormatted  = DateTimeUtil.formatDateTime(v.inTime);
-      const outFormatted = v.outTime ? DateTimeUtil.formatDateTime(v.outTime) : '';
+    if (logo) doc.addImage(logo, 'JPEG', 10, 10, 25, 25);
 
-      const row = worksheet.addRow([
+    const now = new Date();
+    doc.setFontSize(9);
+    doc.text(`Printed On: ${now.toLocaleDateString()} ${now.toLocaleTimeString()}`,
+      pageWidth - 10, 20, { align: 'right' });
+
+    doc.setFontSize(18);
+    doc.setFont(undefined as any, 'bold');
+    doc.text('UNAUTHORIZED VEHICLE REPORT', pageWidth / 2, 20, { align: 'center' });
+    doc.setFont(undefined as any, 'normal');
+
+    doc.setFontSize(10);
+    doc.text(`Date: ${this.getRangeText()}   |   Exit Status: ${this.getExitStatusText()}`,
+      pageWidth / 2, 30, { align: 'center' });
+
+    autoTable(doc, {
+      startY: 40,
+      head: [['Sr No', 'Vehicle No', 'Tag UID', 'Name',
+              'IN Location', 'OUT Location', 'IN Time', 'OUT Time']],
+      body: data.map((v, i) => [
         i + 1,
         v.vehicleNumber,
         v.tagUID,
         v.ownerName,
-       
         v.inCameraLocation,
         v.outCameraLocation,
-        inFormatted,
-        outFormatted,
-        ''
-      ]);
-
-      row.height = 38;
-
-      // ── Only embed image if it is real base64 data ────────────────────────
-      if (v.numberPlateImage && v.numberPlateImage.startsWith('data:image')) {
-        const imgId = workbook.addImage({
-          base64:    v.numberPlateImage.split(',')[1],
-          extension: 'png'
-        });
-        worksheet.addImage(imgId, {
-          tl:     { col: 11, row: row.number - 1 },
-          br:     { col: 12, row: row.number },
-          editAs: 'oneCell'
-        } as any);
+        v.inTime  ? new Date(v.inTime).toLocaleString()  : '',
+        v.outTime ? new Date(v.outTime).toLocaleString() : ''
+      ]),
+      headStyles: { fillColor: [220, 220, 220], textColor: 0, fontStyle: 'bold' },
+      theme: 'grid',
+      bodyStyles: { fontSize: 9, textColor: [0, 0, 0], fontStyle: 'normal' },
+      didDrawPage: (pageData: any) => {
+        const pageCount = (doc as any).internal.pages.length - 1;
+        doc.setFontSize(9);
+        doc.text(`Page ${pageData.pageNumber} of ${pageCount}`, pageWidth - 10, pageHeight - 10, { align: 'right' });
+        doc.text('©IDS ID Smart Tech', 10, pageHeight - 10);
       }
     });
 
-    // ── Footer: printed on ────────────────────────────────────────────────────
-    currentRow = worksheet.lastRow!.number + 1;
-    worksheet.mergeCells(`A${currentRow}:L${currentRow}`);
-    const genCell     = worksheet.getCell(`A${currentRow}`);
-    genCell.value     = `printed on: ${generated}`;
-    genCell.alignment = { horizontal: 'center' };
+    doc.save('UnauthorizedVehicleReport.pdf');
+  }
 
-    worksheet.columns.forEach(col => { col.width = 20; });
+  exportExcel() {
+    this.fetchExportData((data) => {
+      if (!data.length) return;
 
-    workbook.xlsx.writeBuffer().then(buffer => {
-      saveAs(new Blob([buffer]), 'UnauthorizedVehicleReport.xlsx');
+      const generated = new Date().toLocaleString();
+      const workbook  = new ExcelJS.Workbook();
+      const worksheet = workbook.addWorksheet('UnauthorizedVehicle');
+
+      worksheet.mergeCells('A1:H1');
+      const headingCell     = worksheet.getCell('A1');
+      headingCell.value     = 'UNAUTHORIZED VEHICLE REPORT';
+      headingCell.font      = { bold: true, size: 18 };
+      headingCell.alignment = { horizontal: 'center' };
+
+      worksheet.mergeCells('A2:H2');
+      const infoCell     = worksheet.getCell('A2');
+      infoCell.value     = `Date: ${this.getRangeText()}   |   Exit Status: ${this.getExitStatusText()}`;
+      infoCell.alignment = { horizontal: 'center' };
+
+      worksheet.addRow([]);
+
+      const headerRow = worksheet.addRow([
+        'SR NO', 'VEHICLE NUMBER', 'TAG UID', 'NAME',
+        'IN LOCATION', 'OUT LOCATION', 'IN TIME', 'OUT TIME'
+      ]);
+      headerRow.font      = { bold: true, size: 12 };
+      headerRow.alignment = { horizontal: 'center' };
+      headerRow.eachCell((cell) => {
+        cell.fill   = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'DDEBF7' } };
+        cell.border = {
+          top:    { style: 'thin', color: { argb: '000000' } },
+          left:   { style: 'thin', color: { argb: '000000' } },
+          right:  { style: 'thin', color: { argb: '000000' } },
+          bottom: { style: 'thin', color: { argb: '000000' } }
+        };
+      });
+
+      data.forEach((v, i) => {
+        worksheet.addRow([
+          i + 1,
+          v.vehicleNumber,
+          v.tagUID,
+          v.ownerName,
+          v.inCameraLocation,
+          v.outCameraLocation,
+          v.inTime  ? DateTimeUtil.formatDateTime(v.inTime)  : '',
+          v.outTime ? DateTimeUtil.formatDateTime(v.outTime) : ''
+        ]);
+      });
+
+      const footerRow = worksheet.lastRow!.number + 2;
+      worksheet.mergeCells(`A${footerRow}:H${footerRow}`);
+      const genCell     = worksheet.getCell(`A${footerRow}`);
+      genCell.value     = `printed on: ${generated}`;
+      genCell.alignment = { horizontal: 'center' };
+
+      worksheet.columns.forEach(col => { col.width = 22; });
+
+      workbook.xlsx.writeBuffer().then(buffer => {
+        saveAs(new Blob([buffer]), 'UnauthorizedVehicleReport.xlsx');
+      });
     });
   }
+
 }

@@ -4,7 +4,9 @@ import { CommonModule, Location, LocationStrategy } from '@angular/common';
 import { RouterModule } from '@angular/router';
 
 // project import
+// import { NavigationItem, NavigationItems } from '../navigation';
 import { NavigationItem, NavigationItems } from '../navigation';
+import { AuthorityService } from 'src/app/services/authority.service';
 import { environment } from 'src/environments/environment';
 
 import { NavGroupComponent } from './nav-group/nav-group.component';
@@ -12,7 +14,8 @@ import { NavGroupComponent } from './nav-group/nav-group.component';
 // icon
 import { IconService } from '@ant-design/icons-angular';
 import {
-  DashboardOutline,
+   DashboardOutline,
+  AppstoreOutline,
   CreditCardOutline,
   LoginOutline,
   QuestionOutline,
@@ -20,7 +23,29 @@ import {
   FontSizeOutline,
   ProfileOutline,
   BgColorsOutline,
-  AntDesignOutline
+  AntDesignOutline,
+  SettingOutline,
+  BankOutline,
+  IdcardOutline,
+  UserOutline,
+  TeamOutline,
+  EnvironmentOutline,
+  FileTextOutline,
+  ToolOutline,
+  SolutionOutline,
+  GiftOutline,
+  WifiOutline,
+  VideoCameraOutline,
+  SwapOutline,
+  HomeOutline,
+  CustomerServiceOutline,
+  WarningOutline,
+  StopOutline,
+  UserAddOutline,
+  EyeOutline,
+  CarOutline,
+  PrinterOutline,
+  BarChartOutline
 } from '@ant-design/icons-angular/icons';
 import { NgScrollbarModule } from 'ngx-scrollbar';
 
@@ -32,13 +57,15 @@ import { NgScrollbarModule } from 'ngx-scrollbar';
 })
 export class NavContentComponent implements OnInit {
   private location = inject(Location);
-  private locationStrategy = inject(LocationStrategy);
-  private iconService = inject(IconService);
+private locationStrategy = inject(LocationStrategy);
+private iconService = inject(IconService);
+private authorityService = inject(AuthorityService);
 
   // public props
   NavCollapsedMob = output();
 
   navigations: NavigationItem[];
+  // noAccessMessage: string = '';
 
   // version
   title = 'Demo application for version numbering';
@@ -49,9 +76,10 @@ export class NavContentComponent implements OnInit {
 
   // Constructor
   constructor() {
-    this.iconService.addIcon(
+        this.iconService.addIcon(
       ...[
-        DashboardOutline,
+                DashboardOutline,
+        AppstoreOutline,
         CreditCardOutline,
         FontSizeOutline,
         LoginOutline,
@@ -59,7 +87,29 @@ export class NavContentComponent implements OnInit {
         BgColorsOutline,
         AntDesignOutline,
         ChromeOutline,
-        QuestionOutline
+        QuestionOutline,
+        SettingOutline,
+        BankOutline,
+        IdcardOutline,
+        UserOutline,
+        TeamOutline,
+        EnvironmentOutline,
+        FileTextOutline,
+        ToolOutline,
+        SolutionOutline,
+        GiftOutline,
+        WifiOutline,
+        VideoCameraOutline,
+        SwapOutline,
+        HomeOutline,
+        CustomerServiceOutline,
+        WarningOutline,
+        StopOutline,
+        UserAddOutline,
+        EyeOutline,
+        CarOutline,
+        PrinterOutline,
+        BarChartOutline
       ]
     );
     this.navigations = NavigationItems;
@@ -73,13 +123,74 @@ export class NavContentComponent implements OnInit {
   // }
 
 
-  ngOnInit() {
+//   ngOnInit() {
+//   if (this.windowWidth < 1025) {
+//     const navbar = document.querySelector('.coded-navbar') as HTMLDivElement;
+//     if (navbar) {
+//       navbar.classList.add('menupos-static');
+//     }
+//   }
+//   // ✅ Filter navigation based on permissions
+//   // this.navigations = this.filterNavigation(NavigationItems);
+
+//   // ✅ Reload permissions from localStorage first
+//   this.authorityService.initFromLocalStorage();
+//   // ✅ Then filter navigation
+//   this.navigations = this.filterNavigation(NavigationItems);
+// }
+
+
+ngOnInit() {
   if (this.windowWidth < 1025) {
     const navbar = document.querySelector('.coded-navbar') as HTMLDivElement;
-    if (navbar) {                  // <-- check if element exists
+    if (navbar) {
       navbar.classList.add('menupos-static');
     }
   }
+  this.authorityService.initFromLocalStorage();
+this.navigations = this.filterNavigation(NavigationItems);
+
+// ✅ Re-run after short delay to catch post-login state
+setTimeout(() => {
+  this.authorityService.initFromLocalStorage();
+  this.navigations = this.filterNavigation(NavigationItems);
+
+  const hasAnyAccess = this.navigations
+    .flatMap(g => g.children || [])
+    .some(item => item.type === 'item' || (item.children || []).length > 0);
+
+  
+}, 500);
+  // console.log('FILTERED NAV:', JSON.stringify(this.navigations));
+  // ✅ Check if user has any access at all
+  const hasAnyAccess = this.navigations
+    .flatMap(g => g.children || [])
+    .some(item => item.type === 'item' || (item.children || []).length > 0);
+
+  
+}
+
+filterNavigation(items: NavigationItem[]): NavigationItem[] {
+  return items
+    .map(item => {
+      // recursively filter children
+      if (item.children && item.children.length > 0) {
+        return { ...item, children: this.filterNavigation(item.children) };
+      }
+      return item;
+    })
+    .filter(item => {
+      // always show groups
+      if (item.type === 'group') return true;
+      // show collapse only if it has visible children
+      if (item.type === 'collapse') return (item.children || []).length > 0;
+      // hide hidden items
+      if (item.hidden) return false;
+      // if no moduleKey — always show (dashboard, card-print-enroll)
+      if (!item.moduleKey) return true;
+      // ✅ show only if user has canView permission
+      return this.authorityService.canView(item.moduleKey);
+    });
 }
 
 

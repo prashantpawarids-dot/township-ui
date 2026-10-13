@@ -1,53 +1,85 @@
-// /* Table container */
-// .mat-elevation-z8 {
-//   border: 1px solid #e0e0e0 !important;
-//   border-radius: 6px;
-//   overflow: hidden;
-//   width: auto;
-//   display: inline-table; /* auto width based on content */
-//   margin: 10px auto; /* spacing around table */
-//   box-shadow: none !important;
-//   background: #fff;
-// }
+.status-pill {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
 
-// /* Header cells */
-// .mat-mdc-header-cell,
-// th.mat-header-cell {
-//   border-bottom: 1px solid #e0e0e0 !important;
-//   background-color: #f7f7f7 !important;
-//   font-weight: 600 !important;
-//   padding: 10px 16px !important;
-//   color: #333;
-//   text-align: left;
-//   white-space: nowrap;
-// }
+  &--on  { background: #e8f5e9; color: #2e7d32; }
+  &--off { background: #ffebee; color: #b71c1c; }
+}
 
-// /* Data cells */
-// .mat-mdc-cell,
-// td.mat-cell {
-//   border-bottom: 1px solid #eeeeee !important;
-//   padding: 10px 16px !important;
-//   color: #555;
-//   white-space: nowrap;
-// }
+// ── Action icon buttons (View / Edit / Delete) ──────────────────────────
+.action-icon-btn {
+  width: 36px;
+  height: 36px;
+  line-height: 36px;
+  border-radius: 8px;
+  margin-right: 4px;
 
-// /* Rows */
-// .mat-mdc-row,
-// tr.mat-row {
-//   transition: background-color 0.2s ease;
-// }
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
 
-// /* Zebra striping */
-// tr.mat-row:nth-child(even) {
-//   background-color: #fafafa;
-// }
+  &--view {
+    color: #2196f3;
+    background-color: #e3f2fd;
+  }
 
-// /* Hover effect (subtle but attractive) */
-// tr.mat-row:hover {
-//   background-color: #f0f6ff;
-// }
+  &--edit {
+    color: #43a047;
+    background-color: #e8f5e9;
+  }
 
-// /* Remove last row border */
-// tr.mat-row:last-child td {
-//   border-bottom: none !important;
-// }
+  &--delete {
+    color: #e53935;
+    background-color: #fdecea;
+  }
+}
+
+
+
+
+// ── Same white boxed input style as Land Owner ──────────────────────────
+::ng-deep {
+  .full-width .mat-mdc-text-field-wrapper {
+    background-color: #ffffff !important;
+    border: 1px solid #d9dce3 !important;
+    border-radius: 10px !important;
+    overflow: hidden;
+    padding-top: 4px;
+  }
+
+  .full-width .mat-mdc-form-field-flex {
+    background-color: transparent !important;
+  }
+
+  .full-width .mdc-line-ripple::before,
+  .full-width .mdc-line-ripple::after {
+    display: none !important;
+    border: none !important;
+  }
+
+  .full-width.mat-focused .mat-mdc-text-field-wrapper {
+    border-color: #a9aebb !important;
+  }
+
+  .full-width input.mat-mdc-input-element,
+  .full-width .mat-mdc-select-value {
+    color: #1f2438;
+  }
+}
+
+// ── status-pill (kept as-is from your message) ──────────────────────────
+.status-pill {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+
+  &--on  { background: #e8f5e9; color: #2e7d32; }
+  &--off { background: #ffebee; color: #b71c1c; }
+}

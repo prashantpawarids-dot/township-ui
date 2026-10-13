@@ -157,7 +157,7 @@ ngOnInit() {
           doc.setFont('helvetica', 'normal');
           doc.setFontSize(9);
           doc.text(`printed on: ${today.toLocaleDateString()} ${today.toLocaleTimeString()}`, pageWidth - 10, 20, { align: 'right' });
-          doc.text('© IDS ID SMART TECH', 10, pageHeight - 10);
+          doc.text('© IDS ID PVT LTD', 10, pageHeight - 10);
           doc.text(`Page ${data.pageNumber}`, pageWidth - 10, pageHeight - 10, { align: 'right' });
         }
       });

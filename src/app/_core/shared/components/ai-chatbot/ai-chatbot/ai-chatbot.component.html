@@ -1,0 +1,45 @@
+<!-- Floating toggle button -->
+<!-- Floating toggle button -->
+<button class="chatbot-fab" (click)="toggleChat()" [class.chatbot-fab--open]="isOpen">
+  <img *ngIf="!isOpen" src="assets/images/logo/chatbotICON.jpg" alt="Chatbot" class="chatbot-fab__icon" />
+  <span *ngIf="isOpen">✕</span>
+  <span class="chatbot-fab__ping" *ngIf="!isOpen"></span>
+</button>
+
+<!-- Chat window -->
+<div class="chatbot-window" *ngIf="isOpen">
+  <div class="chatbot-window__header">
+    <span>AI Assistant</span>
+  </div>
+
+    <div class="chatbot-window__body" #chatBody>
+    <div *ngFor="let msg of messages"
+         class="chat-bubble"
+         [class.chat-bubble--user]="msg.from === 'user'"
+         [class.chat-bubble--bot]="msg.from === 'bot'">
+      {{ msg.text }}
+    </div>
+    <div class="chat-bubble chat-bubble--bot chat-bubble--typing" *ngIf="isTyping">
+      <span></span><span></span><span></span>
+    </div>
+  </div>
+
+  <div class="chatbot-window__footer">
+    <input
+      type="text"
+      placeholder="Ask something or say 'open dashboard'..."
+      [(ngModel)]="userInput"
+      (keyup.enter)="sendMessage()" />
+
+    <button
+      *ngIf="voiceSupported"
+      class="mic-btn"
+      [class.mic-btn--listening]="isListening"
+      (click)="toggleVoiceInput()"
+      title="Voice input">
+      🎤
+    </button>
+
+    <button class="send-btn" (click)="sendMessage()" title="Send">➤</button>
+  </div>
+</div>

@@ -1,0 +1,129 @@
+<form [formGroup]="reportForm" class="container-fluid">
+
+  <!-- Summary chips (click = status filter) -->
+  <div class="cs-summary mt-3">
+    <div class="cs-chip cs-chip--blue" [class.cs-chip--active]="cur_status === 'ALL'" (click)="setStatus('ALL')">
+      <span>Total</span><b>{{ summary.total }}</b>
+    </div>
+    <div class="cs-chip cs-chip--green" [class.cs-chip--active]="cur_status === 'ISSUED'" (click)="setStatus('ISSUED')">
+      <span>Card Issued</span><b>{{ summary.issued }}</b>
+    </div>
+    <div class="cs-chip cs-chip--orange" [class.cs-chip--active]="cur_status === 'NOT_ISSUED'" (click)="setStatus('NOT_ISSUED')">
+      <span>Not Issued</span><b>{{ summary.notIssued }}</b>
+    </div>
+    <div class="cs-chip cs-chip--red" [class.cs-chip--active]="cur_status === 'BLOCKED'" (click)="setStatus('BLOCKED')">
+      <span>Blocked</span><b>{{ summary.blocked }}</b>
+    </div>
+  </div>
+
+  <div class="row mt-3 g-2 align-items-end">
+
+    <!-- STATUS -->
+    <div class="col-12 col-md-2">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>Status</mat-label>
+        <mat-select formControlName="status">
+          <mat-option *ngFor="let s of statusOptions" [value]="s.value">{{ s.label }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <!-- NRD -->
+    <div class="col-12 col-md-2">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>NRD</mat-label>
+        <mat-select formControlName="nrd" (selectionChange)="onNrdChange()">
+          <mat-option value="ALL">All</mat-option>
+          <mat-option *ngFor="let n of nrdOptions" [value]="n">{{ n }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <!-- BUILDING (NRD ke hisaab se) -->
+    <div class="col-12 col-md-2">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>Building</mat-label>
+        <mat-select formControlName="building">
+          <mat-option value="ALL">All</mat-option>
+          <mat-option *ngFor="let b of buildingOptions" [value]="b">{{ b }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <!-- CARD TYPE -->
+    <div class="col-12 col-md-2">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>Card Type</mat-label>
+        <mat-select formControlName="cardType">
+          <mat-option value="ALL">All</mat-option>
+          <mat-option *ngFor="let c of cardTypeOptions" [value]="c">{{ getCardTypeLabel(c) }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <!-- SEARCH -->
+    <div class="col-12 col-md-2">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>Search</mat-label>
+        <input matInput formControlName="searchValue" placeholder="ID, name, CSN, flat..."
+               (keyup.enter)="showReports()" />
+      </mat-form-field>
+    </div>
+
+    <!-- BUTTONS -->
+    <div class="col-auto d-flex gap-2 align-items-center">
+      <button class="btn" type="button" (click)="showReports()">Search</button>
+      <button class="btn" type="button" (click)="clearAll()">Clear</button>
+      <button class="btn" type="button" *ngIf="pagedData.length" (click)="exportExcel()">Excel</button>
+      <button class="btn" type="button" *ngIf="pagedData.length" (click)="exportPDF()">PDF</button>
+    </div>
+
+  </div>
+
+  <div class="table-responsive mt-3">
+    <table class="table table-bordered table-hover table-striped"
+           style="table-layout:auto; white-space:nowrap;">
+      <thead class="table-dark">
+        <tr>
+          <th>Sr No</th>
+          <th>ID Number</th>
+          <th>Name</th>
+          <th>Card Type</th>
+          <th>NRD</th>
+          <th>Building</th>
+          <th>Flat</th>
+          <th>CSN</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngIf="!pagedData.length">
+          <td colspan="9" class="text-center">No Data Found</td>
+        </tr>
+
+        <tr *ngFor="let d of pagedData; let i = index">
+          <td>{{ pageIndex * pageSize + i + 1 }}</td>
+          <td>{{ d.idNumber }}</td>
+          <td>{{ d.name }}</td>
+          <td>{{ getCardTypeLabel(d.cardType) }}</td>
+          <td>{{ d.nrd || '—' }}</td>
+          <td>{{ d.building || '—' }}</td>
+          <td>{{ d.flatNumber || '—' }}</td>
+          <td>{{ d.cardCsn || '—' }}</td>
+          <td><span class="st-badge" [ngClass]="getStatusClass(d.status)">{{ d.status }}</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <mat-paginator
+    [length]="totalCount"
+    [pageIndex]="pageIndex"
+    [pageSize]="pageSize"
+    [pageSizeOptions]="[10, 25, 50, 100, 150, 200, 250, 300]"
+    showFirstLastButtons
+    (page)="onPageChange($event)">
+  </mat-paginator>
+
+</form>

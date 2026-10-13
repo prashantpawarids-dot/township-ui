@@ -23,15 +23,24 @@
       </mat-form-field>
     </div>
 
+    <!-- <div class="col-12 col-md-2">
+  <mat-form-field appearance="outline" class="w-100">
+    <mat-label>Neighbourhood</mat-label>
+   
+
+    <mat-select formControlName="nrd" multiple (selectionChange)="onNRDChange()">
+  <mat-option *ngFor="let n of nrdList" [value]="n">
+    {{ n }}
+  </mat-option>
+</mat-select>
+
+  </mat-form-field>
+</div> -->
+
+
     <div class="col-12 col-md-2">
   <mat-form-field appearance="outline" class="w-100">
     <mat-label>Neighbourhood</mat-label>
-    <!-- <mat-select formControlName="nrd" multiple (selectionChange)="onNRDChange()">
-      <mat-option *ngFor="let n of nrdList" [value]="n">
-        {{ n }}
-      </mat-option>
-    </mat-select> -->
-
     <mat-select formControlName="nrd" multiple (selectionChange)="onNRDChange()">
   <mat-option *ngFor="let n of nrdList" [value]="n">
     {{ n }}
@@ -41,6 +50,30 @@
   </mat-form-field>
 </div>
 
+                <div class="col-12 col-md-2">
+  <mat-form-field appearance="outline" class="w-100">
+    <mat-label>Status</mat-label>
+        <mat-select formControlName="status" multiple (selectionChange)="onStatusChange()">
+      <mat-option value="ALL">All</mat-option>
+      <mat-option value="Active">Active</mat-option>
+      <mat-option value="Inactive">Inactive</mat-option>
+      <mat-option value="Deleted">Deleted</mat-option>
+      <mat-option value="InvalidFormat">Not Genuine Number</mat-option>
+    </mat-select>
+  </mat-form-field>
+</div>
+
+        <div class="col-12 col-md-2">
+  <mat-form-field appearance="outline" class="w-100">
+    <mat-label>Vehicle Type</mat-label>
+        <mat-select formControlName="vehicleTypeFilter" multiple (selectionChange)="onVehicleTypeChange()">
+      <mat-option value="ALL">All</mat-option>
+      <mat-option value="Two Wheeler">Two Wheeler</mat-option>
+      <mat-option value="Four Wheeler">Four Wheeler</mat-option>
+      <mat-option value="Other">Other</mat-option>
+    </mat-select>
+  </mat-form-field>
+</div>
 
     <!-- Search By -->
     <div class="col-12 col-md-2">
@@ -146,9 +179,15 @@
           </span>
         </th>
 
-        <th (click)="sortColumn('createdon')">
+               <th (click)="sortColumn('createdon')">
           Created On
           <span *ngIf="getSortColumn() === 'createdon'">
+            {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
+          </span>
+        </th>
+        <th (click)="sortColumn('status')">
+          Status
+          <span *ngIf="getSortColumn() === 'status'">
             {{ getSortDirection() === 'asc' ? '▲' : '▼' }}
           </span>
         </th>
@@ -170,7 +209,8 @@
         <td>{{ e.tagUID || '-' }}</td>
         <td>{{ e.stickerNo || '-' }}</td>
         <!-- <td>{{ e.createdon || '-' }}</td> -->
-         <td>{{ e.createdon ? (e.createdon | date:'yyyy-MM-dd') : '-' }}</td>
+                  <td>{{ e.createdon ? (e.createdon | date:'yyyy-MM-dd') : '-' }}</td>
+        <td>{{ e.status || '-' }}</td>
       </tr>
     </tbody>
   </table>

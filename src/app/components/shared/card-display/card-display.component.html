@@ -1,0 +1,73 @@
+<div class="real-card" *ngIf="card">
+
+  <!-- CONTRACTOR -->
+  <ng-container *ngIf="card.holderType === 'Contractor' && contractorTemplate">
+    <img class="real-card__bg" [src]="contractorTemplate" alt="contractor template" />
+    <div class="real-card__photo-overlay"
+         [style.top]="currentCardPhotoStyle['top']"
+         [style.left]="currentCardPhotoStyle['left']"
+         [style.width]="currentCardPhotoStyle['width']"
+         [style.height]="currentCardPhotoStyle['height']"
+         [style.position]="'absolute'">
+      <img *ngIf="photoUrl" [src]="photoUrl" class="real-card__photo-img" />
+      <div *ngIf="!photoUrl" class="real-card__photo-placeholder">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="1">
+          <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+        </svg>
+      </div>
+    </div>
+ <ng-container *ngFor="let key of activeTextFields">
+      <div [style.position]="'absolute'"
+           [style.left.%]="textFields[key]?.x"
+           [style.top.%]="textFields[key]?.y"
+           [style.transform]="'translate(-50%,-50%)'"
+           [style.color]="textFields[key]?.color"
+           [style.font-weight]="textFields[key]?.bold ? 'bold' : 'normal'"
+           [style.font-size.px]="textFields[key]?.size * 160"
+           [style.white-space]="'nowrap'"
+           [style.pointer-events]="'none'">
+        {{ getFieldValue(key) }}
+      </div>
+    </ng-container>
+  </ng-container>
+
+  <!-- PRE-PRINTED non-contractor -->
+  <ng-container *ngIf="card.holderType !== 'Contractor'">
+    <img class="real-card__bg" [src]="currentCardTemplate" alt="card template" />
+    <div class="real-card__photo-overlay"
+         [style.top]="currentCardPhotoStyle['top']"
+         [style.left]="currentCardPhotoStyle['left']"
+         [style.width]="currentCardPhotoStyle['width']"
+         [style.height]="currentCardPhotoStyle['height']"
+         [style.position]="'absolute'">
+      <img *ngIf="photoUrl" [src]="photoUrl" class="real-card__photo-img" alt="photo" />
+      <div *ngIf="!photoUrl" class="real-card__photo-placeholder">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="1">
+          <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+        </svg>
+      </div>
+    </div>
+    <ng-container *ngFor="let key of activeTextFields">
+      <div [style.position]="'absolute'"
+           [style.left.%]="textFields[key]?.x"
+           [style.top.%]="textFields[key]?.y"
+           [style.transform]="'translate(-50%,-50%)'"
+           [style.color]="textFields[key]?.color"
+           [style.font-weight]="textFields[key]?.bold ? 'bold' : 'normal'"
+           [style.font-size.px]="textFields[key]?.size * 160"
+           [style.white-space]="'nowrap'"
+           [style.pointer-events]="'none'">
+        {{ getFieldValue(key) }}
+      </div>
+    </ng-container>
+  </ng-container>
+</div>
+
+<!-- Empty state -->
+<div class="real-card-empty" *ngIf="!card">
+  <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" opacity="0.3">
+    <rect x="2" y="5" width="20" height="14" rx="2"/>
+    <line x1="2" y1="10" x2="22" y2="10"/>
+  </svg>
+  <p>Select a member<br/>to preview card</p>
+</div>

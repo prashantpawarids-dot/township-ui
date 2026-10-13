@@ -130,11 +130,23 @@ return;
 
 
 
-  getProjects() {
-    this.projectOptions = [{
-      name: 'Riverview City',
-      siteId: 1,
-    }]
+  // getProjects() {
+  //   this.projectOptions = [{
+  //     name: 'Riverview City',
+  //     siteId: 1,
+  //   }]
+  // }
+
+getProjects() {
+    this.authService.getNeighbourhood().subscribe({
+      next: (res: any[]) => {
+        this.projectOptions = (res ?? []).map(n => ({
+          name: n.name,
+          siteId: n.id
+        }));
+      },
+      error: () => { this.projectOptions = []; }
+    });
   }
 
   tenantType(event:any) {
@@ -219,20 +231,26 @@ onServiceTypeChange(event: any): void {
 // }
 
 //old get neighbourhood
+// getNeighbourhood() {
+//   this.authService.getNeighbourhood().subscribe(res => {
+//     this.neighbourhoodOptions = res || [];
+
+//     if (
+//       this.isContractor &&
+//       !this.landOwner.neighbourhood &&   // null/undefined = new record
+//       this.neighbourhoodOptions.length > 0
+//     ) {
+//       this.landOwner.neighbourhood = this.neighbourhoodOptions[0].id; // ✅ set default
+//     }
+//   });
+// }
+
+
 getNeighbourhood() {
   this.authService.getNeighbourhood().subscribe(res => {
     this.neighbourhoodOptions = res || [];
-
-    if (
-      this.isContractor &&
-      !this.landOwner.neighbourhood &&   // null/undefined = new record
-      this.neighbourhoodOptions.length > 0
-    ) {
-      this.landOwner.neighbourhood = this.neighbourhoodOptions[0].id; // ✅ set default
-    }
   });
 }
-
 // Update getBuildings() to store all buildings
 getBuildings() {
   this.authService.getBuildings().subscribe(res => {
